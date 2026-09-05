@@ -219,7 +219,7 @@ export default function BeyondTheClassroom() {
                 className="absolute inset-0 origin-left scale-x-0 bg-primary-700 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
               />
 
-              <div className="relative grid min-h-[150px] items-center gap-6 px-1 py-8 lg:px-4 sm:grid-cols-[80px_1fr_auto] sm:gap-8 sm:py-10 lg:min-h-[180px] lg:grid-cols-[100px_1fr_0.7fr_auto] lg:gap-10">
+              <div className="relative grid min-h-[150px] items-center gap-6 px-2 py-8 lg:px-8 sm:grid-cols-[80px_1fr_auto] sm:gap-8 sm:py-10 lg:min-h-[180px] lg:grid-cols-[100px_1fr_0.7fr_auto] lg:gap-10">
                 {/* Number */}
                 <span className="text-xs font-black tracking-[0.2em] text-gray-300 transition-colors duration-300 group-hover:text-white/40">
                   {outcome.number}

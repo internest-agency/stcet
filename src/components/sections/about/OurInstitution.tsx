@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { FaQuoteRight } from "react-icons/fa";
 
 import Container from "../../ui/Container";
 
@@ -265,7 +266,7 @@ export default function OurInstitution() {
             aria-hidden="true"
             className="pointer-events-none absolute -right-3 -top-10 select-none text-[11rem] font-black leading-none tracking-[-0.08em] text-white/[0.045] sm:-right-5 sm:-top-14 sm:text-[15rem] lg:text-[19rem]"
           >
-            01
+            <FaQuoteRight />
           </span>
 
           {/* Accent line */}

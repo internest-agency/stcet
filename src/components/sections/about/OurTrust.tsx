@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { FaQuoteRight } from "react-icons/fa";
 
 import Container from "../../ui/Container";
 
@@ -163,7 +164,7 @@ export default function OurTrust() {
 
   return (
     <section ref={sectionRef} className="overflow-hidden bg-white">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="pt-20 sm:pt-24 lg:pt-32">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}
@@ -236,38 +237,7 @@ export default function OurTrust() {
             </article>
           ))}
         </div>
-
-        {/* -------------------------------------------------
-            CLOSING STATEMENT
-        ------------------------------------------------- */}
-        <div className="relative mt-16 border-l-4 border-accent-400 bg-gray-50 px-7 py-8 sm:mt-20 sm:px-10 sm:py-10 lg:mt-24 lg:ml-[100px] lg:px-12 lg:py-12">
-          <span
-            aria-hidden="true"
-            className="absolute right-6 top-3 select-none text-7xl font-black leading-none tracking-[-0.08em] text-primary-700/[0.04] sm:right-8 sm:text-8xl"
-          >
-            04
-          </span>
-
-          <div className="relative z-10">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-accent-400" />
-
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                Our Purpose
-              </span>
-            </div>
-
-            <p className="max-w-4xl text-xl font-extrabold leading-8 tracking-[-0.02em] text-primary-700 sm:text-2xl sm:leading-9 lg:text-3xl lg:leading-10">
-              Creating educational opportunities that help students build
-              confidence, discover their potential and prepare for successful
-              futures.
-            </p>
-          </div>
-        </div>
       </Container>
-
-      {/* Section transition */}
-      <div className="h-px w-full bg-gray-200" />
     </section>
   );
 }

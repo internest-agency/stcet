@@ -179,7 +179,7 @@ export default function GoverningCouncil() {
 
   return (
     <section ref={sectionRef} className="overflow-hidden bg-white">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="pt-20  sm:pt-24 lg:pt-32">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}
@@ -292,21 +292,7 @@ export default function GoverningCouncil() {
             ))}
           </div>
         </div>
-
-        {/* -------------------------------------------------
-            CLOSING STATEMENT
-        ------------------------------------------------- */}
-        <div className="mt-14 border-l-2 border-primary-700 pl-6 sm:mt-16 sm:pl-8 lg:mt-20">
-          <p className="max-w-3xl text-base font-semibold leading-7 text-gray-700 sm:text-lg sm:leading-8">
-            Guided by diverse perspectives and experience, the Governing Council
-            supports the institution&apos;s commitment to academic quality,
-            professional development and responsible education.
-          </p>
-        </div>
       </Container>
-
-      {/* Bottom transition */}
-      <div className="h-px w-full bg-gray-200" />
     </section>
   );
 }
