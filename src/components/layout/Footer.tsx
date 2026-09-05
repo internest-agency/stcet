@@ -183,25 +183,8 @@ export default function Footer() {
       {/* Copyright */}
       <div className="relative z-10 border-t border-white/15">
         <Container className="py-5 text-white">
-          <div className="flex flex-col gap-3 text-center text-sm text-white/70 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          <div className="text-center text-sm text-white/70 sm:flex-row items-center">
             <p>&copy; {new Date().getFullYear()} STCET. All rights reserved.</p>
-
-            <p className="flex items-center justify-center gap-1.5 sm:justify-end">
-              <span>Made with</span>
-
-              <IoHeart className="text-red-500" aria-hidden="true" />
-
-              <span>by</span>
-
-              <Link
-                href="https://www.example.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-white transition-colors duration-200 hover:text-accent-300"
-              >
-                Example
-              </Link>
-            </p>
           </div>
         </Container>
       </div>

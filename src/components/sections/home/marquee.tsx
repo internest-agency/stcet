@@ -3,9 +3,9 @@ import { GiCheckMark } from "react-icons/gi";
 
 export default function MarqueeSection() {
   return (
-    <section className="bg-primary-0 dark:bg-primary-0 text-white dark:text-white">
+    <section className="bg-primary-0 dark:bg-primary-0">
       <Marquee
-        className="text-xl py-4 text-center uppercase font-semibold text-gray-900 dark:text-gray-100"
+        className="text-xl py-4 text-center uppercase font-semibold text-gray-900"
         speed={100}
         direction="left"
         pauseOnHover={true}
