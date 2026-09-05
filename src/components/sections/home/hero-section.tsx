@@ -135,7 +135,7 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen overflow-hidden"
+      className="relative h-[500] lg:h-screen overflow-hidden"
       aria-labelledby="hero-heading"
     >
       {/* Background */}
