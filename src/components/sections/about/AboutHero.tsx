@@ -16,15 +16,20 @@ export default function AboutHero() {
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
-      const eyebrow = sectionRef.current?.querySelector(".about-hero-eyebrow");
-      const heading = sectionRef.current?.querySelector(".about-hero-heading");
-      const description = sectionRef.current?.querySelector(
-        ".about-hero-description",
-      );
-      const image = sectionRef.current?.querySelector(".about-hero-image");
-      const meta = sectionRef.current?.querySelector(".about-hero-meta");
+      const section = sectionRef.current;
 
-      if (!heading) return;
+      if (!section) return;
+
+      const eyebrow = section.querySelector(".about-hero-eyebrow");
+      const heading = section.querySelector(".about-hero-heading");
+      const description = section.querySelector(".about-hero-description");
+      const image = section.querySelector(".about-hero-image");
+      const meta = section.querySelector(".about-hero-meta");
+
+      // Make sure all required animation targets exist.
+      if (!eyebrow || !heading || !description || !image || !meta) {
+        return;
+      }
 
       const split = SplitText.create(heading, {
         type: "lines",
@@ -104,7 +109,9 @@ export default function AboutHero() {
         );
     }, sectionRef);
 
-    return () => context.revert();
+    return () => {
+      context.revert();
+    };
   }, []);
 
   return (
@@ -123,6 +130,7 @@ export default function AboutHero() {
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-16 xl:gap-24">
           {/* Content */}
           <div className="max-w-3xl">
+            {/* Eyebrow */}
             <div className="about-hero-eyebrow mb-5 inline-flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-accent-400" />
 
@@ -131,12 +139,14 @@ export default function AboutHero() {
               </span>
             </div>
 
-            <h1 className="about-hero-heading max-w-3xl text-2xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl md:text-4xl lg:text-5xl uppercase">
+            {/* Heading */}
+            <h1 className="about-hero-heading max-w-3xl text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl md:text-4xl lg:text-5xl">
               Building Foundations
               <br />
               for a Better Future.
             </h1>
 
+            {/* Description */}
             <p className="about-hero-description mt-7 max-w-2xl text-base leading-7 text-gray-600 sm:mt-8 sm:text-lg sm:leading-8">
               S. Thangapazham College of Engineering and Technology was
               established with a clear vision to provide quality technical
@@ -144,11 +154,13 @@ export default function AboutHero() {
               required to succeed in a rapidly evolving world.
             </p>
 
+            {/* Meta */}
             <div className="about-hero-meta mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-gray-200 pt-6 sm:mt-10">
               <div>
                 <p className="text-2xl font-extrabold tracking-tight text-primary-700">
                   2026–27
                 </p>
+
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-500">
                   Academic Journey
                 </p>
@@ -160,6 +172,7 @@ export default function AboutHero() {
                 <p className="text-2xl font-extrabold tracking-tight text-primary-700">
                   05
                 </p>
+
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-gray-500">
                   Engineering Programmes
                 </p>
