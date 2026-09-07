@@ -189,7 +189,7 @@ export default function AboutHero() {
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover object-center"
+                className="object-cover object-[30%_50%]"
               />
 
               {/* Image overlay */}
