@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
@@ -14,41 +15,49 @@ const councilMembers = [
     number: "01",
     name: "Shri.Murugesan T",
     role: "Chairman",
+    image: "/images/council/murugesan-t.jpg",
   },
   {
     number: "02",
     name: "Shri.Balakrishnan G",
     role: "Trust Nominee",
+    image: "/images/council/balakrishnan-g.jpg",
   },
   {
     number: "03",
     name: "Shri.Murugaiah A",
     role: "Trust Nominee",
+    image: "/images/council/murugaiah-a.jpg",
   },
   {
     number: "04",
     name: "Shri.Tamil Veeran R",
     role: "Academic Expert",
+    image: "/images/council/tamil-veeran-r.jpg",
   },
   {
     number: "05",
     name: "Shri.Bala Murugan C",
     role: "Academic Expert",
+    image: "/images/council/bala-murugan-c.jpg",
   },
   {
     number: "06",
     name: "Prof.Dr.Manikandan V",
     role: "Faculty from Affiliated College",
+    image: "/images/council/manikandan-v.jpg",
   },
   {
     number: "07",
     name: "Shri.Rajkumar C",
     role: "Industrial Expert",
+    image: "/images/council/rajkumar-c.jpg",
   },
   {
     number: "08",
     name: "Prof.Dr.Sundaram M",
     role: "Member Secretary (ex-officio)",
+    image: "/images/council/sundaram-m.jpg",
   },
 ];
 
@@ -57,21 +66,21 @@ export default function GoverningCouncil() {
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
-      const eyebrow = sectionRef.current?.querySelector(
-        ".council-eyebrow",
-      ) as HTMLElement | null;
+      const section = sectionRef.current;
 
-      const heading = sectionRef.current?.querySelector(
-        ".council-heading",
-      ) as HTMLElement | null;
+      if (!section) return;
 
-      const intro = sectionRef.current?.querySelector(
-        ".council-intro",
-      ) as HTMLElement | null;
+      const eyebrow = section.querySelector(".council-eyebrow");
+      const heading = section.querySelector(".council-heading");
+      const intro = section.querySelector(".council-intro");
+      const cards = gsap.utils.toArray<HTMLElement>(".council-card");
 
-      const rows = gsap.utils.toArray<HTMLElement>(".council-row");
+      /*
+       * --------------------------------------------------
+       * INTRO ANIMATION
+       * --------------------------------------------------
+       */
 
-      // Eyebrow
       if (eyebrow) {
         ScrollTrigger.create({
           trigger: eyebrow,
@@ -95,7 +104,6 @@ export default function GoverningCouncil() {
         });
       }
 
-      // Heading
       if (heading) {
         const split = SplitText.create(heading, {
           type: "lines",
@@ -124,7 +132,6 @@ export default function GoverningCouncil() {
         });
       }
 
-      // Intro
       if (intro) {
         ScrollTrigger.create({
           trigger: intro,
@@ -148,27 +155,56 @@ export default function GoverningCouncil() {
         });
       }
 
-      // Council rows
-      rows.forEach((row, index) => {
+      /*
+       * --------------------------------------------------
+       * COUNCIL CARD ANIMATION
+       * --------------------------------------------------
+       */
+
+      cards.forEach((card) => {
+        const image = card.querySelector(".council-card-image");
+        const content = card.querySelector(".council-card-content");
+
+        const elements = [image, content].filter(
+          (element): element is Element => Boolean(element),
+        );
+
         ScrollTrigger.create({
-          trigger: row,
-          start: "top 92%",
+          trigger: card,
+          start: "top 88%",
           once: true,
           onEnter: () => {
             gsap.fromTo(
-              row,
+              card,
               {
                 opacity: 0,
-                y: 20,
+                y: 40,
               },
               {
                 opacity: 1,
                 y: 0,
-                duration: 0.65,
-                delay: index * 0.04,
+                duration: 0.8,
                 ease: "power3.out",
               },
             );
+
+            if (elements.length) {
+              gsap.fromTo(
+                elements,
+                {
+                  opacity: 0,
+                  y: 20,
+                },
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.7,
+                  stagger: 0.08,
+                  delay: 0.12,
+                  ease: "power3.out",
+                },
+              );
+            }
           },
         });
       });
@@ -178,18 +214,18 @@ export default function GoverningCouncil() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="overflow-hidden bg-white">
-      <Container className="pt-20  sm:pt-24 lg:pt-32">
-        {/* -------------------------------------------------
+    <section ref={sectionRef} className="overflow-hidden bg-gray-0">
+      <Container className="pt-20 sm:pt-24 lg:pt-32">
+        {/* =================================================
             INTRO
-        ------------------------------------------------- */}
-        <div className="grid gap-10 lg:grid-cols-[0.80fr_1.25fr] lg:gap-20 xl:gap-28">
+        ================================================= */}
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 xl:gap-28">
           {/* Heading */}
           <div>
             <div className="council-eyebrow mb-6 flex items-center gap-3">
               <span
-                className="h-2 w-2 rounded-full bg-accent-400"
                 aria-hidden="true"
+                className="h-2 w-2 rounded-full bg-accent-400"
               />
 
               <span className="text-xs font-bold uppercase tracking-[0.22em] text-primary-700">
@@ -197,8 +233,10 @@ export default function GoverningCouncil() {
               </span>
             </div>
 
-            <h2 className="council-heading max-w-md text-2xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl lg:text-5xl uppercase">
-              Leadership with purpose.
+            <h2 className="council-heading max-w-md text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-4xl lg:text-5xl">
+              Leadership
+              <br />
+              with purpose.
             </h2>
           </div>
 
@@ -213,84 +251,78 @@ export default function GoverningCouncil() {
           </div>
         </div>
 
-        {/* -------------------------------------------------
-            COUNCIL DIRECTORY
-        ------------------------------------------------- */}
-        <div className="mt-16 sm:mt-20 lg:mt-24">
-          {/* Desktop heading */}
-          <div className="hidden border-y border-gray-200 py-4 sm:grid sm:grid-cols-[72px_1fr_280px_auto] sm:gap-8 lg:grid-cols-[100px_1fr_280px_auto] lg:gap-10">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-              No.
-            </span>
-
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-              Council Member
-            </span>
-
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-              Role
-            </span>
-
-            <span />
-          </div>
-
-          <div className="border-t border-gray-200 sm:border-t-0">
-            {councilMembers.map((member) => (
-              <article
-                key={member.number}
-                className="council-row group relative overflow-hidden border-b border-gray-200 py-7 sm:py-8 lg:py-9"
-              >
-                {/* Hover background */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 origin-left scale-x-0 bg-gray-50 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
+        {/* =================================================
+            COUNCIL GRID
+        ================================================= */}
+        <div className="mt-16 grid grid-cols-1 gap-x-6 gap-y-12 sm:mt-20 sm:grid-cols-2 sm:gap-y-14 lg:mt-24 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-16">
+          {councilMembers.map((member) => (
+            <article key={member.number} className="council-card group">
+              {/* Image */}
+              <div className="council-card-image relative aspect-[4/5] overflow-hidden bg-primary-800">
+                <Image
+                  src={member.image}
+                  alt={member.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                 />
 
-                {/* Bottom accent */}
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-900/80 via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+
+                {/* Number */}
                 <span
                   aria-hidden="true"
-                  className="absolute bottom-0 left-0 z-10 h-0.5 w-0 bg-accent-400 transition-all duration-500 ease-out group-hover:w-full"
-                />
+                  className="absolute left-5 top-5 text-xs font-black tracking-[0.2em] text-white/60 transition-colors duration-300 group-hover:text-white sm:left-6 sm:top-6"
+                >
+                  {member.number}
+                </span>
 
-                <div className="relative grid gap-5 sm:grid-cols-[72px_1fr_auto] sm:items-center sm:gap-8 lg:grid-cols-[100px_1fr_280px_auto] lg:gap-10">
-                  {/* Number */}
-                  <div className="flex items-start">
-                    <span className="text-sm font-black tracking-[0.18em] text-gray-300 transition-colors duration-300 group-hover:text-primary-700">
-                      {member.number}
-                    </span>
-                  </div>
+                {/* Role */}
+                <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6">
+                  <div className="flex items-start gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400"
+                    />
 
-                  {/* Name */}
-                  <div>
-                    <p className="text-xl font-extrabold tracking-[-0.02em] text-gray-900 transition-transform duration-300 ease-out group-hover:translate-x-1 sm:text-2xl lg:text-3xl">
-                      {member.name}
-                    </p>
-                  </div>
-
-                  {/* Role */}
-                  <div>
-                    <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-gray-400 transition-colors duration-300 group-hover:text-primary-700">
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-accent-400"
-                      />
+                    <span className="text-[10px] font-bold uppercase leading-4 tracking-[0.14em] text-white/75">
                       {member.role}
                     </span>
                   </div>
+                </div>
+
+                {/* Bottom Accent */}
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-0 left-0 h-1 w-0 bg-accent-400 transition-all duration-500 ease-out group-hover:w-full"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="council-card-content relative border-b border-gray-200 py-5 sm:py-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-extrabold leading-tight tracking-[-0.02em] text-gray-900 transition-transform duration-300 ease-out group-hover:translate-x-1 sm:text-xl">
+                      {member.name}
+                    </h3>
+
+                    <p className="mt-2 text-[10px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
+                      {member.role}
+                    </p>
+                  </div>
 
                   {/* Indicator */}
-                  <div className="absolute right-0 top-1/2 hidden -translate-y-1/2 sm:block">
-                    <span
-                      aria-hidden="true"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 transition-all duration-500 ease-out group-hover:border-primary-700 group-hover:bg-primary-700"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary-700 transition-transform duration-300 group-hover:scale-150 group-hover:bg-white" />
-                    </span>
-                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 transition-all duration-500 group-hover:border-primary-700 group-hover:bg-primary-700"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary-700 transition-all duration-300 group-hover:scale-150 group-hover:bg-white" />
+                  </span>
                 </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </article>
+          ))}
         </div>
       </Container>
     </section>

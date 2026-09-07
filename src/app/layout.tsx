@@ -3,8 +3,9 @@ import { Josefin_Sans, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "@/src/components/layout/Header";
 import Footer from "@/src/components/layout/Footer";
-import Button from "../components/ui/Button";
-import { FaArrowRight } from "react-icons/fa6";
+import GoToTop from "../components/ui/GoToTop";
+import WhatsAppChat from "../components/ui/WhatsAppChat";
+import EnquireNow from "../components/ui/EnquireNow";
 
 const josefinSans = Josefin_Sans({
   variable: "--font-josefin-sans",
@@ -31,6 +32,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         <main>{children}</main>
         <Footer />
+        <GoToTop />
+        <WhatsAppChat phoneNumber="919600312030" />
+        <EnquireNow />
       </body>
     </html>
   );

@@ -2,159 +2,134 @@
 
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+gsap.registerPlugin(SplitText);
 
 export default function ChairmansMessage() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
-      const eyebrow = sectionRef.current?.querySelector(
-        ".chairman-eyebrow",
-      ) as HTMLElement | null;
+      const section = sectionRef.current;
 
-      const heading = sectionRef.current?.querySelector(
-        ".chairman-heading",
-      ) as HTMLElement | null;
+      if (!section) return;
 
-      const quote = sectionRef.current?.querySelector(
-        ".chairman-quote",
-      ) as HTMLElement | null;
+      const eyebrow = section.querySelector(".chairman-eyebrow");
+      const heading = section.querySelector(".chairman-heading");
+      const quote = section.querySelector(".chairman-quote");
+      const paragraphs = section.querySelectorAll(".chairman-paragraph");
+      const signature = section.querySelector(".chairman-signature");
+      const image = section.querySelector(".chairman-image");
 
-      const paragraphs = gsap.utils.toArray<HTMLElement>(".chairman-paragraph");
-
-      const signature = sectionRef.current?.querySelector(
-        ".chairman-signature",
-      ) as HTMLElement | null;
-
-      if (heading) {
-        const split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        ScrollTrigger.create({
-          trigger: heading,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              split.lines,
-              {
-                yPercent: 100,
-              },
-              {
-                yPercent: 0,
-                duration: 0.9,
-                stagger: 0.08,
-                ease: "power4.out",
-              },
-            );
-          },
-        });
+      if (!eyebrow || !heading || !quote || !signature || !image) {
+        return;
       }
 
-      if (eyebrow) {
-        ScrollTrigger.create({
-          trigger: eyebrow,
-          start: "top 90%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              eyebrow,
-              {
-                opacity: 0,
-                y: 15,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: "power3.out",
-              },
-            );
-          },
-        });
-      }
-
-      if (quote) {
-        ScrollTrigger.create({
-          trigger: quote,
-          start: "top 88%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              quote,
-              {
-                opacity: 0,
-                y: 30,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-              },
-            );
-          },
-        });
-      }
-
-      paragraphs.forEach((paragraph, index) => {
-        ScrollTrigger.create({
-          trigger: paragraph,
-          start: "top 92%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              paragraph,
-              {
-                opacity: 0,
-                y: 20,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.7,
-                delay: index * 0.05,
-                ease: "power3.out",
-              },
-            );
-          },
-        });
+      const split = SplitText.create(heading, {
+        type: "lines",
+        mask: "lines",
+        autoSplit: true,
       });
 
-      if (signature) {
-        ScrollTrigger.create({
-          trigger: signature,
-          start: "top 90%",
+      const tl = gsap.timeline({
+        defaults: {
+          ease: "power4.out",
+        },
+        scrollTrigger: {
+          trigger: section,
+          start: "top 75%",
           once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              signature,
-              {
-                opacity: 0,
-                y: 20,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.7,
-                ease: "power3.out",
-              },
-            );
+        },
+      });
+
+      tl.fromTo(
+        image,
+        {
+          opacity: 0,
+          y: 30,
+          scale: 0.98,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.9,
+        },
+        0,
+      )
+        .fromTo(
+          eyebrow,
+          {
+            opacity: 0,
+            y: 15,
           },
-        });
-      }
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+          },
+          0.15,
+        )
+        .fromTo(
+          split.lines,
+          {
+            yPercent: 100,
+          },
+          {
+            yPercent: 0,
+            duration: 0.9,
+            stagger: 0.08,
+          },
+          0.25,
+        )
+        .fromTo(
+          quote,
+          {
+            opacity: 0,
+            y: 25,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+          },
+          0.45,
+        )
+        .fromTo(
+          paragraphs,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.12,
+          },
+          0.6,
+        )
+        .fromTo(
+          signature,
+          {
+            opacity: 0,
+            y: 15,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+          },
+          0.85,
+        );
     }, sectionRef);
 
-    return () => context.revert();
+    return () => {
+      context.revert();
+    };
   }, []);
 
   return (
@@ -185,7 +160,7 @@ export default function ChairmansMessage() {
               </span>
             </div>
 
-            <h2 className="chairman-heading max-w-md text-2xl font-extrabold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-5xl uppercase">
+            <h2 className="chairman-heading max-w-md mb-6 text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-5xl">
               Education is
               <br />
               more than
@@ -193,9 +168,35 @@ export default function ChairmansMessage() {
               knowledge.
             </h2>
 
+            {/* Chairman Image Placeholder */}
+            <div className="chairman-image relative mb-8 aspect-[4/5] max-w-sm overflow-hidden bg-primary-700/40">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:h-32 sm:w-32">
+                    <span className="text-4xl font-black tracking-tight text-white/20 sm:text-5xl">
+                      ST
+                    </span>
+                  </div>
+
+                  <p className="mt-6 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                    Chairman
+                  </p>
+
+                  <p className="mt-2 text-sm font-semibold text-white/60">
+                    Thiru. S. Thangapazham
+                  </p>
+                </div>
+              </div>
+
+              {/* Accent line */}
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-0 h-1 w-24 bg-accent-400"
+              />
+            </div>
+
             {/* Decorative line */}
-            <div className="mt-8 flex items-center gap-3">
-              <span className="h-px w-12 bg-accent-400" />
+            <div className="mt-8">
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-white/40">
                 A message from our Chairman
               </span>

@@ -313,7 +313,7 @@ export default function DepartmentsSection() {
         </div>
 
         <div>
-          <p className="departments-intro lg:text-right text-primary-800">
+          <p className="departments-intro lg:text-left text-primary-800">
             STCET offers undergraduate programmes in{" "}
             <strong>
               Computer Science and Engineering, CSE with Artificial Intelligence
@@ -388,6 +388,17 @@ export default function DepartmentsSection() {
               </button>
             );
           })}
+
+          <div className="hero-cta mt-4">
+            <Button
+              href="/admissions"
+              variant="primary"
+              size="md"
+              rightIcon={<FaCircleArrowRight />}
+            >
+              Enquire Now
+            </Button>
+          </div>
         </div>
 
         {/* ----------------------------------------

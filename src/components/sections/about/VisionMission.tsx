@@ -234,6 +234,13 @@ export default function VisionMission() {
               professionals who contribute meaningfully to society and address
               the challenges of a changing world.
             </p>
+            {/* Decorative quote */}
+            <span
+              aria-hidden="true"
+              className="absolute -right-5 -bottom-0 text-[7rem] font-black leading-none text-white/[0.06] sm:-right-0 sm:-bottom-28 sm:text-[10rem]"
+            >
+              &rdquo;
+            </span>
           </div>
         </div>
 

@@ -184,12 +184,12 @@ export default function AboutHero() {
           <div className="about-hero-image relative overflow-hidden">
             <div className="relative aspect-[4/5] overflow-hidden bg-gray-100 sm:aspect-[5/6] lg:aspect-[4/5]">
               <Image
-                src="/images/gallery/stcet-engineering-block-entrance.jpg"
+                src="/images/hero-section-image.jpg"
                 alt="S. Thangapazham College of Engineering and Technology"
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover"
+                className="object-cover object-center"
               />
 
               {/* Image overlay */}

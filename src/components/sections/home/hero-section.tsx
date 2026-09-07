@@ -140,7 +140,7 @@ export default function HeroSection() {
     >
       {/* Background */}
       <div
-        className="hero-background absolute inset-0 bg-[url('/images/hero-section-image.png')] bg-cover bg-center bg-no-repeat"
+        className="hero-background absolute inset-0 bg-[url('/images/hero-section-image.jpg')] bg-cover bg-center bg-no-repeat"
         aria-hidden="true"
       />
 
@@ -154,7 +154,7 @@ export default function HeroSection() {
       <Container className="relative z-10 flex h-full max-w-3xl flex-col items-center justify-end py-20 text-center">
         {/* Eyebrow */}
         <p className="hero-eyebrow mb-1 text-sm uppercase font-bold tracking-widest text-accent-400">
-          An AICTE Approved Engineering College
+          AICTE Approved, Anna University Affiliated​
         </p>
 
         {/* Heading */}
@@ -176,7 +176,7 @@ export default function HeroSection() {
             size="md"
             rightIcon={<FaCircleArrowRight />}
           >
-            Start Your Journey
+            Enquire Now
           </Button>
         </div>
       </Container>

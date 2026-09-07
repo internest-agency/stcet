@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import Button from "../../ui/Button";
+import { FaCircleArrowRight } from "react-icons/fa6";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -225,13 +227,23 @@ export default function WhyChooseSection() {
               </h2>
 
               {/* Intro */}
-              <div className="why-choose-intro mt-8 max-w-lg">
+              <div className="why-choose-intro my-8 max-w-lg">
                 <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8">
                   At S. Thangapazham College of Engineering and Technology
                   (STCET), we believe engineering education is essentially about
                   building knowledge, confidence, skills and a vision for the
                   future.
                 </p>
+              </div>
+              <div className="hero-cta">
+                <Button
+                  href="/admissions"
+                  variant="primary"
+                  size="md"
+                  rightIcon={<FaCircleArrowRight />}
+                >
+                  Enquire Now
+                </Button>
               </div>
             </div>
           </div>

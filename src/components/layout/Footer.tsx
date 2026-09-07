@@ -2,7 +2,11 @@ import Container from "../ui/Container";
 import Link from "next/link";
 import { FiPhoneCall } from "react-icons/fi";
 import { BsEnvelope } from "react-icons/bs";
-import { IoHeart } from "react-icons/io5";
+import { FaFacebook } from "react-icons/fa";
+import { PiInstagramLogoFill } from "react-icons/pi";
+import { FaYoutube } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -20,7 +24,8 @@ export default function Footer() {
             </p>
 
             <address className="not-italic text-sm leading-7 text-white/80 sm:text-base">
-              S. Thangapazham College of Engineering and Technology,
+              S. Thangapazham College of <br />
+              Engineering and Technology,
               <br />
               Vasudevanallur, Tenkasi District,
               <br />
@@ -77,15 +82,6 @@ export default function Footer() {
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
                   Grievance Redressal Cell
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-white/80 transition-colors duration-200 hover:text-white"
-                >
-                  Privacy Policy
                 </Link>
               </li>
             </ul>
@@ -173,6 +169,63 @@ export default function Footer() {
                   />
 
                   <span>stcet2026@gmail.com</span>
+                </Link>
+              </li>
+            </ul>
+            <ul className="flex gap-4 mt-6 text-xl">
+              <li>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  <PiInstagramLogoFill
+                    className="shrink-0 text-accent-300"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  <FaYoutube
+                    className="shrink-0 text-accent-300"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  <FaFacebook
+                    className="shrink-0 text-accent-300"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  <FaLinkedin
+                    className="shrink-0 text-accent-300"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="flex items-center gap-3 text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  <FaXTwitter
+                    className="shrink-0 text-accent-300"
+                    aria-hidden="true"
+                  />
                 </Link>
               </li>
             </ul>
