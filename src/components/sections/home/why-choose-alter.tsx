@@ -228,11 +228,40 @@ export default function WhyChooseSection() {
 
               {/* Intro */}
               <div className="why-choose-intro my-8 max-w-lg">
-                <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8">
-                  At S. Thangapazham College of Engineering and Technology
-                  (STCET), we believe engineering education is essentially about
+                <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8 mb-4">
+                  At{" "}
+                  <b>
+                    S. Thangapazham College of Engineering and Technology
+                    (STCET)
+                  </b>
+                  , we believe engineering education is essentially about
                   building knowledge, confidence, skills and a vision for the
                   future.
+                </p>
+                <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8 mb-4">
+                  As an{" "}
+                  <b>
+                    AICTE-approved institution affiliated with Anna University
+                  </b>
+                  , STCET offers an{" "}
+                  <b>industry-oriented, student-centric learning environment</b>
+                  supported by experienced and dedicated faculty, well-equipped
+                  laboratories and exposure to emerging technologies such as
+                  <b>
+                    Artificial Intelligence, Machine Learning, IoT, Embedded
+                    Systems, Cloud Computing, Cybersecurity, Renewable Energy
+                    and Automation.
+                  </b>
+                </p>
+
+                <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8">
+                  Students benefit from placement training activities,
+                  personality development programmes, innovation and
+                  entrepreneurship support, technical activities, projects and
+                  opportunities to participate, compete and lead. With essential
+                  campus amenities, transportation and canteen facilities, STCET
+                  strives to create a supportive and engaging student
+                  experience.
                 </p>
               </div>
               <div className="hero-cta">
