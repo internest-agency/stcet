@@ -199,18 +199,15 @@ export default function Header({ overlay = false }: HeaderProps) {
             "
           >
             <Image
-              src="/images/logo.png"
+              src="/images/logo-transparent.png"
               alt="S. Thangapazham College of Engineering and Technology"
               width={80}
               height={40}
               priority
               className="
                 h-auto
-                w-[60px]
+                w-[76px]
                 sm:w-[76px]
-                bg-white/50
-                p-0.5
-                rounded
               "
             />
           </Link>

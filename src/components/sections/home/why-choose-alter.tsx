@@ -207,7 +207,7 @@ export default function WhyChooseSection() {
            * Sticky Introduction
            * -------------------------------- */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="max-w-xl">
+            <div className="max-w-2xl">
               {/* Eyebrow */}
               <div className="mb-6 flex items-center gap-4">
                 <span className="h-px w-10 bg-primary-700" />
@@ -227,7 +227,7 @@ export default function WhyChooseSection() {
               </h2>
 
               {/* Intro */}
-              <div className="why-choose-intro my-8 max-w-lg">
+              <div className="why-choose-intro my-8 max-w-2xl">
                 <p className="text-base leading-7 text-gray-600 md:text-lg md:leading-8 mb-4">
                   At{" "}
                   <b>

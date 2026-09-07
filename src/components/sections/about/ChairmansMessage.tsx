@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { SplitText } from "gsap/SplitText";
@@ -173,9 +174,13 @@ export default function ChairmansMessage() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:h-32 sm:w-32">
-                    <span className="text-4xl font-black tracking-tight text-white/20 sm:text-5xl">
-                      ST
-                    </span>
+                    <Image
+                      src="/images/gallery/user.png"
+                      width={120}
+                      height={120}
+                      alt="chairman-image"
+                      className="h-full w-full"
+                    />
                   </div>
 
                   <p className="mt-6 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">

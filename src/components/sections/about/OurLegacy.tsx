@@ -162,9 +162,7 @@ export default function OurLegacy() {
                   <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
                     01
                   </span>
-
-                  <span className="h-px w-8 bg-gray-300" />
-
+                  -
                   <span className="text-sm font-extrabold tracking-tight text-primary-700">
                     2010
                   </span>
@@ -194,9 +192,7 @@ export default function OurLegacy() {
                   <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
                     02
                   </span>
-
-                  <span className="h-px w-8 bg-gray-300" />
-
+                  -
                   <span className="text-sm font-extrabold tracking-tight text-primary-700">
                     The Trust
                   </span>
@@ -225,9 +221,7 @@ export default function OurLegacy() {
                   <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
                     03
                   </span>
-
-                  <span className="h-px w-8 bg-gray-300" />
-
+                  -
                   <span className="text-sm font-extrabold tracking-tight text-primary-700">
                     Today
                   </span>

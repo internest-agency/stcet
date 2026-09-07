@@ -155,7 +155,7 @@ export default function OurFounders() {
             {/* Image */}
             <div className="relative aspect-[4/4.5] overflow-hidden bg-gray-200 sm:aspect-[4/4] lg:aspect-auto lg:min-h-[560px]">
               <Image
-                src="/images/gallery/stcet-engineering-block-entrance.jpg"
+                src="/images/gallery/user.png"
                 alt="S. Thangapazham"
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"
@@ -278,7 +278,7 @@ export default function OurFounders() {
             {/* Image */}
             <div className="relative order-1 aspect-[4/4.5] overflow-hidden bg-gray-200 sm:aspect-[4/4] lg:order-2 lg:aspect-auto lg:min-h-[560px]">
               <Image
-                src="/images/gallery/stcet-engineering-block-entrance.jpg"
+                src="/images/gallery/user.png"
                 alt="S.T. Murugesan"
                 fill
                 sizes="(max-width: 1024px) 100vw, 40vw"

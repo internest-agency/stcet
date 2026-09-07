@@ -164,7 +164,7 @@ export default function OurTrust() {
 
   return (
     <section ref={sectionRef} className="overflow-hidden bg-white">
-      <Container className="pt-20 sm:pt-24 lg:pt-32">
+      <Container className="py-20 sm:py-24 lg:py-32">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}
@@ -236,6 +236,64 @@ export default function OurTrust() {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* -------------------------------------------------
+            CLOSING STATEMENT
+        ------------------------------------------------- */}
+        <div className="institution-statement group relative mt-16 overflow-hidden bg-primary-700 px-7 py-9 sm:mt-20 sm:px-10 sm:py-12 lg:mt-24 lg:px-14 lg:py-16">
+          {/* Decorative background number */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-3 -top-10 select-none text-[11rem] font-black leading-none tracking-[-0.08em] text-white/[0.045] sm:-right-5 sm:-top-14 sm:text-[15rem] lg:text-[19rem]"
+          >
+            <FaQuoteRight />
+          </span>
+
+          {/* Accent line */}
+          <span
+            aria-hidden="true"
+            className="absolute left-0 top-0 h-full w-1 bg-accent-400"
+          />
+
+          <div className="relative z-10 grid gap-8 lg:grid-cols-[140px_1fr] lg:gap-12">
+            {/* Label */}
+            <div>
+              <div className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 rounded-full bg-accent-400"
+                />
+
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+                  STCET
+                </span>
+              </div>
+
+              <span className="mt-4 block text-[10px] font-bold uppercase tracking-[0.18em] text-white/30">
+                Our Approach
+              </span>
+            </div>
+
+            {/* Statement */}
+            <div>
+              <p className="max-w-4xl text-xl font-semibold leading-8 tracking-[-0.015em] text-white sm:text-2xl sm:leading-9 lg:text-3xl lg:leading-10">
+                Our institution is committed to creating a learning environment
+                where students can develop the knowledge, skills and confidence
+                required to navigate an evolving engineering landscape and build
+                meaningful futures.
+              </p>
+
+              {/* Bottom detail */}
+              <div className="mt-8 flex items-center gap-4">
+                <span className="h-px w-10 bg-accent-400" />
+
+                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
+                  Learn · Innovate · Grow
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </Container>
     </section>

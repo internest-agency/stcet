@@ -211,7 +211,7 @@ export default function OurInstitution() {
           <div className="lg:pt-8">
             <p className="institution-description max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
               S. Thangapazham College of Engineering and Technology commenced
-              its academic journey in 2026–27 as a co-educational,
+              its academic journey in 2026 - 27 as a co-educational,
               self-financing engineering institution.
             </p>
 
