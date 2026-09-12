@@ -395,7 +395,7 @@ export default function GallerySection() {
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/10" />
 
               {/* Number */}
               <div className="absolute left-5 top-5">

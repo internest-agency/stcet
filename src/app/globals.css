@@ -148,10 +148,7 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
+html,
 body {
   margin: 0;
   background: var(--background);
@@ -161,6 +158,11 @@ body {
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
 }
 
 h1,
@@ -175,6 +177,17 @@ h6 {
 
 img {
   max-width: 100%;
+}
+
+/* GSAP ScrollSmoother */
+#smooth-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+#smooth-content {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* =========================================================

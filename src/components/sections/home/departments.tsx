@@ -405,7 +405,7 @@ export default function DepartmentsSection() {
             Department Image
         ---------------------------------------- */}
 
-        <div className="department-image-wrapper relative h-[400px] overflow-hidden rounded-lg">
+        <div className="department-image-wrapper relative h-100 xl:h-130 overflow-hidden rounded-lg">
           <Image
             ref={imageRef}
             src={department.image}

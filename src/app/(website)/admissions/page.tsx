@@ -1,12 +1,19 @@
-import Section from "@/src/components/ui/Section";
+import AdmissionsHero from "@/src/components/sections/admissions/AdmissionsHero";
+import AdmissionOverview from "@/src/components/sections/admissions/AdmissionOverview";
+import TNEAProcess from "@/src/components/sections/admissions/TNEAProcess";
+import TNEACutoff from "@/src/components/sections/admissions/TNEACutoff";
+import ManagementQuota from "@/src/components/sections/admissions/ManagementQuota";
+import AdmissionEligibility from "@/src/components/sections/admissions/AdmissionEligibility";
 
 export default function AdmissionsPage() {
   return (
     <>
-      <Section>
-        <h1>Admissions Page</h1>
-        <p>Admissions content will come from Strapi.</p>
-      </Section>
+      <AdmissionsHero />
+      <AdmissionOverview />
+      <TNEAProcess />
+      <TNEACutoff />
+      <ManagementQuota />
+      <AdmissionEligibility />
     </>
   );
 }

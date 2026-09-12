@@ -114,10 +114,27 @@ export default function Footer() {
 
               <li>
                 <Link
-                  href="/contact"
+                  href="/enquire-now"
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
                   Contact
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/gallery"
+                  className="text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  Gallery
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/scholarships"
+                  className="text-white/80 transition-colors duration-200 hover:text-white"
+                >
+                  Scholarships
                 </Link>
               </li>
             </ul>

@@ -1,12 +1,31 @@
-import Section from "@/src/components/ui/Section";
+import CSEHero from "@/src/components/sections/courses/cse/CSEHero";
+import CSEOverview from "@/src/components/sections/courses/cse/CSEOverview";
+import CSEOpportunities from "@/src/components/sections/courses/cse/CSEOpportunities";
+import CSECareers from "@/src/components/sections/courses/cse/CSECareers";
+import CSEWhyStudy from "@/src/components/sections/courses/cse/CSEWhyStudy";
+import CSELearning from "@/src/components/sections/courses/cse/CSELearning";
+import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 
-export default function CSEPage() {
+export default function ComputerScienceEngineeringPage() {
   return (
     <>
-      <Section>
-        <h1>Computer Science and Engineering Page</h1>
-        <p>Content for the CSE program will come from Strapi.</p>
-      </Section>
+      <CSEHero />
+      <CSEOverview />
+      <CSELearning />
+      <CSEOpportunities />
+      <CSEWhyStudy />
+      <CSECareers />
+      <CourseCallToAction
+        heading={
+          <>
+            Build your foundation in computing.
+            <span className="text-accent-400">
+              {" "}
+              Create solutions for the digital world.
+            </span>
+          </>
+        }
+      />
     </>
   );
 }

@@ -7,10 +7,10 @@ interface EnquireNowProps {
   href?: string;
 }
 
-export default function EnquireNow({ href = "/contact" }: EnquireNowProps) {
+export default function EnquireNow({ href = "/enquire-now" }: EnquireNowProps) {
   return (
     <Link
-      href="/contact"
+      href="/enquire-now"
       aria-label="Enquire Now"
       className="fixed top-1/2 right-0 z-40 flex -translate-y-1/2 bg-accent-400 px-3 py-5 text-white shadow-lg transition-all duration-300 hover:bg-primary-700 hover:px-4"
     >

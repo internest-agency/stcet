@@ -1,12 +1,9 @@
-import Section from "@/src/components/ui/Section";
+import GalleryGrid from "@/src/components/sections/gallery/GalleryGrid";
 
 export default function GalleryPage() {
   return (
     <>
-      <Section>
-        <h1>Gallery</h1>
-        <p>Content for the gallery will come from Strapi.</p>
-      </Section>
+      <GalleryGrid />
     </>
   );
 }

@@ -1,12 +1,13 @@
-import Section from "@/src/components/ui/Section";
+import CareerHero from "@/src/components/sections/careers/CareerHero";
+import CareerIntroduction from "@/src/components/sections/careers/CareerIntroduction";
+import CareerApplicationForm from "@/src/components/sections/careers/CareerApplicationForm";
 
-export default function CareersPage() {
+export default function CareerPage() {
   return (
     <>
-      <Section>
-        <h1>Careers</h1>
-        <p>Content for the careers information will come from Strapi.</p>
-      </Section>
+      <CareerHero />
+      <CareerIntroduction />
+      <CareerApplicationForm />
     </>
   );
 }

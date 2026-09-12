@@ -30,23 +30,23 @@ interface HeaderProps {
 
 const courseLinks = [
   {
-    href: "/courses/cse",
+    href: "/courses/computer-science-engineering",
     label: "Computer Science Engineering",
   },
   {
-    href: "/courses/cse-ai-ml",
+    href: "/courses/computer-science-ai-ml",
     label: "Computer Science Engineering (AI & ML)",
   },
   {
-    href: "/courses/ece",
+    href: "/courses/electronics-communication-engineering",
     label: "Electronics & Communication Engineering",
   },
   {
-    href: "/courses/eee",
+    href: "/courses/electrical-electronics-engineering",
     label: "Electrical & Electronics Engineering",
   },
   {
-    href: "/courses/it",
+    href: "/courses/information-technology",
     label: "Information Technology",
   },
 ];
@@ -77,7 +77,7 @@ const navLinks = [
     label: "Careers",
   },
   {
-    href: "/contact",
+    href: "/enquire-now",
     label: "Contact Us",
   },
 ];
@@ -253,7 +253,7 @@ export default function Header({ overlay = false }: HeaderProps) {
           ===================================================== */}
           <div className="hidden lg:block">
             <Button
-              href="/contact"
+              href="/enquire-now"
               variant="secondary"
               size="md"
               rightIcon={<FaCircleArrowRight />}
@@ -268,7 +268,7 @@ export default function Header({ overlay = false }: HeaderProps) {
           <div className="flex items-center gap-2 lg:hidden">
             {/* Mobile Apply */}
             <Link
-              href="/contact"
+              href="/enquire-now"
               onClick={closeMobileMenu}
               className="
                 hidden
@@ -564,7 +564,7 @@ export default function Header({ overlay = false }: HeaderProps) {
           "
           >
             <Link
-              href="/contact"
+              href="/enquire-now"
               onClick={closeMobileMenu}
               className="
                 flex

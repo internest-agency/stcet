@@ -164,7 +164,7 @@ export default function OurFounders() {
 
               {/* Image overlay */}
               <div
-                className="absolute inset-0 bg-gradient-to-t from-primary-900/50 via-transparent to-transparent"
+                className="absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
                 aria-hidden="true"
               />
 
@@ -287,7 +287,7 @@ export default function OurFounders() {
 
               {/* Image overlay */}
               <div
-                className="absolute inset-0 bg-gradient-to-t from-primary-900/50 via-transparent to-transparent"
+                className="absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
                 aria-hidden="true"
               />
 

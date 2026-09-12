@@ -22,7 +22,7 @@ export default function Dropdown({
   triggerClassName = "",
 }: DropdownProps) {
   return (
-    <div className="header-dropdown group relative py-1">
+    <div className="header-dropdown group relative">
       {/* Trigger */}
       <Link
         href={href}
