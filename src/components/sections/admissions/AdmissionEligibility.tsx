@@ -51,6 +51,8 @@ export default function AdmissionEligibility() {
         autoSplit: true,
       });
 
+      const rowTargets = rows ? Array.from(rows) : [];
+
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top 82%",
@@ -68,7 +70,7 @@ export default function AdmissionEligibility() {
           );
 
           gsap.fromTo(
-            rows,
+            rowTargets,
             { opacity: 0, y: 18 },
             {
               opacity: 1,
@@ -80,17 +82,19 @@ export default function AdmissionEligibility() {
             },
           );
 
-          gsap.fromTo(
-            note,
-            { opacity: 0, y: 20 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              delay: 0.55,
-              ease: "power3.out",
-            },
-          );
+          if (note) {
+            gsap.fromTo(
+              note,
+              { opacity: 0, y: 20 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                delay: 0.55,
+                ease: "power3.out",
+              },
+            );
+          }
         },
       });
 

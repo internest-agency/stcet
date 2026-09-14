@@ -5,10 +5,13 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
-
 import Container from "../../../ui/Container";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+
+/* =========================================================
+   DATA
+========================================================= */
 
 const careerGroups = [
   {
@@ -57,6 +60,10 @@ const futurePaths = [
       "Build specialised expertise through advanced learning in artificial intelligence, machine learning, data science and related areas.",
   },
 ];
+
+/* =========================================================
+   CAREER CARD
+========================================================= */
 
 function CareerCard({
   group,
@@ -222,8 +229,12 @@ function CareerCard({
   );
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function CSECareers() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -232,35 +243,41 @@ export default function CSECareers() {
 
     if (!section || !marquee) return;
 
+    const splitInstances: SplitText[] = [];
+
     const context = gsap.context(() => {
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-      /*
-       * ============================================================
-       * REDUCED MOTION
-       * ============================================================
-       */
+      /* =====================================================
+         REDUCED MOTION
+      ===================================================== */
 
       if (reducedMotion) {
-        gsap.set(
+        const elements = gsap.utils.toArray<HTMLElement>(
           section.querySelectorAll(
             "[data-career-label], [data-career-heading], [data-career-intro], [data-career-marquee], [data-beyond-label], [data-beyond-heading], [data-beyond-intro], [data-future-path]",
           ),
-          {
-            clearProps: "all",
-          },
         );
+
+        if (elements.length > 0) {
+          gsap.set(elements, {
+            clearProps: "all",
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+          });
+        }
 
         return;
       }
 
-      /*
-       * ============================================================
-       * CAREER PATHWAYS LABEL
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER PATHWAYS LABEL
+      ===================================================== */
 
       const careerLabel = section.querySelector<HTMLElement>(
         "[data-career-label]",
@@ -315,13 +332,9 @@ export default function CSECareers() {
         }
       }
 
-      /*
-       * ============================================================
-       * CAREER HEADING
-       *
-       * SplitText line reveal
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER HEADING
+      ===================================================== */
 
       const careerHeading = section.querySelector<HTMLElement>(
         "[data-career-heading]",
@@ -332,6 +345,8 @@ export default function CSECareers() {
           type: "lines",
           mask: "lines",
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 110,
@@ -353,11 +368,9 @@ export default function CSECareers() {
         });
       }
 
-      /*
-       * ============================================================
-       * CAREER INTRO
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER INTRO
+      ===================================================== */
 
       const careerIntro = section.querySelector<HTMLElement>(
         "[data-career-intro]",
@@ -384,11 +397,9 @@ export default function CSECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * MARQUEE REVEAL
-       * ============================================================
-       */
+      /* =====================================================
+         MARQUEE REVEAL
+      ===================================================== */
 
       const marqueeWrapper = section.querySelector<HTMLElement>(
         "[data-career-marquee]",
@@ -415,15 +426,13 @@ export default function CSECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * CAREER CARD ENTRANCE
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER CARD ENTRANCE
+      ===================================================== */
 
       const cards = gsap.utils.toArray<HTMLElement>(".career-marquee-card");
 
-      if (cards.length) {
+      if (cards.length > 0) {
         gsap.fromTo(
           cards,
           {
@@ -445,48 +454,49 @@ export default function CSECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * INFINITE MARQUEE
-       * ============================================================
-       */
+      /* =====================================================
+         INFINITE MARQUEE
+      ===================================================== */
 
       const firstSetWidth = marquee.scrollWidth / 2;
 
-      const marqueeTween = gsap.to(marquee, {
-        x: -firstSetWidth,
-        duration: 35,
-        ease: "none",
-        repeat: -1,
-        modifiers: {
-          x: gsap.utils.unitize((value) => {
-            const x = Number.parseFloat(value);
+      if (firstSetWidth > 0) {
+        const marqueeTween = gsap.to(marquee, {
+          x: -firstSetWidth,
+          duration: 35,
+          ease: "none",
+          repeat: -1,
+          modifiers: {
+            x: (value) => {
+              const x = Number.parseFloat(value);
 
-            return x <= -firstSetWidth ? x + firstSetWidth : x;
-          }),
-        },
-      });
+              if (x <= -firstSetWidth) {
+                return `${x + firstSetWidth}px`;
+              }
 
-      /*
-       * Pause marquee when the section is outside viewport.
-       * This reduces unnecessary animation work.
-       */
+              return `${x}px`;
+            },
+          },
+        });
 
-      ScrollTrigger.create({
-        trigger: marquee,
-        start: "top bottom",
-        end: "bottom top",
-        onEnter: () => marqueeTween.resume(),
-        onEnterBack: () => marqueeTween.resume(),
-        onLeave: () => marqueeTween.pause(),
-        onLeaveBack: () => marqueeTween.pause(),
-      });
+        /* ===================================================
+           PAUSE MARQUEE OUTSIDE VIEWPORT
+        =================================================== */
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE LABEL
-       * ============================================================
-       */
+        ScrollTrigger.create({
+          trigger: marquee,
+          start: "top bottom",
+          end: "bottom top",
+          onEnter: () => marqueeTween.resume(),
+          onEnterBack: () => marqueeTween.resume(),
+          onLeave: () => marqueeTween.pause(),
+          onLeaveBack: () => marqueeTween.pause(),
+        });
+      }
+
+      /* =====================================================
+         BEYOND THE DEGREE LABEL
+      ===================================================== */
 
       const beyondLabel = section.querySelector<HTMLElement>(
         "[data-beyond-label]",
@@ -541,13 +551,9 @@ export default function CSECareers() {
         }
       }
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE HEADING
-       *
-       * Different SplitText animation from first heading
-       * ============================================================
-       */
+      /* =====================================================
+         BEYOND THE DEGREE HEADING
+      ===================================================== */
 
       const beyondHeading = section.querySelector<HTMLElement>(
         "[data-beyond-heading]",
@@ -558,6 +564,8 @@ export default function CSECareers() {
           type: "lines",
           mask: "lines",
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 100,
@@ -578,11 +586,9 @@ export default function CSECareers() {
         });
       }
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE INTRO
-       * ============================================================
-       */
+      /* =====================================================
+         BEYOND THE DEGREE INTRO
+      ===================================================== */
 
       const beyondIntro = section.querySelector<HTMLElement>(
         "[data-beyond-intro]",
@@ -609,15 +615,13 @@ export default function CSECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * FUTURE PATH CARDS
-       * ============================================================
-       */
+      /* =====================================================
+         FUTURE PATH CARDS
+      ===================================================== */
 
       const futureCards = gsap.utils.toArray<HTMLElement>("[data-future-path]");
 
-      if (futureCards.length) {
+      if (futureCards.length > 0) {
         futureCards.forEach((card, index) => {
           const number = card.querySelector<HTMLElement>(
             "[data-future-number]",
@@ -714,15 +718,13 @@ export default function CSECareers() {
           }
         });
       }
-    }, sectionRef);
-
-    /*
-     * ============================================================
-     * CLEANUP
-     * ============================================================
-     */
+    }, section);
 
     return () => {
+      splitInstances.forEach((split) => {
+        split.revert();
+      });
+
       context.revert();
     };
   }, []);
@@ -737,6 +739,7 @@ export default function CSECareers() {
         <Container>
           <div className="py-14 sm:py-18 lg:py-20">
             {/* Header */}
+
             <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end lg:gap-20 xl:gap-28">
               <div>
                 <div data-career-label className="mb-5 flex items-center gap-3">
@@ -795,6 +798,7 @@ export default function CSECareers() {
         </Container>
 
         {/* Marquee */}
+
         <div
           data-career-marquee
           className="
@@ -835,6 +839,7 @@ export default function CSECareers() {
         <Container>
           <div className="py-14 sm:py-16 lg:py-20">
             {/* Header */}
+
             <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-16 xl:gap-24">
               <div>
                 <div
@@ -901,6 +906,7 @@ export default function CSECareers() {
             </div>
 
             {/* Future Paths */}
+
             <div className="mt-10 border-y border-gray-200 sm:mt-12 lg:mt-14">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3">
                 {futurePaths.map((path, index) => (

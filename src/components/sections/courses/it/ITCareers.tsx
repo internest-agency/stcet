@@ -235,7 +235,7 @@ function CareerCard({
 }
 
 export default function ITCareers() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -243,6 +243,8 @@ export default function ITCareers() {
     const marquee = marqueeRef.current;
 
     if (!section || !marquee) return;
+
+    const splitInstances: SplitText[] = [];
 
     const context = gsap.context(() => {
       const reducedMotion = window.matchMedia(
@@ -257,8 +259,10 @@ export default function ITCareers() {
 
       if (reducedMotion) {
         gsap.set(
-          section.querySelectorAll(
-            "[data-career-label], [data-career-heading], [data-career-intro], [data-career-marquee], [data-beyond-label], [data-beyond-heading], [data-beyond-intro], [data-future-path]",
+          Array.from(
+            section.querySelectorAll<HTMLElement>(
+              "[data-career-label], [data-career-heading], [data-career-intro], [data-career-marquee], [data-beyond-label], [data-beyond-heading], [data-beyond-intro], [data-future-path]",
+            ),
           ),
           {
             clearProps: "all",
@@ -341,7 +345,10 @@ export default function ITCareers() {
         const split = SplitText.create(careerHeading, {
           type: "lines",
           mask: "lines",
+          autoSplit: true,
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 110,
@@ -431,7 +438,9 @@ export default function ITCareers() {
        * ============================================================
        */
 
-      const cards = gsap.utils.toArray<HTMLElement>(".career-marquee-card");
+      const cards = Array.from(
+        section.querySelectorAll<HTMLElement>(".career-marquee-card"),
+      );
 
       if (cards.length) {
         gsap.fromTo(
@@ -469,11 +478,15 @@ export default function ITCareers() {
         ease: "none",
         repeat: -1,
         modifiers: {
-          x: gsap.utils.unitize((value) => {
+          x: (value: string) => {
             const x = Number.parseFloat(value);
 
-            return x <= -firstSetWidth ? x + firstSetWidth : x;
-          }),
+            if (!Number.isFinite(x)) {
+              return "0px";
+            }
+
+            return `${x <= -firstSetWidth ? x + firstSetWidth : x}px`;
+          },
         },
       });
 
@@ -564,7 +577,10 @@ export default function ITCareers() {
         const split = SplitText.create(beyondHeading, {
           type: "lines",
           mask: "lines",
+          autoSplit: true,
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 100,
@@ -622,7 +638,9 @@ export default function ITCareers() {
        * ============================================================
        */
 
-      const futureCards = gsap.utils.toArray<HTMLElement>("[data-future-path]");
+      const futureCards = Array.from(
+        section.querySelectorAll<HTMLElement>("[data-future-path]"),
+      );
 
       if (futureCards.length) {
         futureCards.forEach((card, index) => {
@@ -721,9 +739,13 @@ export default function ITCareers() {
           }
         });
       }
-    }, sectionRef);
+    }, section);
 
     return () => {
+      splitInstances.forEach((split) => {
+        split.revert();
+      });
+
       context.revert();
     };
   }, []);

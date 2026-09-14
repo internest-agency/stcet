@@ -40,88 +40,160 @@ export default function PlacementFuture() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return;
+
+    const splitInstances: SplitText[] = [];
+
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      const heading = section.querySelector<HTMLElement>(
         ".placement-future-heading",
-      ) as HTMLElement | null;
+      );
 
-      const items = sectionRef.current?.querySelectorAll(".future-outcome");
+      const statement = section.querySelector<HTMLElement>(".future-statement");
 
-      const statement = sectionRef.current?.querySelector(
-        ".future-statement",
-      ) as HTMLElement | null;
+      const items = Array.from(
+        section.querySelectorAll<HTMLElement>(".future-outcome"),
+      );
 
-      if (!heading) return;
+      /*
+       * ============================================================
+       * REDUCED MOTION
+       * ============================================================
+       */
 
-      const split = SplitText.create(heading, {
-        type: "lines",
-        mask: "lines",
-        autoSplit: true,
+      if (reducedMotion) {
+        gsap.set(
+          [heading, statement, ...items].filter(
+            (element): element is HTMLElement => element !== null,
+          ),
+          {
+            clearProps: "all",
+          },
+        );
+
+        return;
+      }
+
+      /*
+       * ============================================================
+       * HEADING REVEAL
+       * ============================================================
+       */
+
+      if (heading) {
+        const split = SplitText.create(heading, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+        });
+
+        splitInstances.push(split);
+
+        gsap.set(split.lines, {
+          yPercent: 100,
+        });
+
+        gsap.to(split.lines, {
+          yPercent: 0,
+          duration: 0.85,
+          stagger: 0.1,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: heading,
+            start: "top 84%",
+            once: true,
+          },
+        });
+      }
+
+      /*
+       * ============================================================
+       * STATEMENT REVEAL
+       * ============================================================
+       */
+
+      if (statement) {
+        gsap.set(statement, {
+          opacity: 0,
+          y: 20,
+        });
+
+        gsap.to(statement, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: statement,
+            start: "top 88%",
+            once: true,
+          },
+        });
+      }
+
+      /*
+       * ============================================================
+       * OUTCOME ITEMS
+       * ============================================================
+       */
+
+      if (items.length) {
+        gsap.set(items, {
+          opacity: 0,
+          y: 20,
+        });
+
+        gsap.to(items, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: items[0],
+            start: "top 88%",
+            once: true,
+          },
+        });
+      }
+    }, section);
+
+    return () => {
+      splitInstances.forEach((split) => {
+        split.revert();
       });
 
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "top 82%",
-        once: true,
-        onEnter: () => {
-          gsap.fromTo(
-            split.lines,
-            { yPercent: 100 },
-            {
-              yPercent: 0,
-              duration: 0.85,
-              stagger: 0.1,
-              ease: "power4.out",
-            },
-          );
-
-          gsap.fromTo(
-            statement,
-            { opacity: 0, y: 20 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              delay: 0.2,
-              ease: "power3.out",
-            },
-          );
-
-          gsap.fromTo(
-            items,
-            { opacity: 0, y: 20 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.08,
-              delay: 0.35,
-              ease: "power3.out",
-            },
-          );
-        },
-      });
-
-      return () => split.revert();
-    }, sectionRef);
-
-    return () => context.revert();
+      context.revert();
+    };
   }, []);
 
   return (
     <section ref={sectionRef} className="bg-primary-700 text-white">
       <Container className="py-20 sm:py-24 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
+          {/* =========================================================
+              INTRO
+          ========================================================== */}
+
           <div>
             <div className="mb-6 flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-accent-400" />
+              <span
+                aria-hidden="true"
+                className="h-2 w-2 shrink-0 rounded-full bg-accent-400"
+              />
 
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
                 Preparing for the Future
               </span>
             </div>
 
-            <h2 className="placement-future-heading max-w-md text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+            <h2 className="placement-future-heading max-w-md [perspective:900px] text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
               Preparing
               <br />
               For The
@@ -129,6 +201,10 @@ export default function PlacementFuture() {
               Future.
             </h2>
           </div>
+
+          {/* =========================================================
+              CONTENT
+          ========================================================== */}
 
           <div>
             <div className="future-statement max-w-3xl">
@@ -144,11 +220,27 @@ export default function PlacementFuture() {
               </p>
             </div>
 
+            {/* =======================================================
+                OUTCOMES
+            ======================================================== */}
+
             <div className="mt-8 border-t border-white/15">
               {outcomes.map((item) => (
                 <div
                   key={item.number}
-                  className="future-outcome group flex items-center gap-5 border-b border-white/15 py-6"
+                  className="
+                    future-outcome
+                    group
+                    flex
+                    items-center
+                    gap-5
+                    border-b
+                    border-white/15
+                    py-6
+                    transition-colors
+                    duration-300
+                    hover:bg-white/[0.03]
+                  "
                 >
                   <span className="w-8 shrink-0 text-xs font-bold text-accent-400">
                     {item.number}
@@ -164,7 +256,15 @@ export default function PlacementFuture() {
 
                   <span
                     aria-hidden="true"
-                    className="h-px w-0 bg-accent-400 transition-all duration-400 group-hover:w-8"
+                    className="
+                      h-px
+                      w-0
+                      shrink-0
+                      bg-accent-400
+                      transition-all
+                      duration-400
+                      group-hover:w-8
+                    "
                   />
                 </div>
               ))}
@@ -173,7 +273,8 @@ export default function PlacementFuture() {
         </div>
       </Container>
 
-      <div className="h-1 w-full bg-accent-400" />
+      {/* Bottom accent */}
+      <div aria-hidden="true" className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

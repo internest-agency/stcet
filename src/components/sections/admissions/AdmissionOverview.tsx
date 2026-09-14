@@ -28,11 +28,15 @@ export default function AdmissionOverview() {
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(
+      const section = sectionRef.current;
+
+      if (!section) return;
+
+      const heading = section.querySelector(
         ".admission-overview-heading",
       ) as HTMLElement | null;
 
-      const cards = sectionRef.current?.querySelectorAll(".admission-route");
+      const cards = Array.from(section.querySelectorAll(".admission-route"));
 
       if (!heading) return;
 
@@ -43,7 +47,7 @@ export default function AdmissionOverview() {
       });
 
       ScrollTrigger.create({
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top 82%",
         once: true,
         onEnter: () => {
@@ -58,25 +62,31 @@ export default function AdmissionOverview() {
             },
           );
 
-          gsap.fromTo(
-            cards,
-            { opacity: 0, y: 25 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              stagger: 0.12,
-              delay: 0.25,
-              ease: "power3.out",
-            },
-          );
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              { opacity: 0, y: 25 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                stagger: 0.12,
+                delay: 0.25,
+                ease: "power3.out",
+              },
+            );
+          }
         },
       });
 
-      return () => split.revert();
+      return () => {
+        split.revert();
+      };
     }, sectionRef);
 
-    return () => context.revert();
+    return () => {
+      context.revert();
+    };
   }, []);
 
   return (

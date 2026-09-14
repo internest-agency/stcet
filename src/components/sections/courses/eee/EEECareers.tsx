@@ -10,6 +10,10 @@ import Container from "../../../ui/Container";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
+/* =========================================================
+   DATA
+========================================================= */
+
 const careerGroups = [
   {
     number: "01",
@@ -63,6 +67,10 @@ const futurePaths = [
       "Continue developing expertise in emerging electrical technologies and advanced engineering applications.",
   },
 ];
+
+/* =========================================================
+   CAREER CARD
+========================================================= */
 
 function CareerCard({
   group,
@@ -125,7 +133,7 @@ function CareerCard({
         "
       />
 
-      {/* Subtle bottom gradient */}
+      {/* Bottom gradient */}
       <div
         aria-hidden="true"
         className="
@@ -228,45 +236,65 @@ function CareerCard({
   );
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function EEECareers() {
-  const sectionRef = useRef<HTMLElement>(null);
+  /*
+   * The root element is a <div>.
+   * Therefore this must be HTMLDivElement.
+   */
+  const sectionRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const marquee = marqueeRef.current;
 
-    if (!section || !marquee) return;
+    if (!section || !marquee) {
+      return;
+    }
+
+    const splitInstances: SplitText[] = [];
 
     const context = gsap.context(() => {
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-      /*
-       * ============================================================
-       * REDUCED MOTION
-       * ============================================================
-       */
+      /* =====================================================
+         REDUCED MOTION
+      ===================================================== */
 
       if (reducedMotion) {
-        gsap.set(
-          section.querySelectorAll(
-            "[data-career-label], [data-career-heading], [data-career-intro], [data-career-marquee], [data-beyond-label], [data-beyond-heading], [data-beyond-intro], [data-future-path]",
+        const elements = Array.from(
+          section.querySelectorAll<HTMLElement>(
+            [
+              "[data-career-label]",
+              "[data-career-heading]",
+              "[data-career-intro]",
+              "[data-career-marquee]",
+              "[data-beyond-label]",
+              "[data-beyond-heading]",
+              "[data-beyond-intro]",
+              "[data-future-path]",
+            ].join(", "),
           ),
-          {
-            clearProps: "all",
-          },
         );
+
+        if (elements.length > 0) {
+          gsap.set(elements, {
+            clearProps: "all",
+          });
+        }
 
         return;
       }
 
-      /*
-       * ============================================================
-       * CAREER PATHWAYS LABEL
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER PATHWAYS LABEL
+      ===================================================== */
 
       const careerLabel = section.querySelector<HTMLElement>(
         "[data-career-label]",
@@ -321,13 +349,9 @@ export default function EEECareers() {
         }
       }
 
-      /*
-       * ============================================================
-       * CAREER HEADING
-       *
-       * SplitText line reveal
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER HEADING
+      ===================================================== */
 
       const careerHeading = section.querySelector<HTMLElement>(
         "[data-career-heading]",
@@ -337,7 +361,10 @@ export default function EEECareers() {
         const split = SplitText.create(careerHeading, {
           type: "lines",
           mask: "lines",
+          autoSplit: true,
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 110,
@@ -359,11 +386,9 @@ export default function EEECareers() {
         });
       }
 
-      /*
-       * ============================================================
-       * CAREER INTRO
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER INTRO
+      ===================================================== */
 
       const careerIntro = section.querySelector<HTMLElement>(
         "[data-career-intro]",
@@ -390,11 +415,9 @@ export default function EEECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * MARQUEE REVEAL
-       * ============================================================
-       */
+      /* =====================================================
+         MARQUEE REVEAL
+      ===================================================== */
 
       const marqueeWrapper = section.querySelector<HTMLElement>(
         "[data-career-marquee]",
@@ -421,15 +444,15 @@ export default function EEECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * CAREER CARD ENTRANCE
-       * ============================================================
-       */
+      /* =====================================================
+         CAREER CARD ENTRANCE
+      ===================================================== */
 
-      const cards = gsap.utils.toArray<HTMLElement>(".career-marquee-card");
+      const cards = Array.from(
+        section.querySelectorAll<HTMLElement>(".career-marquee-card"),
+      );
 
-      if (cards.length) {
+      if (cards.length > 0) {
         gsap.fromTo(
           cards,
           {
@@ -451,48 +474,61 @@ export default function EEECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * INFINITE MARQUEE
-       * ============================================================
-       */
+      /* =====================================================
+         INFINITE MARQUEE
+      ===================================================== */
 
       const firstSetWidth = marquee.scrollWidth / 2;
 
-      const marqueeTween = gsap.to(marquee, {
-        x: -firstSetWidth,
-        duration: 35,
-        ease: "none",
-        repeat: -1,
-        modifiers: {
-          x: gsap.utils.unitize((value) => {
-            const x = Number.parseFloat(value);
+      if (firstSetWidth > 0) {
+        const marqueeTween = gsap.to(marquee, {
+          x: -firstSetWidth,
+          duration: 35,
+          ease: "none",
+          repeat: -1,
 
-            return x <= -firstSetWidth ? x + firstSetWidth : x;
-          }),
-        },
-      });
+          modifiers: {
+            x: (value: string) => {
+              const x = Number.parseFloat(value);
 
-      /*
-       * Pause marquee when the section is outside viewport.
-       * This reduces unnecessary animation work.
-       */
+              if (!Number.isFinite(x)) {
+                return "0px";
+              }
 
-      ScrollTrigger.create({
-        trigger: marquee,
-        start: "top bottom",
-        end: "bottom top",
-        onEnter: () => marqueeTween.resume(),
-        onEnterBack: () => marqueeTween.resume(),
-        onLeave: () => marqueeTween.pause(),
-        onLeaveBack: () => marqueeTween.pause(),
-      });
+              return `${x <= -firstSetWidth ? x + firstSetWidth : x}px`;
+            },
+          },
+        });
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE LABEL
-       * ============================================================
-       */
+        /*
+         * Pause marquee when it is outside the viewport.
+         */
+        ScrollTrigger.create({
+          trigger: marquee,
+          start: "top bottom",
+          end: "bottom top",
+
+          onEnter: () => {
+            marqueeTween.resume();
+          },
+
+          onEnterBack: () => {
+            marqueeTween.resume();
+          },
+
+          onLeave: () => {
+            marqueeTween.pause();
+          },
+
+          onLeaveBack: () => {
+            marqueeTween.pause();
+          },
+        });
+      }
+
+      /* =====================================================
+         BEYOND THE DEGREE LABEL
+      ===================================================== */
 
       const beyondLabel = section.querySelector<HTMLElement>(
         "[data-beyond-label]",
@@ -547,13 +583,9 @@ export default function EEECareers() {
         }
       }
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE HEADING
-       *
-       * Different SplitText animation from first heading
-       * ============================================================
-       */
+      /* =====================================================
+         BEYOND THE DEGREE HEADING
+      ===================================================== */
 
       const beyondHeading = section.querySelector<HTMLElement>(
         "[data-beyond-heading]",
@@ -563,7 +595,10 @@ export default function EEECareers() {
         const split = SplitText.create(beyondHeading, {
           type: "lines",
           mask: "lines",
+          autoSplit: true,
         });
+
+        splitInstances.push(split);
 
         gsap.set(split.lines, {
           yPercent: 100,
@@ -584,11 +619,9 @@ export default function EEECareers() {
         });
       }
 
-      /*
-       * ============================================================
-       * BEYOND THE DEGREE INTRO
-       * ============================================================
-       */
+      /* =====================================================
+         BEYOND THE DEGREE INTRO
+      ===================================================== */
 
       const beyondIntro = section.querySelector<HTMLElement>(
         "[data-beyond-intro]",
@@ -615,15 +648,15 @@ export default function EEECareers() {
         );
       }
 
-      /*
-       * ============================================================
-       * FUTURE PATH CARDS
-       * ============================================================
-       */
+      /* =====================================================
+         FUTURE PATH CARDS
+      ===================================================== */
 
-      const futureCards = gsap.utils.toArray<HTMLElement>("[data-future-path]");
+      const futureCards = Array.from(
+        section.querySelectorAll<HTMLElement>("[data-future-path]"),
+      );
 
-      if (futureCards.length) {
+      if (futureCards.length > 0) {
         futureCards.forEach((card, index) => {
           const number = card.querySelector<HTMLElement>(
             "[data-future-number]",
@@ -643,6 +676,7 @@ export default function EEECareers() {
             },
           });
 
+          /* Initial card state */
           gsap.set(card, {
             opacity: 0,
             y: 45,
@@ -669,6 +703,7 @@ export default function EEECareers() {
             });
           }
 
+          /* Card */
           timeline.to(
             card,
             {
@@ -680,6 +715,7 @@ export default function EEECareers() {
             index * 0.08,
           );
 
+          /* Number */
           if (number) {
             timeline.to(
               number,
@@ -693,6 +729,7 @@ export default function EEECareers() {
             );
           }
 
+          /* Title */
           if (title) {
             timeline.to(
               title,
@@ -706,6 +743,7 @@ export default function EEECareers() {
             );
           }
 
+          /* Description */
           if (description) {
             timeline.to(
               description,
@@ -720,15 +758,20 @@ export default function EEECareers() {
           }
         });
       }
-    }, sectionRef);
+    }, section);
 
-    /*
-     * ============================================================
-     * CLEANUP
-     * ============================================================
-     */
+    /* =========================================================
+       CLEANUP
+    ========================================================= */
 
     return () => {
+      /*
+       * Revert SplitText before reverting the GSAP context.
+       */
+      splitInstances.forEach((split) => {
+        split.revert();
+      });
+
       context.revert();
     };
   }, []);
@@ -800,7 +843,10 @@ export default function EEECareers() {
           </div>
         </Container>
 
-        {/* Marquee */}
+        {/* =====================================================
+            MARQUEE
+        ====================================================== */}
+
         <div
           data-career-marquee
           className="
@@ -906,7 +952,10 @@ export default function EEECareers() {
               </p>
             </div>
 
-            {/* Future Paths */}
+            {/* =====================================================
+                FUTURE PATHS
+            ====================================================== */}
+
             <div className="mt-10 border-y border-gray-200 sm:mt-12 lg:mt-14">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3">
                 {futurePaths.map((path, index) => (

@@ -177,11 +177,15 @@ export default function TNEAProcess() {
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(
+      const section = sectionRef.current;
+
+      if (!section) return;
+
+      const heading = section.querySelector(
         ".tnea-process-heading",
       ) as HTMLElement | null;
 
-      const steps = sectionRef.current?.querySelectorAll(".tnea-step");
+      const stepElements = Array.from(section.querySelectorAll(".tnea-step"));
 
       if (!heading) return;
 
@@ -191,14 +195,16 @@ export default function TNEAProcess() {
         autoSplit: true,
       });
 
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
+      const trigger = ScrollTrigger.create({
+        trigger: section,
         start: "top 80%",
         once: true,
         onEnter: () => {
           gsap.fromTo(
             split.lines,
-            { yPercent: 100 },
+            {
+              yPercent: 100,
+            },
             {
               yPercent: 0,
               duration: 0.85,
@@ -207,31 +213,42 @@ export default function TNEAProcess() {
             },
           );
 
-          gsap.fromTo(
-            steps,
-            { opacity: 0, y: 25 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.65,
-              stagger: 0.06,
-              delay: 0.2,
-              ease: "power3.out",
-            },
-          );
+          if (stepElements.length > 0) {
+            gsap.fromTo(
+              stepElements,
+              {
+                opacity: 0,
+                y: 25,
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.65,
+                stagger: 0.06,
+                delay: 0.2,
+                ease: "power3.out",
+              },
+            );
+          }
         },
       });
 
-      return () => split.revert();
+      return () => {
+        trigger.kill();
+        split.revert();
+      };
     }, sectionRef);
 
-    return () => context.revert();
+    return () => {
+      context.revert();
+    };
   }, []);
 
   return (
     <section ref={sectionRef} className="bg-gray-50">
       <Container className="py-20 sm:py-24 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
+          {/* Left Content */}
           <div>
             <div className="mb-6 flex items-center gap-3 lg:sticky lg:top-32">
               <span className="h-2 w-2 rounded-full bg-accent-400" />
@@ -250,6 +267,7 @@ export default function TNEAProcess() {
             </h2>
           </div>
 
+          {/* Steps */}
           <div className="border-t border-gray-200">
             {steps.map((step) => (
               <div
@@ -265,20 +283,8 @@ export default function TNEAProcess() {
                     {step.title}
                   </h3>
 
-                  <div className="mt-4 text-base leading-7 text-gray-600">
+                  <div className="tnea-step-content mt-4 text-base leading-7 text-gray-600">
                     {step.content}
-
-                    <style jsx>{`
-                      ul {
-                        margin-top: 0.75rem;
-                        padding-left: 1.25rem;
-                        list-style: disc;
-                      }
-
-                      li + li {
-                        margin-top: 0.35rem;
-                      }
-                    `}</style>
                   </div>
                 </div>
               </div>
@@ -286,6 +292,18 @@ export default function TNEAProcess() {
           </div>
         </div>
       </Container>
+
+      <style jsx>{`
+        .tnea-step-content :global(ul) {
+          margin-top: 0.75rem;
+          padding-left: 1.25rem;
+          list-style: disc;
+        }
+
+        .tnea-step-content :global(li + li) {
+          margin-top: 0.35rem;
+        }
+      `}</style>
     </section>
   );
 }
