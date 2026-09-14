@@ -15,25 +15,25 @@ const careerGroups = [
     number: "01",
     title: "Artificial Intelligence & Machine Learning",
     roles: ["AI/ML Engineer", "Machine Learning Developer"],
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/roles/artificial-intelligence.webp",
   },
   {
     number: "02",
     title: "Data & Analytics",
     roles: ["Data Analyst", "Data Engineer"],
-    image: "/images/courses/cse/dataset.webp",
+    image: "/images/courses/ai-ml/roles/dataset.webp",
   },
   {
     number: "03",
     title: "Software Engineering",
     roles: ["Software Engineer", "AI Application Developer"],
-    image: "/images/courses/cse/software-development.webp",
+    image: "/images/courses/ai-ml/roles/software-development.webp",
   },
   {
     number: "04",
     title: "Natural Language Processing",
     roles: ["NLP Engineer"],
-    image: "/images/courses/cse/natural-language-processing.webp",
+    image: "/images/courses/ai-ml/roles/natural-language-processing.webp",
   },
 ];
 

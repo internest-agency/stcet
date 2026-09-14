@@ -29,77 +29,77 @@ const slides: ShowcaseSlide[] = [
     title: "Programming & Computational Thinking",
     description:
       "Master core logic, problem-solving techniques, and fundamental programming concepts to build a strong computing foundation.",
-    image: "/images/courses/cse/programming.webp",
+    image: "/images/courses/cse/learning/programming.webp",
   },
   {
     number: "02",
     title: "Data Structures & Algorithms",
     description:
       "Learn essential data organization and algorithmic strategies to solve complex problems efficiently and write optimized code.",
-    image: "/images/courses/cse/data-structures.webp",
+    image: "/images/courses/cse/learning/data-structures.webp",
   },
   {
     number: "03",
     title: "Object-Oriented Programming",
     description:
       "Understand modern software design using object-oriented principles like encapsulation, inheritance, polymorphism, and abstraction.",
-    image: "/images/courses/cse/object-oriented-programming.webp",
+    image: "/images/courses/cse/learning/object-oriented-programming.webp",
   },
   {
     number: "04",
     title: "Database Management Systems",
     description:
       "Explore relational databases, SQL, data modeling, and query processing to manage and secure organizational data.",
-    image: "/images/courses/cse/database-management.webp",
+    image: "/images/courses/cse/learning/database-management.webp",
   },
   {
     number: "05",
     title: "Operating Systems",
     description:
       "Gain insight into resource management, process scheduling, memory allocations, and file systems driving modern computing devices.",
-    image: "/images/courses/cse/operating-systems.webp",
+    image: "/images/courses/cse/learning/operating-systems.webp",
   },
   {
     number: "06",
     title: "Computer Networks",
     description:
       "Discover network architecture, routing protocols, data communication, and distributed system fundamentals.",
-    image: "/images/courses/cse/computer-networks.webp",
+    image: "/images/courses/cse/learning/computer-networks.webp",
   },
   {
     number: "07",
     title: "Software Engineering",
     description:
       "Apply agile methodologies, system design principles, testing frameworks, and software development lifecycles.",
-    image: "/images/courses/cse/software-engineering.webp",
+    image: "/images/courses/cse/learning/software-engineering.webp",
   },
   {
     number: "08",
     title: "Web & Application Development",
     description:
       "Design and build responsive front-end interfaces, robust backend APIs, and scalable mobile application experiences.",
-    image: "/images/courses/cse/web-development.webp",
+    image: "/images/courses/cse/learning/web-development.webp",
   },
   {
     number: "09",
     title: "Cloud Computing",
     description:
       "Deploy, scale, and manage distributed infrastructure using virtualized environments and modern cloud services.",
-    image: "/images/courses/cse/cloud-computing.webp",
+    image: "/images/courses/cse/learning/cloud-computing.webp",
   },
   {
     number: "10",
     title: "Cybersecurity",
     description:
       "Study network security, cryptography, threat mitigation, and defensive mechanisms to protect digital infrastructure.",
-    image: "/images/courses/cse/cybersecurity.webp",
+    image: "/images/courses/cse/learning/cybersecurity.webp",
   },
   {
     number: "11",
     title: "Artificial Intelligence & Emerging Technologies",
     description:
       "Explore machine learning, neural networks, intelligent systems, and cutting-edge innovations transforming industry paradigms.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/cse/learning/artificial-intelligence.webp",
   },
 ];
 

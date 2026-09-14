@@ -29,77 +29,77 @@ const slides: ShowcaseSlide[] = [
     title: "Electronic Devices & Circuits",
     description:
       "Understand electronic components, semiconductor devices and circuit principles used to design and develop electronic systems.",
-    image: "/images/courses/ece/electronic-devices-circuits.webp",
+    image: "/images/courses/ece/learning/electronic-devices-circuits.webp",
   },
   {
     number: "02",
     title: "Analog & Digital Electronics",
     description:
       "Explore analog and digital electronic circuits, logic systems and the principles behind modern electronic devices.",
-    image: "/images/courses/ece/analog-digital-electronics.webp",
+    image: "/images/courses/ece/learning/analog-digital-electronics.webp",
   },
   {
     number: "03",
     title: "Digital Signal Processing",
     description:
       "Learn how digital signals are represented, processed and analysed for applications in communication, audio, imaging and intelligent systems.",
-    image: "/images/courses/ece/digital-signal-processing.webp",
+    image: "/images/courses/ece/learning/digital-signal-processing.webp",
   },
   {
     number: "04",
     title: "Communication Systems",
     description:
       "Study the principles of information transmission, modulation, communication channels and modern communication technologies.",
-    image: "/images/courses/ece/communication-systems.webp",
+    image: "/images/courses/ece/learning/communication-systems.webp",
   },
   {
     number: "05",
     title: "Microprocessors & Microcontrollers",
     description:
       "Understand processor architectures, interfacing, programming and embedded control using microprocessors and microcontrollers.",
-    image: "/images/courses/ece/microprocessors-microcontrollers.webp",
+    image: "/images/courses/ece/learning/microprocessors-microcontrollers.webp",
   },
   {
     number: "06",
     title: "Embedded Systems",
     description:
       "Learn how hardware and software are integrated to develop embedded systems for connected and intelligent electronic applications.",
-    image: "/images/courses/ece/embedded-systems.webp",
+    image: "/images/courses/ece/learning/embedded-systems.webp",
   },
   {
     number: "07",
     title: "Computer Networks",
     description:
       "Explore networking fundamentals, data communication, network architecture and the technologies that connect computing and electronic systems.",
-    image: "/images/courses/ece/computer-networks.webp",
+    image: "/images/courses/ece/learning/computer-networks.webp",
   },
   {
     number: "08",
     title: "Wireless Communication",
     description:
       "Understand wireless communication principles and technologies used to transmit information across modern communication networks.",
-    image: "/images/courses/ece/wireless-communication.webp",
+    image: "/images/courses/ece/learning/wireless-communication.webp",
   },
   {
     number: "09",
     title: "Antennas & Propagation",
     description:
       "Study antenna fundamentals, electromagnetic wave propagation and the technologies used in wireless and communication systems.",
-    image: "/images/courses/ece/antennas-propagation.webp",
+    image: "/images/courses/ece/learning/antennas-propagation.webp",
   },
   {
     number: "10",
     title: "VLSI & Digital System Design",
     description:
       "Explore digital system design and VLSI concepts used to develop compact, high-performance integrated electronic systems.",
-    image: "/images/courses/ece/vlsi-digital-system-design.webp",
+    image: "/images/courses/ece/learning/vlsi-digital-system-design.webp",
   },
   {
     number: "11",
     title: "Control & Instrumentation",
     description:
       "Learn measurement, instrumentation and control principles used to monitor, regulate and automate modern engineering systems.",
-    image: "/images/courses/ece/control-instrumentation.webp",
+    image: "/images/courses/ece/learning/control-instrumentation.webp",
   },
 ];
 

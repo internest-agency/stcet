@@ -19,31 +19,31 @@ const careerGroups = [
       "Full-Stack Developer",
       "Application Developer",
     ],
-    image: "/images/courses/cse/software-development.webp",
+    image: "/images/courses/cse/roles/software-development.webp",
   },
   {
     number: "02",
     title: "Cloud & Systems",
     roles: ["Cloud Engineer", "Systems Engineer"],
-    image: "/images/courses/cse/cloud-and-systems.webp",
+    image: "/images/courses/cse/roles/cloud-and-systems.webp",
   },
   {
     number: "03",
     title: "Data",
     roles: ["Data Engineer", "Database Administrator"],
-    image: "/images/courses/cse/dataset.webp",
+    image: "/images/courses/cse/roles/dataset.webp",
   },
   {
     number: "04",
     title: "Cybersecurity",
     roles: ["Cybersecurity Professional"],
-    image: "/images/courses/cse/cyber-security.webp",
+    image: "/images/courses/cse/roles/cyber-security.webp",
   },
   {
     number: "05",
     title: "DevOps & Analysis",
     roles: ["DevOps Engineer", "Software Analyst"],
-    image: "/images/courses/cse/devops-and-analysis.webp",
+    image: "/images/courses/cse/roles/devops-and-analysis.webp",
   },
 ];
 

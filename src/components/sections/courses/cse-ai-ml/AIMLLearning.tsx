@@ -29,70 +29,71 @@ const slides: ShowcaseSlide[] = [
     title: "Programming & Computational Thinking",
     description:
       "Build a strong foundation in programming and computational thinking while developing the logical and problem-solving skills required for intelligent computing.",
-    image: "/images/courses/cse/programming.webp",
+    image: "/images/courses/ai-ml/learning/programming.webp",
   },
   {
     number: "02",
     title: "Data Structures & Algorithms",
     description:
       "Understand how data can be organised, processed and analysed while developing efficient algorithms for solving computational problems.",
-    image: "/images/courses/cse/data-structures.webp",
+    image: "/images/courses/ai-ml/learning/data-structures.webp",
   },
   {
     number: "03",
     title: "Database Management",
     description:
       "Learn how data is stored, organised, managed and retrieved through database concepts and technologies.",
-    image: "/images/courses/cse/database-management.webp",
+    image: "/images/courses/ai-ml/learning/database-management.webp",
   },
   {
     number: "04",
     title: "Computer Networks & Operating Systems",
     description:
       "Develop an understanding of the systems and networks that support modern computing, communication and intelligent applications.",
-    image: "/images/courses/cse/computer-networks.webp",
+    image: "/images/courses/ai-ml/learning/computer-networks.webp",
   },
   {
     number: "05",
     title: "Artificial Intelligence",
     description:
       "Explore the fundamental concepts of artificial intelligence and understand how intelligent systems can process information and support decision-making.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/learning/artificial-intelligence.webp",
   },
   {
     number: "06",
     title: "Machine Learning",
     description:
       "Learn how machines can learn from data, identify patterns and develop models that support prediction and intelligent decision-making.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/learning/machine-learning.webp",
   },
   {
     number: "07",
     title: "Data Analytics & Pattern Recognition",
     description:
       "Explore data analytics and pattern recognition techniques to discover meaningful relationships and insights from data.",
-    image: "/images/courses/cse/data-structures.webp",
+    image:
+      "/images/courses/ai-ml/learning/data-analytics-pattern-recognition.webp",
   },
   {
     number: "08",
     title: "Deep Learning & Neural Networks",
     description:
       "Understand neural networks and deep learning approaches used to develop intelligent systems capable of learning from complex data.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/learning/deep-learning-neural-networks.webp",
   },
   {
     number: "09",
     title: "Natural Language Processing",
     description:
       "Explore how computers can process, understand and work with human language to build intelligent language-based applications.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/learning/natural-language-processing.webp",
   },
   {
     number: "10",
     title: "Computer Vision",
     description:
       "Learn how computer systems can process and interpret visual information to support intelligent applications and automated solutions.",
-    image: "/images/courses/cse/artificial-intelligence.webp",
+    image: "/images/courses/ai-ml/learning/computer-vision.webp",
   },
 ];
 

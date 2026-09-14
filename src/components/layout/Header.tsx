@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -83,6 +84,8 @@ const navLinks = [
 ];
 
 export default function Header({ overlay = false }: HeaderProps) {
+  const pathname = usePathname();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [coursesOpen, setCoursesOpen] = useState(false);
@@ -217,7 +220,8 @@ export default function Header({ overlay = false }: HeaderProps) {
           ===================================================== */}
           <nav
             className={`
-              nav-container backdrop-blur-2xl
+              nav-container
+              backdrop-blur-2xl
               ${navMode}
             `}
           >
@@ -233,7 +237,12 @@ export default function Header({ overlay = false }: HeaderProps) {
 
             {/* COURSES */}
             <div className="header-dropdown">
-              <Dropdown href="/courses" label="Courses" items={courseLinks} />
+              <Dropdown
+                key={pathname}
+                href="/courses"
+                label="Courses"
+                items={courseLinks}
+              />
             </div>
 
             {/* REMAINING LINKS */}
@@ -556,12 +565,12 @@ export default function Header({ overlay = false }: HeaderProps) {
           ----------------------------------------------------- */}
           <div
             className="
-            border-t
-            border-gray-200
-            bg-white/60
-            p-6
-            backdrop-blur-xl
-          "
+              border-t
+              border-gray-200
+              bg-white/60
+              p-6
+              backdrop-blur-xl
+            "
           >
             <Link
               href="/enquire-now"

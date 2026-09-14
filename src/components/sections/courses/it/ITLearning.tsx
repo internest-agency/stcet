@@ -29,70 +29,71 @@ const slides: ShowcaseSlide[] = [
     title: "Programming",
     description:
       "Build a strong foundation in programming concepts, computational thinking and problem-solving techniques used to develop practical technology solutions.",
-    image: "/images/courses/it/programming.webp",
+    image: "/images/courses/it/learning/programming.webp",
   },
   {
     number: "02",
     title: "Data Structures & Algorithms",
     description:
       "Learn how to organise data and apply algorithmic techniques to solve problems efficiently and develop effective software solutions.",
-    image: "/images/courses/it/data-structures.webp",
+    image: "/images/courses/it/learning/data-structures.webp",
   },
   {
     number: "03",
     title: "Database Technologies",
     description:
       "Explore database concepts, data modelling, SQL and database management techniques used to store, organise and retrieve information.",
-    image: "/images/courses/it/database-technologies.webp",
+    image: "/images/courses/it/learning/database-technologies.webp",
   },
   {
     number: "04",
     title: "Web Technologies",
     description:
       "Learn to design and develop modern web applications using front-end, back-end and web development technologies.",
-    image: "/images/courses/it/web-technologies.webp",
+    image: "/images/courses/it/learning/web-technologies.webp",
   },
   {
     number: "05",
     title: "Software Engineering",
     description:
       "Understand software development processes, system design, testing and engineering practices for building reliable technology solutions.",
-    image: "/images/courses/it/software-engineering.webp",
+    image: "/images/courses/it/learning/software-engineering.webp",
   },
   {
     number: "06",
     title: "Computer Networks",
     description:
       "Develop knowledge of networking concepts, communication protocols and network infrastructure that enable connected digital systems.",
-    image: "/images/courses/it/computer-networks.webp",
+    image: "/images/courses/it/learning/computer-networks.webp",
   },
   {
     number: "07",
     title: "Operating Systems",
     description:
       "Understand how operating systems manage processes, memory, storage, files and other resources that support modern computing environments.",
-    image: "/images/courses/it/operating-systems.webp",
+    image: "/images/courses/it/learning/operating-systems.webp",
   },
   {
     number: "08",
     title: "Cloud Computing",
     description:
       "Explore cloud platforms, virtualisation, distributed infrastructure and modern cloud services used to deploy and scale digital solutions.",
-    image: "/images/courses/it/cloud-computing.webp",
+    image: "/images/courses/it/learning/cloud-computing.webp",
   },
   {
     number: "09",
     title: "Cybersecurity",
     description:
       "Learn fundamental approaches to protecting systems, networks, applications and data against security threats and vulnerabilities.",
-    image: "/images/courses/it/cybersecurity.webp",
+    image: "/images/courses/it/learning/cybersecurity.webp",
   },
   {
     number: "10",
     title: "Data Analytics & Information Systems",
     description:
       "Develop an understanding of data analytics and information systems to transform organisational data into useful insights and support effective decision-making.",
-    image: "/images/courses/it/data-analytics-information-systems.webp",
+    image:
+      "/images/courses/it/learning/data-analytics-information-systems.webp",
   },
   {
     number: "11",
@@ -100,7 +101,7 @@ const slides: ShowcaseSlide[] = [
     description:
       "Explore artificial intelligence and emerging technologies shaping the future of digital services, intelligent systems and technology-driven solutions.",
     image:
-      "/images/courses/it/artificial-intelligence-emerging-technologies.webp",
+      "/images/courses/it/learning/artificial-intelligence-emerging-technologies.webp",
   },
 ];
 

@@ -15,31 +15,31 @@ const careerGroups = [
     number: "01",
     title: "Electrical Engineering",
     roles: ["Electrical Engineer", "Electrical Design Engineer"],
-    image: "/images/courses/eee/electrical-engineering.webp",
+    image: "/images/courses/eee/roles/electrical-engineering.webp",
   },
   {
     number: "02",
     title: "Power Systems",
     roles: ["Power Systems Engineer", "Power Electronics Engineer"],
-    image: "/images/courses/eee/power-systems.webp",
+    image: "/images/courses/eee/roles/power-systems.webp",
   },
   {
     number: "03",
     title: "Control & Automation",
     roles: ["Control Systems Engineer", "Automation Engineer"],
-    image: "/images/courses/eee/control-automation.webp",
+    image: "/images/courses/eee/roles/control-automation.webp",
   },
   {
     number: "04",
     title: "Energy & Renewables",
     roles: ["Renewable Energy Engineer", "Systems Engineer"],
-    image: "/images/courses/eee/renewable-energy.webp",
+    image: "/images/courses/eee/roles/renewable-energy.webp",
   },
   {
     number: "05",
     title: "Testing & Maintenance",
     roles: ["Electrical Testing Engineer", "Maintenance Engineer"],
-    image: "/images/courses/eee/testing-maintenance.webp",
+    image: "/images/courses/eee/roles/testing-maintenance.webp",
   },
 ];
 

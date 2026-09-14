@@ -15,37 +15,37 @@ const careerGroups = [
     number: "01",
     title: "Software Development",
     roles: ["Software Developer", "Application Developer"],
-    image: "/images/courses/it/software-development.webp",
+    image: "/images/courses/it/roles/software-development.webp",
   },
   {
     number: "02",
     title: "Web Technologies",
     roles: ["Web Developer", "Application Developer"],
-    image: "/images/courses/it/web-technologies.webp",
+    image: "/images/courses/it/roles/web-technologies.webp",
   },
   {
     number: "03",
     title: "Cloud & Systems",
     roles: ["Cloud Engineer", "Systems Analyst"],
-    image: "/images/courses/it/cloud-and-systems.webp",
+    image: "/images/courses/it/roles/cloud-and-systems.webp",
   },
   {
     number: "04",
     title: "Data & Databases",
     roles: ["Data Analyst", "Database Administrator"],
-    image: "/images/courses/it/data-and-databases.webp",
+    image: "/images/courses/it/roles/data-and-databases.webp",
   },
   {
     number: "05",
     title: "Networks & Cybersecurity",
     roles: ["Network Engineer", "Cybersecurity Analyst"],
-    image: "/images/courses/it/networks-cybersecurity.webp",
+    image: "/images/courses/it/roles/networks-cybersecurity.webp",
   },
   {
     number: "06",
     title: "IT Services & DevOps",
     roles: ["IT Consultant", "DevOps Professional"],
-    image: "/images/courses/it/it-services-devops.webp",
+    image: "/images/courses/it/roles/it-services-devops.webp",
   },
 ];
 

@@ -15,31 +15,31 @@ const careerGroups = [
     number: "01",
     title: "Electronics Engineering",
     roles: ["Electronics Engineer", "Hardware Design Engineer"],
-    image: "/images/courses/ece/electronics-engineering.webp",
+    image: "/images/courses/ece/roles/electronics-engineering.webp",
   },
   {
     number: "02",
     title: "Embedded Systems",
     roles: ["Embedded Systems Engineer", "IoT Engineer"],
-    image: "/images/courses/ece/embedded-systems.webp",
+    image: "/images/courses/ece/roles/embedded-systems.webp",
   },
   {
     number: "03",
     title: "Communication & Networks",
     roles: ["Communication Engineer", "Network Engineer"],
-    image: "/images/courses/ece/communication-networks.webp",
+    image: "/images/courses/ece/roles/communication-networks.webp",
   },
   {
     number: "04",
     title: "VLSI Design",
     roles: ["VLSI Design Engineer", "Test Engineer"],
-    image: "/images/courses/ece/vlsi-design.webp",
+    image: "/images/courses/ece/roles/vlsi-design.webp",
   },
   {
     number: "05",
     title: "Technology & Software",
     roles: ["Systems Engineer", "Software Professional"],
-    image: "/images/courses/ece/technology-software.webp",
+    image: "/images/courses/ece/roles/technology-software.webp",
   },
 ];
 
