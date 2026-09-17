@@ -1,5 +1,4 @@
 import CourseHero from "@/src/components/sections/courses/CourseHero";
-import ITOverview from "@/src/components/sections/courses/it/ITOverview";
 import CurriculumExplorer, {
   type CurriculumSlide,
 } from "@/src/components/sections/courses/CurriculumExplorer";

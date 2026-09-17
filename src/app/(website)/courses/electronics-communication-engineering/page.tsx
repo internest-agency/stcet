@@ -1,5 +1,4 @@
 import CourseHero from "@/src/components/sections/courses/CourseHero";
-import ECEOverview from "@/src/components/sections/courses/ece/ECEOverview";
 import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
