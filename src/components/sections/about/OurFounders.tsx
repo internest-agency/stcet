@@ -192,7 +192,7 @@ export default function OurFounders() {
                 </div>
 
                 {/* Name */}
-                <h3 className="text-3xl font-extrabold tracking-[-0.025em] text-gray-900 sm:text-4xl">
+                <h3 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                   Thiru. S. Thangapazham
                 </h3>
 
@@ -243,7 +243,7 @@ export default function OurFounders() {
                 </div>
 
                 {/* Name */}
-                <h3 className="text-3xl font-extrabold tracking-[-0.025em] text-gray-900 sm:text-4xl">
+                <h3 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
                   Thiru. S.T. Murugesan
                 </h3>
 

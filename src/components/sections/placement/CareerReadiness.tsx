@@ -190,12 +190,8 @@ export default function CareerReadiness() {
               </span>
             </div>
 
-            <h2 className="career-readiness-heading max-w-md [perspective:900px] text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 sm:text-4xl lg:text-5xl">
-              Preparing
-              <br />
-              Students
-              <br />
-              For Careers.
+            <h2 className="career-readiness-heading max-w-md perspective-[900px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 text-[32px] sm:text-[40px] lg:text-[48px]">
+              Preparing Students For Careers.
             </h2>
 
             <p className="mt-7 max-w-sm text-base leading-7 text-gray-500">

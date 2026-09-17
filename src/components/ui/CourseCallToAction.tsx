@@ -106,7 +106,7 @@ export default function CourseCallToAction({
       className="relative overflow-hidden bg-gray-100 text-primary-700"
     >
       <Container>
-        <div className="py-8 sm:py-10 lg:py-12">
+        <div className="py-8 sm:py-10 md:py-16 lg:py-20">
           <div className="relative overflow-hidden">
             <div className="grid items-center gap-7 pl-5 sm:pl-7 lg:grid-cols-[1fr_auto] lg:gap-12 lg:pl-8">
               {/* Statement */}

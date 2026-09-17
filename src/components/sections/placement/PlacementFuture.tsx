@@ -193,12 +193,8 @@ export default function PlacementFuture() {
               </span>
             </div>
 
-            <h2 className="placement-future-heading max-w-md [perspective:900px] text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-              Preparing
-              <br />
-              For The
-              <br />
-              Future.
+            <h2 className="placement-future-heading max-w-md perspective-[900px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-white text-[32px] sm:text-[40px] lg:text-[48px]">
+              Preparing For The Future.
             </h2>
           </div>
 
@@ -236,10 +232,11 @@ export default function PlacementFuture() {
                     gap-5
                     border-b
                     border-white/15
+                    px-4
                     py-6
                     transition-colors
                     duration-300
-                    hover:bg-white/[0.03]
+                    hover:bg-white/3
                   "
                 >
                   <span className="w-8 shrink-0 text-xs font-bold text-accent-400">

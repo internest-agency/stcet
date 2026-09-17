@@ -465,7 +465,7 @@ export default function GalleryGrid() {
               </div>
             </div>
 
-            <p className="max-w-4xl text-2xl font-extrabold leading-[1.3] tracking-[-0.025em] text-primary-700 sm:text-3xl lg:text-4xl lg:leading-[1.25]">
+            <p className="max-w-4xl text-2xl font-extrabold leading-[1.3] tracking-tight text-primary-700 sm:text-3xl lg:text-4xl lg:leading-[1.25]">
               Every space at STCET is part of a larger journey — learning,
               discovering, collaborating and growing together.
             </p>

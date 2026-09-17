@@ -223,7 +223,7 @@ export default function OurTrust() {
 
               {/* Title */}
               <div className="mt-4 lg:mt-0">
-                <h3 className="text-2xl font-extrabold tracking-[-0.025em] text-gray-900 transition-transform duration-300 ease-out group-hover:translate-x-1 sm:text-3xl">
+                <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 transition-transform duration-300 ease-out group-hover:translate-x-1 sm:text-3xl">
                   {pillar.title}
                 </h3>
               </div>

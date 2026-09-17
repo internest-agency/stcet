@@ -149,12 +149,8 @@ export default function IndustryEngagement() {
               </span>
             </div>
 
-            <h2 className="industry-engagement-heading max-w-md [perspective:900px] text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 sm:text-4xl lg:text-5xl">
-              Connecting
-              <br />
-              Students
-              <br />
-              With Industry.
+            <h2 className="industry-engagement-heading max-w-md perspective-[900px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 text-[32px] sm:text-[40px] lg:text-[48px]">
+              Connecting Students With Industry.
             </h2>
           </div>
 

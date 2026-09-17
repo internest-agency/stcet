@@ -97,12 +97,8 @@ export default function PlacementHead() {
               </span>
             </div>
 
-            <h2 className="placement-head-heading max-w-md text-3xl font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 sm:text-4xl lg:text-5xl">
-              Guiding
-              <br />
-              Students
-              <br />
-              Towards Careers.
+            <h2 className="placement-head-heading max-w-md font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 text-[32px] sm:text-[40px] lg:text-[48px]">
+              Guiding Students Towards Careers.
             </h2>
           </div>
 

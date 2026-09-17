@@ -69,7 +69,7 @@ export default function EnquirySupport() {
             </div>
 
             <div className="max-w-4xl">
-              <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-[-0.025em] text-white sm:text-3xl lg:text-4xl">
+              <h2 className="text-2xl font-extrabold uppercase leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
                 Have Questions About Your Engineering Journey?
               </h2>
 

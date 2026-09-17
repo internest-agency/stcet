@@ -5,68 +5,37 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
-
-import Container from "../../../ui/Container";
+import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 /* =========================================================
-   DATA
+   TYPES
 ========================================================= */
 
-const careerGroups = [
-  {
-    number: "01",
-    title: "Electrical Engineering",
-    roles: ["Electrical Engineer", "Electrical Design Engineer"],
-    image: "/images/courses/eee/roles/electrical-engineering.webp",
-  },
-  {
-    number: "02",
-    title: "Power Systems",
-    roles: ["Power Systems Engineer", "Power Electronics Engineer"],
-    image: "/images/courses/eee/roles/power-systems.webp",
-  },
-  {
-    number: "03",
-    title: "Control & Automation",
-    roles: ["Control Systems Engineer", "Automation Engineer"],
-    image: "/images/courses/eee/roles/control-automation.webp",
-  },
-  {
-    number: "04",
-    title: "Energy & Renewables",
-    roles: ["Renewable Energy Engineer", "Systems Engineer"],
-    image: "/images/courses/eee/roles/renewable-energy.webp",
-  },
-  {
-    number: "05",
-    title: "Testing & Maintenance",
-    roles: ["Electrical Testing Engineer", "Maintenance Engineer"],
-    image: "/images/courses/eee/roles/testing-maintenance.webp",
-  },
-];
+export interface CareerGroup {
+  number: string;
+  title: string;
+  roles: string[];
+  image: string;
+}
 
-const futurePaths = [
-  {
-    number: "01",
-    title: "Higher Studies",
-    description:
-      "Pursue higher studies to deepen knowledge and specialise in advanced areas of electrical engineering.",
-  },
-  {
-    number: "02",
-    title: "Specialised Careers",
-    description:
-      "Build specialised careers in power systems, renewable energy, automation, control and related areas.",
-  },
-  {
-    number: "03",
-    title: "Advanced Engineering",
-    description:
-      "Continue developing expertise in emerging electrical technologies and advanced engineering applications.",
-  },
-];
+export interface FuturePath {
+  number: string;
+  title: string;
+  description: string;
+}
+
+interface CareerPathwaysProps {
+  careerTitle: string;
+  careerIntro: string;
+  careerGroups: CareerGroup[];
+
+  beyondTitle: string;
+  beyondIntro: string;
+  futurePaths: FuturePath[];
+}
 
 /* =========================================================
    CAREER CARD
@@ -76,7 +45,7 @@ function CareerCard({
   group,
   isDecorative = false,
 }: {
-  group: (typeof careerGroups)[number];
+  group: CareerGroup;
   isDecorative?: boolean;
 }) {
   return (
@@ -87,8 +56,8 @@ function CareerCard({
         career-marquee-card
         group
         relative
-        aspect-[4/3]
-        w-[300px]
+        aspect-4/3
+        w-75
         shrink-0
         overflow-hidden
         bg-gray-950
@@ -101,16 +70,22 @@ function CareerCard({
         focus-visible:ring-2
         focus-visible:ring-accent-400
         focus-visible:ring-offset-2
-        sm:w-[360px]
-        lg:w-[500px]
-        xl:w-[540px]
+        sm:w-90
+        lg:w-125
+        xl:w-135
       "
     >
+      {/* IMAGE */}
+
       <Image
         src={group.image}
         alt={isDecorative ? "" : group.title}
         fill
-        sizes="(max-width: 640px) 300px, (max-width: 1024px) 360px, 500px"
+        sizes="
+          (max-width: 640px) 300px,
+          (max-width: 1024px) 360px,
+          500px
+        "
         className="
           object-cover
           transition-transform
@@ -120,20 +95,22 @@ function CareerCard({
         "
       />
 
-      {/* Image readability gradient */}
+      {/* IMAGE READABILITY GRADIENT */}
+
       <div
         aria-hidden="true"
         className="
           absolute
           inset-0
-          bg-gradient-to-b
+          bg-linear-to-b
           from-black/5
           via-black/10
           to-black/90
         "
       />
 
-      {/* Bottom gradient */}
+      {/* BOTTOM GRADIENT */}
+
       <div
         aria-hidden="true"
         className="
@@ -147,8 +124,21 @@ function CareerCard({
         "
       />
 
-      {/* Card content */}
-      <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-6 lg:p-7">
+      {/* CARD CONTENT */}
+
+      <div
+        className="
+          absolute
+          inset-x-0
+          bottom-0
+          z-10
+          p-5
+          sm:p-6
+          lg:p-7
+        "
+      >
+        {/* LABEL */}
+
         <div className="mb-3 flex items-center gap-3">
           <span
             className="
@@ -177,9 +167,11 @@ function CareerCard({
           </span>
         </div>
 
+        {/* TITLE */}
+
         <h3
           className="
-            max-w-[430px]
+            max-w-107.5
             text-[24px]
             font-extrabold
             uppercase
@@ -196,6 +188,8 @@ function CareerCard({
         >
           {group.title}
         </h3>
+
+        {/* ROLES */}
 
         <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1.5">
           {group.roles.map((role) => (
@@ -215,7 +209,8 @@ function CareerCard({
         </div>
       </div>
 
-      {/* Hover accent */}
+      {/* HOVER ACCENT */}
+
       <span
         aria-hidden="true"
         className="
@@ -237,14 +232,17 @@ function CareerCard({
 }
 
 /* =========================================================
-   COMPONENT
+   REUSABLE COMPONENT
 ========================================================= */
 
-export default function EEECareers() {
-  /*
-   * The root element is a <div>.
-   * Therefore this must be HTMLDivElement.
-   */
+export default function CareerPathways({
+  careerTitle,
+  careerIntro,
+  careerGroups,
+  beyondTitle,
+  beyondIntro,
+  futurePaths,
+}: CareerPathwaysProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
@@ -252,11 +250,7 @@ export default function EEECareers() {
     const section = sectionRef.current;
     const marquee = marqueeRef.current;
 
-    if (!section || !marquee) {
-      return;
-    }
-
-    const splitInstances: SplitText[] = [];
+    if (!section || !marquee) return;
 
     const context = gsap.context(() => {
       const reducedMotion = window.matchMedia(
@@ -268,24 +262,29 @@ export default function EEECareers() {
       ===================================================== */
 
       if (reducedMotion) {
-        const elements = Array.from(
-          section.querySelectorAll<HTMLElement>(
-            [
-              "[data-career-label]",
-              "[data-career-heading]",
-              "[data-career-intro]",
-              "[data-career-marquee]",
-              "[data-beyond-label]",
-              "[data-beyond-heading]",
-              "[data-beyond-intro]",
-              "[data-future-path]",
-            ].join(", "),
+        const elements = gsap.utils.toArray<HTMLElement>(
+          section.querySelectorAll(
+            `
+              [data-career-label],
+              [data-career-heading],
+              [data-career-intro],
+              [data-career-marquee],
+              [data-beyond-label],
+              [data-beyond-heading],
+              [data-beyond-intro],
+              [data-future-path]
+            `,
           ),
         );
 
         if (elements.length > 0) {
           gsap.set(elements, {
             clearProps: "all",
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
           });
         }
 
@@ -364,8 +363,6 @@ export default function EEECareers() {
           autoSplit: true,
         });
 
-        splitInstances.push(split);
-
         gsap.set(split.lines, {
           yPercent: 110,
           rotateX: -65,
@@ -390,13 +387,13 @@ export default function EEECareers() {
          CAREER INTRO
       ===================================================== */
 
-      const careerIntro = section.querySelector<HTMLElement>(
+      const careerIntroElement = section.querySelector<HTMLElement>(
         "[data-career-intro]",
       );
 
-      if (careerIntro) {
+      if (careerIntroElement) {
         gsap.fromTo(
-          careerIntro,
+          careerIntroElement,
           {
             opacity: 0,
             y: 28,
@@ -407,7 +404,7 @@ export default function EEECareers() {
             duration: 0.8,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: careerIntro,
+              trigger: careerIntroElement,
               start: "top 88%",
               once: true,
             },
@@ -486,23 +483,19 @@ export default function EEECareers() {
           duration: 35,
           ease: "none",
           repeat: -1,
-
           modifiers: {
-            x: (value: string) => {
+            x: gsap.utils.unitize((value) => {
               const x = Number.parseFloat(value);
 
-              if (!Number.isFinite(x)) {
-                return "0px";
-              }
-
-              return `${x <= -firstSetWidth ? x + firstSetWidth : x}px`;
-            },
+              return x <= -firstSetWidth ? x + firstSetWidth : x;
+            }),
           },
         });
 
-        /*
-         * Pause marquee when it is outside the viewport.
-         */
+        /* ===================================================
+           PAUSE MARQUEE OUTSIDE VIEWPORT
+        =================================================== */
+
         ScrollTrigger.create({
           trigger: marquee,
           start: "top bottom",
@@ -598,8 +591,6 @@ export default function EEECareers() {
           autoSplit: true,
         });
 
-        splitInstances.push(split);
-
         gsap.set(split.lines, {
           yPercent: 100,
           opacity: 0,
@@ -623,13 +614,13 @@ export default function EEECareers() {
          BEYOND THE DEGREE INTRO
       ===================================================== */
 
-      const beyondIntro = section.querySelector<HTMLElement>(
+      const beyondIntroElement = section.querySelector<HTMLElement>(
         "[data-beyond-intro]",
       );
 
-      if (beyondIntro) {
+      if (beyondIntroElement) {
         gsap.fromTo(
-          beyondIntro,
+          beyondIntroElement,
           {
             opacity: 0,
             x: 30,
@@ -640,7 +631,7 @@ export default function EEECareers() {
             duration: 0.8,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: beyondIntro,
+              trigger: beyondIntroElement,
               start: "top 88%",
               once: true,
             },
@@ -676,7 +667,6 @@ export default function EEECareers() {
             },
           });
 
-          /* Initial card state */
           gsap.set(card, {
             opacity: 0,
             y: 45,
@@ -703,7 +693,6 @@ export default function EEECareers() {
             });
           }
 
-          /* Card */
           timeline.to(
             card,
             {
@@ -715,7 +704,6 @@ export default function EEECareers() {
             index * 0.08,
           );
 
-          /* Number */
           if (number) {
             timeline.to(
               number,
@@ -729,7 +717,6 @@ export default function EEECareers() {
             );
           }
 
-          /* Title */
           if (title) {
             timeline.to(
               title,
@@ -743,7 +730,6 @@ export default function EEECareers() {
             );
           }
 
-          /* Description */
           if (description) {
             timeline.to(
               description,
@@ -760,66 +746,69 @@ export default function EEECareers() {
       }
     }, section);
 
-    /* =========================================================
-       CLEANUP
-    ========================================================= */
-
     return () => {
-      /*
-       * Revert SplitText before reverting the GSAP context.
-       */
-      splitInstances.forEach((split) => {
-        split.revert();
-      });
-
       context.revert();
     };
   }, []);
 
   return (
     <div ref={sectionRef}>
-      {/* =========================================================
+      {/* =====================================================
           CAREER PATHWAYS
-      ========================================================== */}
+      ===================================================== */}
 
       <section className="overflow-hidden bg-gray-50">
         <Container>
           <div className="py-14 sm:py-18 lg:py-20">
-            {/* Header */}
-            <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end lg:gap-20 xl:gap-28">
+            {/* HEADER */}
+
+            <div
+              className="
+                grid
+                gap-6
+                lg:grid-cols-[1fr_1fr]
+                lg:items-end
+                lg:gap-20
+                xl:gap-28
+              "
+            >
               <div>
-                <div data-career-label className="mb-5 flex items-center gap-3">
+                <div
+                  data-career-label
+                  className="
+                    mb-5
+                    flex
+                    items-center
+                    gap-3
+                  "
+                >
                   <span
                     data-career-dot
                     aria-hidden="true"
-                    className="h-2 w-2 shrink-0 rounded-full bg-accent-400"
+                    className="
+                      h-2
+                      w-2
+                      shrink-0
+                      rounded-full
+                      bg-accent-400
+                    "
                   />
 
                   <span
                     data-career-label-text
-                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-700"
+                    className="
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.2em]
+                      text-primary-700
+                    "
                   >
                     Career Pathways
                   </span>
                 </div>
 
-                <h2
-                  data-career-heading
-                  className="
-                    max-w-xl
-                    [perspective:900px]
-                    text-[34px]
-                    font-extrabold
-                    uppercase
-                    leading-[0.97]
-                    tracking-[-0.045em]
-                    text-primary-700
-                    sm:text-[42px]
-                    lg:text-[50px]
-                  "
-                >
-                  Build your future in electrical engineering.
-                </h2>
+                <SectionHeading as="h2">{careerTitle}</SectionHeading>
               </div>
 
               <p
@@ -835,17 +824,15 @@ export default function EEECareers() {
                   lg:leading-7
                 "
               >
-                EEE graduates can pursue opportunities across core electrical
-                industries, infrastructure, manufacturing, automation, energy
-                and technology.
+                {careerIntro}
               </p>
             </div>
           </div>
         </Container>
 
-        {/* =====================================================
+        {/* ===================================================
             MARQUEE
-        ====================================================== */}
+        =================================================== */}
 
         <div
           data-career-marquee
@@ -879,19 +866,34 @@ export default function EEECareers() {
         </div>
       </section>
 
-      {/* =========================================================
+      {/* =====================================================
           BEYOND THE DEGREE
-      ========================================================== */}
+      ===================================================== */}
 
       <section className="bg-gray-50">
         <Container>
           <div className="py-14 sm:py-16 lg:py-20">
-            {/* Header */}
-            <div className="grid gap-7 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-16 xl:gap-24">
+            {/* HEADER */}
+
+            <div
+              className="
+                grid
+                gap-7
+                lg:grid-cols-[0.95fr_1.05fr]
+                lg:items-end
+                lg:gap-16
+                xl:gap-24
+              "
+            >
               <div>
                 <div
                   data-beyond-label
-                  className="mb-4 flex items-center gap-2.5"
+                  className="
+                    mb-4
+                    flex
+                    items-center
+                    gap-2.5
+                  "
                 >
                   <span
                     data-beyond-dot
@@ -909,28 +911,19 @@ export default function EEECareers() {
 
                   <span
                     data-beyond-label-text
-                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-700"
+                    className="
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.2em]
+                      text-primary-700
+                    "
                   >
                     Beyond the Degree
                   </span>
                 </div>
 
-                <h2
-                  data-beyond-heading
-                  className="
-                    max-w-2xl
-                    text-[32px]
-                    font-extrabold
-                    uppercase
-                    leading-[0.98]
-                    tracking-[-0.045em]
-                    text-primary-700
-                    sm:text-[40px]
-                    lg:text-[48px]
-                  "
-                >
-                  Keep learning. Keep growing.
-                </h2>
+                <SectionHeading as="h2">{beyondTitle}</SectionHeading>
               </div>
 
               <p
@@ -946,81 +939,99 @@ export default function EEECareers() {
                   lg:leading-8
                 "
               >
-                The programme provides a foundation for higher studies and
-                specialised careers in power systems, renewable energy,
-                automation, control and related areas.
+                {beyondIntro}
               </p>
             </div>
 
-            {/* =====================================================
+            {/* =================================================
                 FUTURE PATHS
-            ====================================================== */}
+            ================================================= */}
 
-            <div className="mt-10 border-y border-gray-200 sm:mt-12 lg:mt-14">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3">
+            <div
+              className="
+                mt-10
+                border-y
+                border-gray-200
+                sm:mt-12
+                lg:mt-14
+              "
+            >
+              <div
+                className="
+                  grid
+                  sm:grid-cols-2
+                  lg:grid-cols-3
+                "
+              >
                 {futurePaths.map((path, index) => (
                   <article
-                    key={path.number}
+                    key={`${path.number}-${index}`}
                     data-future-path
                     className={`
-                      px-5
-                      py-7
-                      sm:px-7
-                      sm:py-8
-                      lg:px-8
-                      lg:py-9
-                      xl:px-9
-                      xl:py-10
-                      ${
-                        index > 0
-                          ? "border-t border-gray-200 sm:border-t-0 sm:border-l"
-                          : ""
-                      }
-                    `}
+                        px-5
+                        py-7
+                        sm:px-7
+                        sm:py-8
+                        lg:px-8
+                        lg:py-9
+                        xl:px-9
+                        xl:py-10
+                        ${
+                          index > 0
+                            ? "border-t border-gray-200 sm:border-t-0 sm:border-l"
+                            : ""
+                        }
+                      `}
                   >
+                    {/* NUMBER */}
+
                     <span
                       data-future-number
                       className="
-                        inline-block
-                        font-mono
-                        text-[10px]
-                        font-bold
-                        tracking-[0.14em]
-                        text-accent-400
-                      "
+                          inline-block
+                          font-mono
+                          text-[10px]
+                          font-bold
+                          tracking-[0.14em]
+                          text-accent-400
+                        "
                     >
                       {path.number}
                     </span>
 
+                    {/* TITLE */}
+
                     <h3
                       data-future-title
                       className="
-                        mt-5
-                        text-[18px]
-                        font-extrabold
-                        leading-[1.08]
-                        tracking-[-0.03em]
-                        text-primary-700
-                        sm:text-[20px]
-                        lg:text-[21px]
-                      "
+                          mt-5
+                          text-[18px]
+                          font-extrabold
+                          leading-[1.08]
+                          tracking-[-0.03em]
+                          text-primary-700
+                          sm:text-[20px]
+                          lg:text-[21px]
+                        "
                     >
                       {path.title}
                     </h3>
 
+                    {/* DESCRIPTION */}
+
                     <p
                       data-future-description
                       className="
-                        mt-3
-                        text-[13px]
-                        leading-5
-                        text-gray-500
-                        sm:mt-4
-                        sm:text-[14px]
-                        sm:leading-6
-                        lg:text-[15px]
-                        lg:leading-7
-                      "
+                          mt-3
+                          text-[13px]
+                          leading-5
+                          text-gray-500
+                          sm:mt-4
+                          sm:text-[14px]
+                          sm:leading-6
+                          lg:text-[15px]
+                          lg:leading-7
+                        "
                     >
                       {path.description}
                     </p>

@@ -83,7 +83,7 @@ export default function PlacementHero() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-gray-50">
-      <Container className="py-10 sm:py-14 lg:py-16">
+      <Container className="pt-28 pb-16 sm:pt-32 sm:pb-20 lg:pt-36 lg:pb-24">
         <Breadcrumb
           items={[{ label: "Placement & Training Cell" }]}
           className="mb-14 sm:mb-16 lg:mb-20"
@@ -104,7 +104,7 @@ export default function PlacementHero() {
           </div>
 
           <div>
-            <h1 className="placement-hero-heading max-w-5xl text-4xl font-black uppercase leading-[0.98] tracking-[-0.045em] text-primary-700 sm:text-6xl lg:text-7xl">
+            <h1 className="placement-hero-heading max-w-5xl text-4xl font-black uppercase leading-[0.98] tracking-[-0.045em] text-primary-700 sm:text-5xl lg:text-6xl">
               Preparing Students
               <br />
               for Careers.
