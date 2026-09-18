@@ -50,77 +50,77 @@ const curriculum: CurriculumSlide[] = [
     title: "Electrical Circuits & Systems",
     description:
       "Understand fundamental electrical concepts, circuit analysis and the behaviour of electrical systems used in engineering applications.",
-    image: "/images/courses/eee/electrical-circuits.webp",
+    image: "/images/courses/eee/learning/electrical-circuits.webp",
   },
   {
     number: "02",
     title: "Electrical Machines",
     description:
       "Learn the principles and operation of electrical machines including transformers, motors and generators used across modern power applications.",
-    image: "/images/courses/eee/electrical-machines.webp",
+    image: "/images/courses/eee/learning/electrical-machines.webp",
   },
   {
     number: "03",
     title: "Power Systems",
     description:
       "Explore the generation, transmission, distribution and management of electrical power systems and their role in modern infrastructure.",
-    image: "/images/courses/eee/power-systems.webp",
+    image: "/images/courses/eee/learning/power-systems.webp",
   },
   {
     number: "04",
     title: "Power Electronics",
     description:
       "Study power semiconductor devices, converters and control techniques used to efficiently manage and convert electrical energy.",
-    image: "/images/courses/eee/power-electronics.webp",
+    image: "/images/courses/eee/learning/power-electronics.webp",
   },
   {
     number: "05",
     title: "Control Systems",
     description:
       "Understand feedback, system modelling and control techniques used to regulate and automate electrical and engineering systems.",
-    image: "/images/courses/eee/control-systems.webp",
+    image: "/images/courses/eee/learning/control-systems.webp",
   },
   {
     number: "06",
     title: "Measurements & Instrumentation",
     description:
       "Develop knowledge of electrical measurements, sensors, instrumentation systems and techniques for accurate monitoring and analysis.",
-    image: "/images/courses/eee/measurements-instrumentation.webp",
+    image: "/images/courses/eee/learning/measurements-instrumentation.webp",
   },
   {
     number: "07",
     title: "Digital Electronics",
     description:
       "Learn digital logic, combinational and sequential circuits and electronic systems that form the foundation of modern digital technology.",
-    image: "/images/courses/eee/digital-electronics.webp",
+    image: "/images/courses/eee/learning/digital-electronics.webp",
   },
   {
     number: "08",
     title: "Microcontrollers",
     description:
       "Explore microcontroller architecture, programming and interfacing to develop embedded and intelligent electronic applications.",
-    image: "/images/courses/eee/microcontrollers.webp",
+    image: "/images/courses/eee/learning/microcontrollers.webp",
   },
   {
     number: "09",
     title: "Electrical Drives",
     description:
       "Understand electric drive systems, motor control and power conversion techniques used in industrial and automated applications.",
-    image: "/images/courses/eee/electrical-drives.webp",
+    image: "/images/courses/eee/learning/electrical-drives.webp",
   },
   {
     number: "10",
     title: "Renewable Energy Systems",
     description:
       "Explore renewable energy technologies and their integration into modern electrical systems for efficient and sustainable power generation.",
-    image: "/images/courses/eee/renewable-energy.webp",
+    image: "/images/courses/eee/learning/renewable-energy.webp",
   },
   {
     number: "11",
     title: "Automation & Industrial Control",
     description:
       "Learn automation principles, industrial control systems and technologies used to improve efficiency, reliability and productivity.",
-    image: "/images/courses/eee/automation-industrial-control.webp",
+    image: "/images/courses/eee/learning/automation-industrial-control.webp",
   },
 ];
 

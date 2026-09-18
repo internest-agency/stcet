@@ -43,20 +43,36 @@ export default function CurriculumExplorer({
   intro,
   slides,
 }: CurriculumExplorerProps) {
+  /* =========================================================
+     REFS
+  ========================================================= */
+
   const sectionRef = useRef<HTMLElement>(null);
+
   const imageRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const introRef = useRef<HTMLParagraphElement>(null);
+
+  const explorerRef = useRef<HTMLDivElement>(null);
+  const navigationRef = useRef<HTMLDivElement>(null);
+  const modulesRef = useRef<HTMLDivElement>(null);
+  const featuredRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+
   const slideTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  /* =========================================================
+     STATE
+  ========================================================= */
 
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isChanging, setIsChanging] = useState(false);
 
-  /*
-   * Prevent invalid active index when the
-   * data changes dynamically.
-   */
+  /* =========================================================
+     SAFE ACTIVE INDEX
+  ========================================================= */
+
   const safeActiveIndex =
     slides.length > 0 ? Math.min(activeIndex, slides.length - 1) : 0;
 
@@ -77,25 +93,74 @@ export default function CurriculumExplorer({
       const image = imageRef.current;
       const content = contentRef.current;
 
-      /*
-       * Fallback when animation elements
-       * are not available.
-       */
       if (!image || !content) {
         setActiveIndex(index);
         return;
       }
 
+      /*
+       * Determine direction.
+       *
+       * Forward:
+       * old content exits left
+       * new content enters from right
+       *
+       * Backward:
+       * old content exits right
+       * new content enters from left
+       */
       const direction = index > safeActiveIndex ? 1 : -1;
 
       setIsChanging(true);
 
       /*
-       * Kill any previous slide animation.
+       * Kill any running slide animation.
        */
       slideTimelineRef.current?.kill();
 
+      /* =====================================================
+         CONTENT ELEMENTS
+
+         IMPORTANT:
+         The bottom navigation controls are deliberately
+         NOT included here.
+
+         They must remain completely stationary when
+         changing modules.
+      ===================================================== */
+
+      const moduleNumber = content.querySelector<HTMLElement>(
+        ".curriculum-module-number",
+      );
+
+      const title = content.querySelector<HTMLElement>(
+        ".curriculum-module-title",
+      );
+
+      const description = content.querySelector<HTMLElement>(
+        ".curriculum-module-description",
+      );
+
+      /*
+       * Only these elements participate in the
+       * directional slide transition.
+       *
+       * Previous / Counter / Next are intentionally
+       * excluded.
+       */
+      const animatedContent = [moduleNumber, title, description].filter(
+        (element): element is HTMLElement => Boolean(element),
+      );
+
+      /* =====================================================
+         TIMELINE
+      ===================================================== */
+
       const timeline = gsap.timeline({
+        defaults: {
+          overwrite: "auto",
+        },
+
         onComplete: () => {
           slideTimelineRef.current = null;
           setIsChanging(false);
@@ -104,96 +169,160 @@ export default function CurriculumExplorer({
 
       slideTimelineRef.current = timeline;
 
-      timeline
-        /*
-         * -----------------------------------------------------
-         * EXIT IMAGE
-         * -----------------------------------------------------
-         */
+      /* =====================================================
+         EXIT CURRENT CONTENT
+      ===================================================== */
 
-        .to(image, {
+      const exitX = direction > 0 ? -36 : 36;
+
+      if (animatedContent.length > 0) {
+        timeline.to(animatedContent, {
           opacity: 0,
-          y: direction > 0 ? -12 : 12,
-          duration: 0.18,
+          x: exitX,
+          duration: 0.24,
+          stagger: 0.025,
           ease: "power2.in",
-        })
+        });
+      }
 
-        /*
-         * -----------------------------------------------------
-         * EXIT CONTENT
-         * -----------------------------------------------------
-         */
+      /* =====================================================
+         EXIT IMAGE
+      ===================================================== */
 
-        .to(
-          content,
-          {
-            opacity: 0,
-            y: direction > 0 ? -6 : 6,
-            duration: 0.16,
-            ease: "power2.in",
-          },
-          "<",
-        )
+      timeline.to(
+        image,
+        {
+          opacity: 0,
+          x: direction > 0 ? -50 : 50,
+          scale: 1.035,
+          duration: 0.34,
+          ease: "power2.inOut",
+        },
+        "<0.02",
+      );
 
-        /*
-         * -----------------------------------------------------
-         * CHANGE ACTIVE SLIDE
-         * -----------------------------------------------------
-         */
+      /* =====================================================
+         CHANGE ACTIVE SLIDE
+      ===================================================== */
 
-        .call(() => {
-          setActiveIndex(index);
-        })
+      timeline.call(() => {
+        setActiveIndex(index);
+      });
 
-        /*
-         * -----------------------------------------------------
-         * ENTER STARTING POSITIONS
-         * -----------------------------------------------------
-         */
+      /* =====================================================
+         PREPARE NEW IMAGE
+      ===================================================== */
 
-        .set(image, {
-          y: direction > 0 ? 12 : -12,
-        })
+      timeline.set(image, {
+        opacity: 0,
+        x: direction > 0 ? 50 : -50,
+        scale: 1.06,
+      });
 
-        .set(content, {
-          y: direction > 0 ? 6 : -6,
-        })
+      /* =====================================================
+         PREPARE NEW CONTENT
 
-        /*
-         * -----------------------------------------------------
-         * ENTER IMAGE
-         * -----------------------------------------------------
-         */
+         Navigation controls are NOT touched.
+      ===================================================== */
 
-        .to(image, {
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-          ease: "power3.out",
-        })
+      if (moduleNumber) {
+        timeline.set(moduleNumber, {
+          opacity: 0,
+          x: direction > 0 ? 20 : -20,
+        });
+      }
 
-        /*
-         * -----------------------------------------------------
-         * ENTER CONTENT
-         * -----------------------------------------------------
-         */
+      if (title) {
+        timeline.set(title, {
+          opacity: 0,
+          x: direction > 0 ? 32 : -32,
+        });
+      }
 
-        .to(
-          content,
+      if (description) {
+        timeline.set(description, {
+          opacity: 0,
+          x: direction > 0 ? 22 : -22,
+        });
+      }
+
+      /* =====================================================
+         ENTER IMAGE
+      ===================================================== */
+
+      timeline.to(image, {
+        opacity: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.62,
+        ease: "power3.out",
+      });
+
+      /* =====================================================
+         ENTER MODULE NUMBER
+      ===================================================== */
+
+      if (moduleNumber) {
+        timeline.to(
+          moduleNumber,
           {
             opacity: 1,
-            y: 0,
-            duration: 0.32,
+            x: 0,
+            duration: 0.3,
             ease: "power3.out",
           },
-          "<0.04",
+          "-=0.42",
         );
+      }
+
+      /* =====================================================
+         ENTER TITLE
+      ===================================================== */
+
+      if (title) {
+        timeline.to(
+          title,
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.46,
+            ease: "power4.out",
+          },
+          "-=0.2",
+        );
+      }
+
+      /* =====================================================
+         ENTER DESCRIPTION
+      ===================================================== */
+
+      if (description) {
+        timeline.to(
+          description,
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.42,
+            ease: "power3.out",
+          },
+          "-=0.24",
+        );
+      }
+
+      /*
+       * IMPORTANT:
+       *
+       * There is intentionally NO animation here for
+       * .curriculum-module-controls.
+       *
+       * Previous / Counter / Next remain fixed.
+       */
     },
     [slides.length, safeActiveIndex, isChanging],
   );
 
   /* =========================================================
-     HEADING ANIMATION
+     ENTRANCE / SCROLL ANIMATIONS
   ========================================================= */
 
   useLayoutEffect(() => {
@@ -206,33 +335,293 @@ export default function CurriculumExplorer({
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
+      /*
+       * Target the actual SectionHeading.
+       */
       const heading = section.querySelector<HTMLElement>(".curriculum-heading");
 
-      if (!heading || reducedMotion) return;
+      const introElement = introRef.current;
 
-      const split = SplitText.create(heading, {
-        type: "lines",
-        mask: "lines",
-      });
+      const explorer = explorerRef.current;
+      const navigation = navigationRef.current;
+      const modules = modulesRef.current;
+      const featured = featuredRef.current;
+      const image = imageRef.current;
+      const content = contentRef.current;
+      const controls = controlsRef.current;
 
-      gsap.set(split.lines, {
-        yPercent: 105,
-      });
+      /* =====================================================
+         REDUCED MOTION
+      ===================================================== */
 
-      ScrollTrigger.create({
-        trigger: heading,
-        start: "top 86%",
-        once: true,
+      if (reducedMotion) {
+        gsap.set(
+          [
+            heading,
+            introElement,
+            explorer,
+            navigation,
+            modules,
+            featured,
+            image,
+            content,
+            controls,
+          ],
+          {
+            clearProps: "all",
+          },
+        );
 
-        onEnter: () => {
-          gsap.to(split.lines, {
-            yPercent: 0,
-            duration: 0.9,
-            stagger: 0.08,
-            ease: "power4.out",
+        return;
+      }
+
+      /* =====================================================
+         HEADING
+      ===================================================== */
+
+      if (heading) {
+        const split = SplitText.create(heading, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+        });
+
+        gsap.set(split.lines, {
+          yPercent: 105,
+        });
+
+        ScrollTrigger.create({
+          trigger: heading,
+          start: "top 86%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(split.lines, {
+              yPercent: 0,
+              duration: 0.9,
+              stagger: 0.08,
+              ease: "power4.out",
+              overwrite: true,
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         INTRO
+      ===================================================== */
+
+      if (introElement) {
+        gsap.set(introElement, {
+          opacity: 0,
+          y: 20,
+        });
+
+        ScrollTrigger.create({
+          trigger: introElement,
+          start: "top 88%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(introElement, {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: "power3.out",
+              delay: 0.12,
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         CURRICULUM EXPLORER
+      ===================================================== */
+
+      if (explorer) {
+        gsap.set(explorer, {
+          opacity: 0,
+          y: 36,
+        });
+
+        ScrollTrigger.create({
+          trigger: explorer,
+          start: "top 84%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(explorer, {
+              opacity: 1,
+              y: 0,
+              duration: 0.85,
+              ease: "power4.out",
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         LEFT NAVIGATION
+      ===================================================== */
+
+      if (navigation) {
+        gsap.set(navigation, {
+          opacity: 0,
+          x: -24,
+        });
+
+        ScrollTrigger.create({
+          trigger: navigation,
+          start: "top 82%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(navigation, {
+              opacity: 1,
+              x: 0,
+              duration: 0.7,
+              ease: "power3.out",
+              delay: 0.1,
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         MODULE LIST
+      ===================================================== */
+
+      if (modules) {
+        const moduleItems = Array.from(
+          modules.querySelectorAll<HTMLElement>(".curriculum-module"),
+        );
+
+        if (moduleItems.length > 0) {
+          gsap.set(moduleItems, {
+            opacity: 0,
+            x: -12,
           });
-        },
-      });
+
+          ScrollTrigger.create({
+            trigger: modules,
+            start: "top 82%",
+            once: true,
+
+            onEnter: () => {
+              gsap.to(moduleItems, {
+                opacity: 1,
+                x: 0,
+                duration: 0.42,
+                stagger: 0.055,
+                ease: "power3.out",
+                delay: 0.18,
+              });
+            },
+          });
+        }
+      }
+
+      /* =====================================================
+         FEATURED AREA
+      ===================================================== */
+
+      if (featured) {
+        gsap.set(featured, {
+          opacity: 0,
+          x: 24,
+        });
+
+        ScrollTrigger.create({
+          trigger: featured,
+          start: "top 82%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(featured, {
+              opacity: 1,
+              x: 0,
+              duration: 0.75,
+              ease: "power3.out",
+              delay: 0.14,
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         IMAGE INITIAL REVEAL
+      ===================================================== */
+
+      if (image) {
+        gsap.set(image, {
+          scale: 1.08,
+        });
+
+        ScrollTrigger.create({
+          trigger: image,
+          start: "top 82%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(image, {
+              scale: 1,
+              duration: 1.15,
+              ease: "power3.out",
+              delay: 0.08,
+            });
+          },
+        });
+      }
+
+      /* =====================================================
+         CONTENT
+      ===================================================== */
+
+      if (content) {
+        /*
+         * Keep the content container fixed.
+         *
+         * Individual content elements are responsible
+         * for module-change animation.
+         */
+        gsap.set(content, {
+          opacity: 1,
+          x: 0,
+          y: 0,
+        });
+      }
+
+      /* =====================================================
+         CONTROLS INITIAL REVEAL
+
+         This animation happens only when the section
+         first enters the viewport.
+
+         It will NOT run during module changes.
+      ===================================================== */
+
+      if (controls) {
+        gsap.set(controls, {
+          opacity: 0,
+          y: 12,
+        });
+
+        ScrollTrigger.create({
+          trigger: controls,
+          start: "top 92%",
+          once: true,
+
+          onEnter: () => {
+            gsap.to(controls, {
+              opacity: 1,
+              y: 0,
+              duration: 0.4,
+              ease: "power3.out",
+              delay: 0.2,
+            });
+          },
+        });
+      }
     }, section);
 
     return () => {
@@ -279,7 +668,13 @@ export default function CurriculumExplorer({
   ========================================================= */
 
   return (
-    <section ref={sectionRef} className="overflow-hidden bg-gray-50">
+    <section
+      ref={sectionRef}
+      className="
+        overflow-hidden
+        bg-gray-50
+      "
+    >
       <Container>
         {/* ===================================================
             SECTION INTRO
@@ -290,13 +685,15 @@ export default function CurriculumExplorer({
             className="
               grid
               gap-8
-              lg:grid-cols-[0.95fr_1.05fr]
-              lg:items-end
+              lg:grid-cols-[2fr_1fr]
+              lg:items-center
               lg:gap-16
               xl:gap-24
             "
           >
-            {/* LEFT */}
+            {/* =================================================
+                LEFT
+            ================================================= */}
 
             <div>
               <div
@@ -334,13 +731,22 @@ export default function CurriculumExplorer({
                 </span>
               </div>
 
-              <SectionHeading>{title}</SectionHeading>
+              {/* =================================================
+                  HEADING
+              ================================================= */}
+
+              <SectionHeading as="h2" className="curriculum-heading">
+                {title}
+              </SectionHeading>
             </div>
 
-            {/* RIGHT */}
+            {/* =================================================
+                RIGHT
+            ================================================= */}
 
             <div>
               <p
+                ref={introRef}
                 className="
                   curriculum-intro
                   max-w-xl
@@ -364,13 +770,16 @@ export default function CurriculumExplorer({
         =================================================== */}
 
         <div
+          ref={explorerRef}
           className="
-            my-14
+            mt-6
+            mb-14
             border-y
             border-gray-200
             bg-white
-            sm:my-18
-            lg:my-20
+            sm:mb-18
+            lg:mb-20
+            will-change-transform
           "
         >
           <div
@@ -381,10 +790,11 @@ export default function CurriculumExplorer({
             "
           >
             {/* =================================================
-                NAVIGATION
+                LEFT NAVIGATION
             ================================================= */}
 
             <div
+              ref={navigationRef}
               className="
                 border-b
                 border-gray-200
@@ -413,13 +823,14 @@ export default function CurriculumExplorer({
                     text-gray-400
                   "
                 >
-                  Focus Areas
+                  Course Modules
                 </span>
               </div>
 
               {/* MODULES */}
 
               <div
+                ref={modulesRef}
                 className="
                   grid
                   grid-cols-1
@@ -439,60 +850,63 @@ export default function CurriculumExplorer({
                       aria-current={isActive ? "true" : undefined}
                       disabled={isChanging}
                       className={`
-                          group
-                          relative
-                          flex
-                          min-h-13.5
-                          w-full
-                          cursor-pointer
-                          items-center
-                          gap-4
-                          border-b
-                          border-gray-100
-                          px-5
-                          py-3
-                          text-left
-                          transition-colors
-                          duration-300
-                          focus:outline-none
-                          focus-visible:ring-1
-                          focus-visible:ring-inset
-                          focus-visible:ring-accent-400
-                          sm:px-6
-                          lg:px-7
-                          ${isActive ? "bg-gray-50" : "hover:bg-gray-50/70"}
-                        `}
+                        curriculum-module
+                        group
+                        relative
+                        flex
+                        min-h-13.5
+                        w-full
+                        cursor-pointer
+                        items-center
+                        gap-4
+                        border-b
+                        border-gray-100
+                        px-5
+                        py-3
+                        text-left
+                        transition-colors
+                        duration-300
+                        focus:outline-none
+                        focus-visible:ring-1
+                        focus-visible:ring-inset
+                        focus-visible:ring-accent-400
+                        sm:px-6
+                        lg:px-7
+                        ${isActive ? "bg-gray-50" : "hover:bg-gray-50/70"}
+                      `}
                     >
                       {/* ACTIVE INDICATOR */}
 
                       <span
                         aria-hidden="true"
                         className={`
-                            absolute
-                            bottom-0
-                            left-0
-                            top-0
-                            w-0.5
-                            origin-bottom
-                            bg-accent-400
-                            transition-transform
-                            duration-300
-                            ${isActive ? "scale-y-100" : "scale-y-0"}
-                          `}
+                          absolute
+                          bottom-0
+                          left-0
+                          top-0
+                          w-0.5
+                          origin-bottom
+                          bg-accent-400
+                          transition-transform
+                          duration-300
+                          ${isActive ? "scale-y-100" : "scale-y-0"}
+                        `}
                       />
 
                       {/* NUMBER */}
 
                       <span
                         className={`
-                            w-5
-                            shrink-0
-                            font-mono
-                            text-[10px]
-                            font-bold
-                            tracking-[0.08em]
-                            ${isActive ? "text-accent-400" : "text-gray-300"}
-                          `}
+                          w-5
+                          shrink-0
+                          font-mono
+                          text-[10px]
+                          font-bold
+                          tracking-[0.08em]
+                          transition-colors
+                          duration-300
+                          ${isActive ? "text-accent-400" : "text-gray-300"}
+                        `}
                       >
                         {slide.number}
                       </span>
@@ -501,19 +915,19 @@ export default function CurriculumExplorer({
 
                       <span
                         className={`
-                            min-w-0
-                            text-[11px]
-                            font-bold
-                            leading-4
-                            transition-colors
-                            duration-300
-                            sm:text-xs
-                            ${
-                              isActive
-                                ? "text-primary-700"
-                                : "text-gray-500 group-hover:text-primary-700"
-                            }
-                          `}
+                          min-w-0
+                          text-[11px]
+                          font-bold
+                          leading-4
+                          transition-colors
+                          duration-300
+                          sm:text-xs
+                          ${
+                            isActive
+                              ? "text-primary-700"
+                              : "text-gray-500 group-hover:text-primary-700"
+                          }
+                        `}
                       >
                         {slide.title}
                       </span>
@@ -528,9 +942,11 @@ export default function CurriculumExplorer({
             ================================================= */}
 
             <div
+              ref={featuredRef}
               className="
                 grid
-                lg:grid-cols-[0.95fr_1.05fr]
+                xl:grid-cols-[1.3fr_1.05fr]
+                will-change-transform
               "
             >
               {/* =================================================
@@ -568,7 +984,9 @@ export default function CurriculumExplorer({
                       (max-width: 1023px) 100vw,
                       45vw
                     "
-                    className="object-cover"
+                    className="
+                      object-cover
+                    "
                   />
                 </div>
               </div>
@@ -584,6 +1002,7 @@ export default function CurriculumExplorer({
                   min-h-[320px]
                   flex-col
                   justify-center
+                  overflow-hidden
                   p-6
                   sm:p-8
                   lg:min-h-[500px]
@@ -592,29 +1011,19 @@ export default function CurriculumExplorer({
                   xl:p-14
                 "
               >
-                {/* MODULE NUMBER */}
-
-                <span
-                  className="
-                    font-mono
-                    text-[10px]
-                    font-bold
-                    tracking-[0.15em]
-                    text-accent-400
-                  "
-                >
-                  MODULE {activeSlide.number}
-                </span>
-
                 {/* TITLE */}
-                <SectionHeading className="mt-4" as="h3">
-                  {activeSlide.title}
-                </SectionHeading>
+
+                <div className="curriculum-module-title">
+                  <SectionHeading className="mt-4" as="h3">
+                    {activeSlide.title}
+                  </SectionHeading>
+                </div>
 
                 {/* DESCRIPTION */}
 
                 <p
                   className="
+                    curriculum-module-description
                     mt-5
                     max-w-xl
                     text-[14px]
@@ -629,94 +1038,6 @@ export default function CurriculumExplorer({
                 >
                   {activeSlide.description}
                 </p>
-
-                {/* =================================================
-                    PREVIOUS / COUNTER / NEXT
-                ================================================= */}
-
-                <div
-                  className="
-                    mt-8
-                    flex
-                    items-center
-                    justify-between
-                    border-t
-                    border-gray-200
-                    pt-5
-                    sm:mt-10
-                    sm:pt-6
-                  "
-                >
-                  {/* PREVIOUS */}
-
-                  <button
-                    type="button"
-                    disabled={isChanging}
-                    onClick={() =>
-                      selectSlide(
-                        safeActiveIndex === 0
-                          ? slides.length - 1
-                          : safeActiveIndex - 1,
-                      )
-                    }
-                    className="
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-gray-400
-                      transition-colors
-                      duration-300
-                      hover:text-primary-700
-                      disabled:cursor-not-allowed
-                      disabled:opacity-40
-                    "
-                  >
-                    Previous
-                  </button>
-
-                  {/* COUNTER */}
-
-                  <span
-                    className="
-                      font-mono
-                      text-[10px]
-                      font-bold
-                      tracking-[0.12em]
-                      text-gray-400
-                    "
-                  >
-                    {activeSlide.number} / {totalSlides}
-                  </span>
-
-                  {/* NEXT */}
-
-                  <button
-                    type="button"
-                    disabled={isChanging}
-                    onClick={() =>
-                      selectSlide(
-                        safeActiveIndex === slides.length - 1
-                          ? 0
-                          : safeActiveIndex + 1,
-                      )
-                    }
-                    className="
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-gray-400
-                      transition-colors
-                      duration-300
-                      hover:text-primary-700
-                      disabled:cursor-not-allowed
-                      disabled:opacity-40
-                    "
-                  >
-                    Next
-                  </button>
-                </div>
               </div>
             </div>
           </div>

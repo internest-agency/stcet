@@ -50,7 +50,7 @@ export default function CareerIntroduction() {
 
   return (
     <section ref={sectionRef} className="bg-white">
-      <Container className="py-14 sm:py-18 lg:py-20">
+      <Container className="pt-14 sm:pt-18 lg:pt-20">
         <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
           <div>
             <div className="flex items-center gap-3">

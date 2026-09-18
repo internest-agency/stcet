@@ -1,12 +1,21 @@
-import Section from "@/src/components/ui/Section";
+import CampusFutureSection from "@/src/components/sections/infrastructure/CampusFutureSection";
+import CentralLibrary from "@/src/components/sections/infrastructure/CentralLibrary";
+import InteractiveLaboratoryExplorer from "@/src/components/sections/infrastructure/CurriculumExplorer";
+import EngineeringLaboratories from "@/src/components/sections/infrastructure/EngineeringLaboratories";
+import InfrastructureHero from "@/src/components/sections/infrastructure/InfrastructureHero";
+import SportsRecreation from "@/src/components/sections/infrastructure/SportsRecreation";
+import StudentFacilities from "@/src/components/sections/infrastructure/StudentFacilities";
 
 export default function InfrastructurePage() {
   return (
     <>
-      <Section>
-        <h1>Infrastructure</h1>
-        <p>Content for the infrastructure information will come from Strapi.</p>
-      </Section>
+      <InfrastructureHero />
+      <CampusFutureSection />
+      <EngineeringLaboratories />
+      <InteractiveLaboratoryExplorer />
+      <CentralLibrary />
+      <StudentFacilities />
+      <SportsRecreation />
     </>
   );
 }

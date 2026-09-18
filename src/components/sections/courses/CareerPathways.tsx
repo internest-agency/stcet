@@ -520,15 +520,15 @@ export default function CareerPathways({
 
       <section className="overflow-hidden bg-gray-50">
         <Container>
-          <div className="py-14 sm:py-18 lg:py-20">
+          <div className="pt-14 sm:pt-18 lg:pt-20 pb-6">
             {/* HEADER */}
 
             <div
               className="
                 grid
                 gap-6
-                lg:grid-cols-[1fr_1fr]
-                lg:items-end
+                lg:grid-cols-[2fr_1fr]
+                lg:items-center
                 lg:gap-20
                 xl:gap-28
               "

@@ -343,14 +343,7 @@ export default function WhyStudyHorizontal({
               CAROUSEL AREA
               ================================================= */}
 
-          <div
-            className="
-              mt-auto
-              pt-8
-              sm:pt-10
-              lg:pt-12
-            "
-          >
+          <div className="mt-8">
             {/* ---------------------------------------------
                 DIVIDER
                 --------------------------------------------- */}
@@ -565,43 +558,6 @@ export default function WhyStudyHorizontal({
                     bg-primary-700
                   "
                 />
-              </div>
-
-              {/* Progress labels */}
-
-              <div
-                className="
-                  mt-3
-                  flex
-                  items-center
-                  justify-between
-                "
-              >
-                <span
-                  className="
-                    font-mono
-                    text-[9px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.16em]
-                    text-gray-500
-                  "
-                >
-                  Explore
-                </span>
-
-                <span
-                  className="
-                    font-mono
-                    text-[9px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.16em]
-                    text-gray-500
-                  "
-                >
-                  {String(reasons.length).padStart(2, "0")} reasons
-                </span>
               </div>
             </div>
           </div>
