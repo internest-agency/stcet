@@ -1,9 +1,7 @@
 import CourseHero from "@/src/components/sections/courses/CourseHero";
-import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
   CareerGroup,
-  FuturePath,
 } from "@/src/components/sections/courses/CareerPathways";
 import CurriculumExplorer, {
   type CurriculumSlide,
@@ -46,104 +44,83 @@ const careerGroups: CareerGroup[] = [
   },
 ];
 
-const futurePaths: FuturePath[] = [
-  {
-    number: "01",
-    title: "Higher Studies",
-    description:
-      "Pursue higher studies to deepen knowledge and specialise in advanced areas of electrical engineering.",
-  },
-  {
-    number: "02",
-    title: "Specialised Careers",
-    description:
-      "Build specialised careers in power systems, renewable energy, automation, control and related areas.",
-  },
-  {
-    number: "03",
-    title: "Advanced Engineering",
-    description:
-      "Continue developing expertise in emerging electrical technologies and advanced engineering applications.",
-  },
-];
-
 const curriculum: CurriculumSlide[] = [
   {
     number: "01",
-    title: "Electronic Devices & Circuits",
+    title: "Electrical Circuits & Systems",
     description:
-      "Understand electronic components, semiconductor devices and circuit principles used to design and develop electronic systems.",
-    image: "/images/courses/ece/learning/electronic-devices-circuits.webp",
+      "Understand fundamental electrical concepts, circuit analysis and the behaviour of electrical systems used in engineering applications.",
+    image: "/images/courses/eee/electrical-circuits.webp",
   },
   {
     number: "02",
-    title: "Analog & Digital Electronics",
+    title: "Electrical Machines",
     description:
-      "Explore analog and digital electronic circuits, logic systems and the principles behind modern electronic devices.",
-    image: "/images/courses/ece/learning/analog-digital-electronics.webp",
+      "Learn the principles and operation of electrical machines including transformers, motors and generators used across modern power applications.",
+    image: "/images/courses/eee/electrical-machines.webp",
   },
   {
     number: "03",
-    title: "Digital Signal Processing",
+    title: "Power Systems",
     description:
-      "Learn how digital signals are represented, processed and analysed for applications in communication, audio, imaging and intelligent systems.",
-    image: "/images/courses/ece/learning/digital-signal-processing.webp",
+      "Explore the generation, transmission, distribution and management of electrical power systems and their role in modern infrastructure.",
+    image: "/images/courses/eee/power-systems.webp",
   },
   {
     number: "04",
-    title: "Communication Systems",
+    title: "Power Electronics",
     description:
-      "Study the principles of information transmission, modulation, communication channels and modern communication technologies.",
-    image: "/images/courses/ece/learning/communication-systems.webp",
+      "Study power semiconductor devices, converters and control techniques used to efficiently manage and convert electrical energy.",
+    image: "/images/courses/eee/power-electronics.webp",
   },
   {
     number: "05",
-    title: "Microprocessors & Microcontrollers",
+    title: "Control Systems",
     description:
-      "Understand processor architectures, interfacing, programming and embedded control using microprocessors and microcontrollers.",
-    image: "/images/courses/ece/learning/microprocessors-microcontrollers.webp",
+      "Understand feedback, system modelling and control techniques used to regulate and automate electrical and engineering systems.",
+    image: "/images/courses/eee/control-systems.webp",
   },
   {
     number: "06",
-    title: "Embedded Systems",
+    title: "Measurements & Instrumentation",
     description:
-      "Learn how hardware and software are integrated to develop embedded systems for connected and intelligent electronic applications.",
-    image: "/images/courses/ece/learning/embedded-systems.webp",
+      "Develop knowledge of electrical measurements, sensors, instrumentation systems and techniques for accurate monitoring and analysis.",
+    image: "/images/courses/eee/measurements-instrumentation.webp",
   },
   {
     number: "07",
-    title: "Computer Networks",
+    title: "Digital Electronics",
     description:
-      "Explore networking fundamentals, data communication, network architecture and the technologies that connect computing and electronic systems.",
-    image: "/images/courses/ece/learning/computer-networks.webp",
+      "Learn digital logic, combinational and sequential circuits and electronic systems that form the foundation of modern digital technology.",
+    image: "/images/courses/eee/digital-electronics.webp",
   },
   {
     number: "08",
-    title: "Wireless Communication",
+    title: "Microcontrollers",
     description:
-      "Understand wireless communication principles and technologies used to transmit information across modern communication networks.",
-    image: "/images/courses/ece/learning/wireless-communication.webp",
+      "Explore microcontroller architecture, programming and interfacing to develop embedded and intelligent electronic applications.",
+    image: "/images/courses/eee/microcontrollers.webp",
   },
   {
     number: "09",
-    title: "Antennas & Propagation",
+    title: "Electrical Drives",
     description:
-      "Study antenna fundamentals, electromagnetic wave propagation and the technologies used in wireless and communication systems.",
-    image: "/images/courses/ece/learning/antennas-propagation.webp",
+      "Understand electric drive systems, motor control and power conversion techniques used in industrial and automated applications.",
+    image: "/images/courses/eee/electrical-drives.webp",
   },
   {
     number: "10",
-    title: "VLSI & Digital System Design",
+    title: "Renewable Energy Systems",
     description:
-      "Explore digital system design and VLSI concepts used to develop compact, high-performance integrated electronic systems.",
-    image: "/images/courses/ece/learning/vlsi-digital-system-design.webp",
+      "Explore renewable energy technologies and their integration into modern electrical systems for efficient and sustainable power generation.",
+    image: "/images/courses/eee/renewable-energy.webp",
   },
   {
     number: "11",
-    title: "Control & Instrumentation",
+    title: "Automation & Industrial Control",
     description:
-      "Learn measurement, instrumentation and control principles used to monitor, regulate and automate modern engineering systems.",
-    image: "/images/courses/ece/learning/control-instrumentation.webp",
+      "Learn automation principles, industrial control systems and technologies used to improve efficiency, reliability and productivity.",
+    image: "/images/courses/eee/automation-industrial-control.webp",
   },
 ];
 
@@ -224,17 +201,17 @@ export default function ComputerScienceEngineeringPage() {
               "The programme combines fundamental engineering principles with contemporary applications, preparing students to understand and develop systems that generate, transmit, control and efficiently use electrical energy.",
           },
         ]}
-        keyStatement="Engineering intelligence to understand data, discover patterns and create intelligent solutions for a changing world."
+        keyStatement="Engineering intelligence to understand energy, shape electronic systems and build solutions that power a smarter world."
       />
       <CurriculumExplorer
-        title="Build your foundation in electrical engineering."
+        title="Master the principles shaping electrical and electronic innovation."
         intro="Students develop knowledge across electrical systems,
                 electronics, power technologies, control systems,
                 instrumentation, automation and emerging energy technologies."
         slides={curriculum}
       />
       <OpportunityAreas
-        title="Explore the technologies shaping a smarter energy future."
+        title="Find your place in the technologies powering the world ahead."
         data={[
           "Renewable Energy",
           "Electric Vehicles",
@@ -248,8 +225,8 @@ export default function ComputerScienceEngineeringPage() {
         ]}
       />
       <WhyStudy
-        label="Why Study EEE"
-        heading="Build the skills to power a connected and sustainable future."
+        label="Why Study EEE at STCET"
+        heading="Turn EEE into a world of private and public sector career possibilities."
         intro="Develop a strong foundation in electrical engineering while
                 building practical knowledge across electronics, automation,
                 energy technologies and modern electrical systems."
@@ -261,20 +238,6 @@ export default function ComputerScienceEngineeringPage() {
                 industries, infrastructure, manufacturing, automation, energy
                 and technology."
         careerGroups={careerGroups}
-        beyondTitle="Keep learning. Keep growing."
-        beyondIntro="The programme provides a foundation for higher studies and
-                specialised careers in power systems, renewable energy,
-                automation, control and related areas."
-        futurePaths={futurePaths}
-      />
-      <CourseCallToAction
-        heading={
-          <>
-            Understand power.
-            <span className="text-accent-400"> Control systems.</span> Build a
-            more connected and sustainable future.
-          </>
-        }
       />
     </>
   );

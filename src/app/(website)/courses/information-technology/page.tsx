@@ -2,11 +2,9 @@ import CourseHero from "@/src/components/sections/courses/CourseHero";
 import CurriculumExplorer, {
   type CurriculumSlide,
 } from "@/src/components/sections/courses/CurriculumExplorer";
-import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
   CareerGroup,
-  FuturePath,
 } from "@/src/components/sections/courses/CareerPathways";
 import WhyStudy, {
   type WhyStudyReason,
@@ -49,27 +47,6 @@ const careerGroups: CareerGroup[] = [
     title: "IT Services & DevOps",
     roles: ["IT Consultant", "DevOps Professional"],
     image: "/images/courses/it/roles/it-services-devops.webp",
-  },
-];
-
-const futurePaths: FuturePath[] = [
-  {
-    number: "01",
-    title: "Higher Studies",
-    description:
-      "Pursue higher studies to deepen knowledge and specialise in computing, information systems, data, cloud and cybersecurity.",
-  },
-  {
-    number: "02",
-    title: "Specialised Certifications",
-    description:
-      "Build specialised expertise through professional certifications across computing, information systems, data, cloud and cybersecurity.",
-  },
-  {
-    number: "03",
-    title: "Continuous Technology Learning",
-    description:
-      "Continue developing skills as technologies and digital business environments evolve.",
   },
 ];
 
@@ -231,7 +208,7 @@ export default function ComputerScienceEngineeringPage() {
         keyStatement="While sharing a strong foundation with computer science, Information Technology places particular emphasis on using technology to develop, deploy and manage solutions in real-world environments."
       />
       <CurriculumExplorer
-        title="Build your foundation in information technology."
+        title="Learn how technology works, and how to put it to work."
         intro="The programme progresses from programming and data structures to databases, web technologies, software engineering, networking, cloud computing, cybersecurity, data analytics and emerging technologies."
         slides={curriculum}
       />
@@ -249,7 +226,7 @@ export default function ComputerScienceEngineeringPage() {
         ]}
       />
       <WhyStudy
-        label="Why Study IT"
+        label="Why Study IT at STCET"
         heading="Learn technology. Apply it intelligently."
         intro="Build a strong foundation in information technology while
                 developing practical skills to apply contemporary digital
@@ -257,28 +234,11 @@ export default function ComputerScienceEngineeringPage() {
         reasons={whyStudyDept}
       />
       <CareerPathways
-        careerTitle="Shape your IT future."
+        careerTitle="From code to cloud, find your path in I.T."
         careerIntro="The broad nature of Information Technology allows graduates to
                 work across software, technology services and digital
                 businesses."
         careerGroups={careerGroups}
-        beyondTitle="Keep learning. Keep specialising."
-        beyondIntro="Students can pursue higher studies and specialised
-                certifications in computing, information systems, data, cloud
-                and cybersecurity."
-        futurePaths={futurePaths}
-      />
-      <CourseCallToAction
-        heading={
-          <>
-            Learn Technology.
-            <span className="text-accent-400">
-              {" "}
-              Apply it intelligently.
-            </span>{" "}
-            Create solutions that matter.
-          </>
-        }
       />
     </>
   );

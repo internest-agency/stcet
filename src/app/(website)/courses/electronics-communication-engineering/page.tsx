@@ -1,9 +1,7 @@
 import CourseHero from "@/src/components/sections/courses/CourseHero";
-import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
   CareerGroup,
-  FuturePath,
 } from "@/src/components/sections/courses/CareerPathways";
 import CurriculumExplorer, {
   type CurriculumSlide,
@@ -43,27 +41,6 @@ const careerGroups: CareerGroup[] = [
     title: "Technology & Software",
     roles: ["Systems Engineer", "Software Professional"],
     image: "/images/courses/ece/roles/technology-software.webp",
-  },
-];
-
-const futurePaths: FuturePath[] = [
-  {
-    number: "01",
-    title: "Higher Studies",
-    description:
-      "Pursue higher studies to deepen knowledge and specialise in electronics, communication, embedded systems, VLSI and related fields.",
-  },
-  {
-    number: "02",
-    title: "Specialisation",
-    description:
-      "Build specialised expertise in emerging areas of electronics, communication, embedded systems and VLSI.",
-  },
-  {
-    number: "03",
-    title: "Advanced Technology",
-    description:
-      "Continue developing skills in evolving technologies and applications across electronics and communication engineering.",
   },
 ];
 
@@ -226,29 +203,28 @@ export default function ComputerScienceEngineeringPage() {
         ]}
       />
       <CurriculumExplorer
-        title="Build your foundation in electronics and communication."
+        title="Engineer the Technologies that connect the world."
         intro="The programme progresses from electronic devices and circuits to
                 communication systems, signal processing, embedded technologies,
                 networking, wireless communication, VLSI and control systems."
         slides={curriculum}
       />
       <OpportunityAreas
-        title="Explore the technologies shaping what comes next."
+        title="Open doors to diverse careeers in Electronics & Communication."
         data={[
-          "Software Development",
-          "Cloud Computing",
-          "Cybersecurity",
-          "Data Engineering",
-          "Artificial Intelligence",
-          "Web Technologies",
-          "Mobile Applications",
-          "DevOps",
-          "Emerging Computing Technologies",
+          "Internet of Things",
+          "Embedded Systems",
+          "VLSI",
+          "Robotics",
+          "Automotive Electronics",
+          "Wireless Technologies",
+          "Signal & Image Processing",
+          "Smart Devices",
         ]}
       />
       <WhyStudy
-        label="Why Study ECE"
-        heading="Understand the technology behind the connection"
+        label="Why Study ECE at STCET"
+        heading="Turn Signals into Solutions"
         intro="Build a strong foundation in electronics and communication while
                 developing practical knowledge across hardware, software and
                 emerging technologies."
@@ -260,20 +236,6 @@ export default function ComputerScienceEngineeringPage() {
                 electronics, communication, embedded systems, technology and
                 software."
         careerGroups={careerGroups}
-        beyondTitle="Keep learning. Keep specialising."
-        beyondIntro="The discipline also offers opportunities for higher studies and
-                specialisation in electronics, communication, embedded systems,
-                VLSI and related fields."
-        futurePaths={futurePaths}
-      />
-      <CourseCallToAction
-        heading={
-          <>
-            Understand power.
-            <span className="text-accent-400"> Control systems.</span> Build a
-            more connected and sustainable future.
-          </>
-        }
       />
     </>
   );

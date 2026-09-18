@@ -168,7 +168,7 @@ export default function AboutSection() {
         <div className="about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
           <h3 className="about-stat-number text-4xl font-semibold">AU</h3>
 
-          <p>Affiliated University Affiliated</p>
+          <p>Anna University Affiliated</p>
         </div>
 
         {/* Stat 04 */}

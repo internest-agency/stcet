@@ -1,10 +1,8 @@
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
-import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
   CareerGroup,
-  FuturePath,
 } from "@/src/components/sections/courses/CareerPathways";
 import CurriculumExplorer, {
   type CurriculumSlide,
@@ -37,27 +35,6 @@ const careerGroups: CareerGroup[] = [
     title: "Natural Language Processing",
     roles: ["NLP Engineer"],
     image: "/images/courses/ai-ml/roles/natural-language-processing.webp",
-  },
-];
-
-const futurePaths: FuturePath[] = [
-  {
-    number: "01",
-    title: "Postgraduate Education",
-    description:
-      "Pursue postgraduate education to deepen knowledge and specialise in advanced areas of computing.",
-  },
-  {
-    number: "02",
-    title: "Research",
-    description:
-      "Explore research opportunities and contribute to new ideas, technologies and solutions.",
-  },
-  {
-    number: "03",
-    title: "Specialised Technology Certifications",
-    description:
-      "Build specialised expertise through professional certifications and continuous technology learning.",
   },
 ];
 
@@ -194,7 +171,7 @@ export default function ComputerScienceEngineeringPage() {
         paragraphs={[
           {
             content:
-              "Computer Science is at the heart of today's digital world. Software, cloud platforms, mobile applications, cybersecurity, artificial intelligence and digital services all depend on computing technologies.",
+              "Software, cloud platforms, mobile applications, cybersecurity, artificial intelligence and digital services all depend on computing technologies.",
           },
           {
             content: (
@@ -235,7 +212,7 @@ export default function ComputerScienceEngineeringPage() {
         ]}
       />
       <WhyStudy
-        label="Why Study CSE"
+        label="Why Study CSE at STCET"
         heading="Build the skills to shape the digital world"
         intro="A strong foundation in computing gives students the knowledge,
                 practical skills and flexibility to explore different areas of
@@ -243,25 +220,10 @@ export default function ComputerScienceEngineeringPage() {
         reasons={whyStudyDept}
       />
       <CareerPathways
-        careerTitle="Build your future in computing."
+        careerTitle="From Learning to Leading What's Next."
         careerIntro="Computer Science opens pathways across software, cloud systems,
                 data, cybersecurity and emerging technology domains."
         careerGroups={careerGroups}
-        beyondTitle="Keep learning. Keep growing."
-        beyondIntro="The degree provides a foundation for postgraduate education,
-                research, and specialised technology certifications."
-        futurePaths={futurePaths}
-      />
-      <CourseCallToAction
-        heading={
-          <>
-            Build your foundation in computing.
-            <span className="text-accent-400">
-              {" "}
-              Create solutions for the digital world.
-            </span>
-          </>
-        }
       />
     </>
   );

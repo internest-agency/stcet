@@ -3,9 +3,7 @@ import CourseOverview from "@/src/components/sections/courses/CourseOverview";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
   CareerGroup,
-  FuturePath,
 } from "@/src/components/sections/courses/CareerPathways";
-import CourseCallToAction from "@/src/components/ui/CourseCallToAction";
 import CurriculumExplorer, {
   type CurriculumSlide,
 } from "@/src/components/sections/courses/CurriculumExplorer";
@@ -40,33 +38,12 @@ const careerGroups: CareerGroup[] = [
   },
 ];
 
-const futurePaths: FuturePath[] = [
-  {
-    number: "01",
-    title: "Postgraduate Education",
-    description:
-      "Pursue postgraduate education to deepen knowledge and specialise in advanced areas of artificial intelligence, machine learning and data science.",
-  },
-  {
-    number: "02",
-    title: "Research",
-    description:
-      "Explore research opportunities and contribute to new ideas, technologies and intelligent solutions.",
-  },
-  {
-    number: "03",
-    title: "Specialised Learning",
-    description:
-      "Build specialised expertise through advanced learning in artificial intelligence, machine learning, data science and related areas.",
-  },
-];
-
 const curriculum: CurriculumSlide[] = [
   {
     number: "01",
     title: "Programming & Computational Thinking",
     description:
-      "Build a strong foundation in programming and computational thinking while developing the logical and problem-solving skills required for intelligent computing.",
+      "Develop the logic, problem-solving, and Coding Skills to turn complex challenges into computational Solutions.",
     image: "/images/courses/ai-ml/learning/programming.webp",
   },
   {
@@ -212,6 +189,7 @@ export default function ComputerScienceEngineeringPage() {
             ),
           },
         ]}
+        keyStatement="Turn data into intelligence. Turn intelligence into impact"
       />
       <CurriculumExplorer
         title="Build your foundation in intelligent computing."
@@ -234,32 +212,18 @@ export default function ComputerScienceEngineeringPage() {
           "Responsible AI",
         ]}
       />
-      <CareerPathways
-        careerTitle="Build your future in intelligent technology."
-        careerIntro="Graduates can explore opportunities across software and
-                technology organisations as well as sectors increasingly
-                adopting intelligent systems."
-        careerGroups={careerGroups}
-        beyondTitle="Keep learning. Keep growing."
-        beyondIntro="The programme provides a foundation for higher studies and
-                specialised learning in artificial intelligence, machine
-                learning, data science and related areas."
-        futurePaths={futurePaths}
-      />
       <WhyStudy
-        label="Why Study CSE (AI+ML)"
+        label="Why Study CSE (AI+ML) at STCET"
         heading="Build the skills to shape the future of intelligent technology."
         intro="Develop a strong foundation in computer science while building specialised knowledge and practical skills in artificial intelligence and machine learning."
         reasons={whyStudyDept}
       />
-      <CourseCallToAction
-        heading={
-          <>
-            Learn the fundamentals.
-            <span className="text-accent-400"> Explore intelligence.</span>{" "}
-            Build what comes next.
-          </>
-        }
+      <CareerPathways
+        careerTitle="Explore careers at the forefront of AI and ML."
+        careerIntro="Graduates can explore opportunities across software and
+                technology organisations as well as sectors increasingly
+                adopting intelligent systems."
+        careerGroups={careerGroups}
       />
     </>
   );
