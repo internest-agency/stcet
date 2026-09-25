@@ -164,11 +164,11 @@ export default function CareerReadiness() {
         ease: "none",
 
         scrollTrigger: {
-          trigger: horizontalSection,
+          trigger: section,
 
           // Pin exactly when the carousel reaches
           // the top of the viewport.
-          start: "center center",
+          start: "top top",
 
           // Vertical scroll distance equals
           // horizontal movement distance.
@@ -314,47 +314,48 @@ export default function CareerReadiness() {
       {/* ============================================
           HORIZONTAL TRAINING CAROUSEL
       ============================================ */}
+      <Container>
+        <div ref={horizontalSectionRef} className="relative overflow-hidden">
+          <div ref={trackRef} className="flex gap-2 h-full w-max">
+            {trainingAreas.map((item) => (
+              <article
+                key={item.number}
+                className="career-slide flex items-center h-auto max-w-lg border-r border-gray-200 py-3 sm:py-5 lg:py-8 px-7 sm:px-10 lg:px-16 bg-gray-50"
+              >
+                <div className="career-slide-content max-w-2xl">
+                  {/* Icon */}
 
-      <div ref={horizontalSectionRef} className="relative overflow-hidden">
-        <div ref={trackRef} className="flex gap-2 h-full w-max">
-          {trainingAreas.map((item) => (
-            <article
-              key={item.number}
-              className="career-slide flex h-full max-w-lg shrink-0 items-center border-r border-gray-200 py-3 sm:py-5 lg:py-8 px-7 sm:px-10 lg:px-16 bg-gray-50"
-            >
-              <div className="career-slide-content max-w-2xl">
-                {/* Icon */}
+                  <div className="mb-6">
+                    <Image
+                      src={item.image}
+                      width={56}
+                      height={56}
+                      alt=""
+                      className="h-14 w-14 object-contain"
+                    />
+                  </div>
 
-                <div className="mb-6">
-                  <Image
-                    src={item.image}
-                    width={56}
-                    height={56}
-                    alt=""
-                    className="h-14 w-14 object-contain"
-                  />
+                  {/* Heading */}
+
+                  <SectionHeading as="h3" className="career-slide-heading">
+                    {item.title}
+                  </SectionHeading>
+
+                  {/* Description */}
+
+                  <p className="mt-5 max-w-xl text-base leading-7 text-gray-600">
+                    {item.description}
+                  </p>
                 </div>
+              </article>
+            ))}
 
-                {/* Heading */}
+            {/* End spacing */}
 
-                <SectionHeading as="h3" className="career-slide-heading">
-                  {item.title}
-                </SectionHeading>
-
-                {/* Description */}
-
-                <p className="mt-5 max-w-xl text-base leading-7 text-gray-600">
-                  {item.description}
-                </p>
-              </div>
-            </article>
-          ))}
-
-          {/* End spacing */}
-
-          <div aria-hidden="true" className="w-[10vw] shrink-0" />
+            <div aria-hidden="true" className="w-[10vw] shrink-0" />
+          </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }
