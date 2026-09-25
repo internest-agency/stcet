@@ -78,7 +78,7 @@ const navLinks = [
     label: "Careers",
   },
   {
-    href: "/enquire-now",
+    href: "/contact",
     label: "Contact Us",
   },
 ];

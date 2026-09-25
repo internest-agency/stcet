@@ -157,7 +157,7 @@ export default function BeyondTheClassroom() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-gray-50">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="py-14 sm:py-18 lg:py-20">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}
@@ -276,9 +276,6 @@ export default function BeyondTheClassroom() {
           </div>
         </div>
       </Container>
-
-      {/* Bottom accent */}
-      <div className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

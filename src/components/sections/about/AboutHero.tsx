@@ -215,9 +215,6 @@ export default function AboutHero() {
           </div>
         </div>
       </Container>
-
-      {/* Bottom accent line */}
-      <div className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

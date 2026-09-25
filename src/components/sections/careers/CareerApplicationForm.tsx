@@ -216,7 +216,11 @@ export default function CareerApplicationForm() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-gray-50 py-8 sm:py-12 lg:py-16">
+    <section
+      id="application"
+      ref={sectionRef}
+      className="bg-gray-50 py-8 sm:py-12 lg:py-16"
+    >
       <Container>
         <div className="mx-auto max-w-5xl">
           {/* Unified Form Card */}

@@ -206,7 +206,7 @@ export default function WhyChooseSection() {
           {/* --------------------------------
            * Sticky Introduction
            * -------------------------------- */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="sticky-element lg:top-24 lg:self-start">
             <div className="max-w-2xl">
               {/* Eyebrow */}
               <div className="mb-6 flex items-center gap-4">
@@ -280,7 +280,7 @@ export default function WhyChooseSection() {
           {/* --------------------------------
            * Editorial Benefits List
            * -------------------------------- */}
-          <div className="border-t border-gray-200">
+          <div className="border-t border-gray-200 editorial-content">
             {cards.map((card, index) => (
               <article
                 key={card.title}

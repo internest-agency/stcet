@@ -1,131 +1,449 @@
 "use client";
 
+import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-import Container from "../../ui/Container";
+import Container from "@/src/components/ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 import Breadcrumb from "../../ui/Breadcrumb";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 export default function CareerHero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const actionRef = useRef<HTMLButtonElement>(null);
+  const counterRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return;
+
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(".career-hero-heading");
+      const image = imageRef.current;
+      const eyebrow = eyebrowRef.current;
+      const heading = headingRef.current;
+      const description = descriptionRef.current;
+      const action = actionRef.current;
+      const counter = counterRef.current;
 
-      if (heading) {
-        const split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        ScrollTrigger.create({
-          trigger: heading,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              split.lines,
-              { yPercent: 100 },
-              {
-                yPercent: 0,
-                duration: 0.9,
-                stagger: 0.1,
-                ease: "power4.out",
-              },
-            );
-          },
-        });
+      if (
+        !image ||
+        !eyebrow ||
+        !heading ||
+        !description ||
+        !action ||
+        !counter
+      ) {
+        return;
       }
 
-      gsap.fromTo(
-        ".career-hero-copy",
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (reducedMotion) {
+        gsap.set([image, eyebrow, heading, description, action, counter], {
+          clearProps: "all",
+        });
+
+        return;
+      }
+
+      /* ---------------------------------------------
+         INITIAL STATES
+      --------------------------------------------- */
+
+      gsap.set(image, {
+        scale: 1.08,
+      });
+
+      gsap.set(eyebrow, {
+        opacity: 0,
+        y: 20,
+      });
+
+      gsap.set(heading, {
+        opacity: 0,
+        y: 45,
+      });
+
+      gsap.set(description, {
+        opacity: 0,
+        y: 25,
+      });
+
+      gsap.set(action, {
+        opacity: 0,
+        y: 20,
+      });
+
+      gsap.set(counter, {
+        opacity: 0,
+        x: 20,
+      });
+
+      /* ---------------------------------------------
+         INTRO ANIMATION
+      --------------------------------------------- */
+
+      const timeline = gsap.timeline({
+        delay: 0.1,
+      });
+
+      timeline.to(
+        image,
         {
-          opacity: 0,
-          y: 25,
+          scale: 1,
+          duration: 1.5,
+          ease: "power3.out",
         },
+        0,
+      );
+
+      timeline.to(
+        eyebrow,
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          delay: 0.25,
+          duration: 0.5,
           ease: "power3.out",
         },
+        0.2,
       );
 
-      gsap.fromTo(
-        ".career-hero-label",
+      timeline.to(
+        heading,
         {
-          opacity: 0,
-          x: -20,
+          opacity: 1,
+          y: 0,
+          duration: 0.85,
+          ease: "power4.out",
         },
+        0.3,
+      );
+
+      timeline.to(
+        description,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        },
+        0.65,
+      );
+
+      timeline.to(
+        action,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power3.out",
+        },
+        0.85,
+      );
+
+      timeline.to(
+        counter,
         {
           opacity: 1,
           x: 0,
-          duration: 0.7,
+          duration: 0.5,
           ease: "power3.out",
         },
+        0.9,
       );
-    }, sectionRef);
 
-    return () => context.revert();
+      /* ---------------------------------------------
+         IMAGE PARALLAX
+      --------------------------------------------- */
+
+      gsap.to(image, {
+        yPercent: 5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+    }, section);
+
+    return () => {
+      context.revert();
+    };
   }, []);
 
+  const handleExplore = () => {
+    const target = document.getElementById("application");
+
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-gray-50">
-      <Container className="py-16 sm:py-20 lg:py-28">
-        <Breadcrumb
-          items={[
-            {
-              label: "Careers",
-            },
-          ]}
-          className="mb-14"
+    <section
+      ref={sectionRef}
+      className="
+        relative
+        min-h-[680px]
+        h-[100svh]
+        overflow-hidden
+        bg-primary-800
+      "
+    >
+      {/* =====================================================
+          DESKTOP RIGHT IMAGE
+      ===================================================== */}
+
+      <div
+        ref={imageRef}
+        className="
+          absolute
+          inset-0
+        "
+      >
+        <Image
+          src="/images/careers/career-hero.webp"
+          alt="STCET campus"
+          fill
+          priority
+          sizes="52vw"
+          className="
+            object-cover
+            object-center
+            will-change-transform
+          "
         />
 
-        <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-          <div className="career-hero-label">
-            <div className="flex items-center gap-3">
+        {/* Image edge gradient */}
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-linear-to-r
+            from-primary-800
+            via-primary-800/80
+            to-transparent
+          "
+        />
+      </div>
+
+      {/* =====================================================
+          MOBILE IMAGE
+      ===================================================== */}
+
+      <div
+        className="
+          absolute
+          inset-0
+          lg:hidden
+        "
+      >
+        <Image
+          src="/images/infrastructure/hero.webp"
+          alt="STCET campus"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-primary-800/70
+          "
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-linear-to-t
+            from-primary-800
+            via-primary-800/60
+            to-primary-800/20
+          "
+        />
+      </div>
+
+      {/* =====================================================
+          LEFT CONTENT AREA
+      ===================================================== */}
+
+      <div
+        className="
+          relative
+          z-10
+          flex
+          h-full
+          w-full
+          items-center
+          lg:w-[52%]
+        "
+      >
+        {/* angled transition to image */}
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            right-[-80px]
+            top-0
+            bottom-0
+            hidden
+            lg:block
+          "
+        />
+
+        <Container>
+          <div
+            className="
+              relative
+              z-20
+              max-w-[720px]
+
+              px-0
+              pt-24
+              pb-20
+
+              sm:pt-28
+
+              lg:pr-10
+              xl:pr-16
+            "
+          >
+            <Breadcrumb
+              items={[
+                {
+                  label: "Careers",
+                },
+              ]}
+              className="text-white/80 my-6"
+            />
+
+            {/* =================================================
+                HEADING
+            ================================================= */}
+
+            <SectionHeading as="h1" className="text-white">
+              Join Our Team.
+            </SectionHeading>
+
+            {/* =================================================
+                DESCRIPTION
+            ================================================= */}
+
+            <p
+              ref={descriptionRef}
+              className="
+                text-gray-300
+                mt-7
+                max-w-[530px]
+                sm:mt-8"
+            >
+              We are looking for passionate, talented, and committed
+              professionals who would like to be part of a growing institution
+              committed to excellence in education, innovation, and student
+              development.
+            </p>
+
+            {/* =================================================
+                EXPLORE
+            ================================================= */}
+
+            <button
+              ref={actionRef}
+              type="button"
+              onClick={handleExplore}
+              className="
+                group
+                mt-8
+                flex
+                items-center
+                gap-4
+
+                sm:mt-10
+              "
+            >
               <span
-                aria-hidden="true"
-                className="h-2 w-2 rounded-full bg-accent-400"
-              />
+                className="
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/35
+                  text-white
+                  transition-all
+                  duration-300
 
-              <span className="text-xs font-bold uppercase tracking-[0.22em] text-gray-500">
-                Careers
+                  group-hover:border-accent-400
+                  group-hover:bg-accent-400
+                  group-hover:text-primary-800
+                "
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="
+                    h-3.5
+                    w-3.5
+                    transition-transform
+                    duration-300
+                    group-hover:translate-y-0.5
+                  "
+                >
+                  <path
+                    d="M10 4V16M5 11L10 16L15 11"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </span>
-            </div>
 
-            <div className="mt-8 hidden h-px w-20 bg-accent-400 lg:block" />
+              <span
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.18em]
+                  text-white/65
+                  transition-colors
+                  duration-300
+                  group-hover:text-white
+                "
+              >
+                Start Your Journey
+              </span>
+            </button>
           </div>
-
-          <div>
-            <h1 className="career-hero-heading max-w-4xl text-4xl font-extrabold uppercase leading-[1.02] tracking-[-0.045em] text-primary-700 sm:text-5xl lg:text-6xl xl:text-7xl">
-              Join Our Team
-              <br />
-              Build Your
-              <br />
-              Career With Us.
-            </h1>
-
-            <div className="career-hero-copy mt-8 max-w-3xl">
-              <p className="text-lg leading-8 text-gray-600 sm:text-xl sm:leading-9">
-                We are looking for passionate, talented, and committed
-                professionals who would like to be part of a growing institution
-                committed to excellence in education, innovation, and student
-                development.
-              </p>
-            </div>
-          </div>
-        </div>
-      </Container>
-
-      <div className="h-1 w-full bg-accent-400" />
+        </Container>
+      </div>
     </section>
   );
 }

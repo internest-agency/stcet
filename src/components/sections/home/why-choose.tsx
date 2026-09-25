@@ -78,6 +78,22 @@ export default function WhyChooseSection() {
 
       if (reducedMotion) return;
 
+      const stickyElement = sectionRef.current?.querySelector(
+        ".lg:sticky",
+      ) as HTMLElement | null;
+
+      if (stickyElement) {
+        console.log("Sticky Element found");
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "bottom bottom",
+          pin: stickyElement,
+        });
+      } else {
+        console.log("Sticky Element not found!");
+      }
+
       /*
        * ========================================
        * SECTION HEADING

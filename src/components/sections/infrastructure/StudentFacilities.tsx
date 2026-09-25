@@ -4,71 +4,35 @@ import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
 import Container from "@/src/components/ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger);
 
-/* =========================================================
-   TYPES
-========================================================= */
-
-interface StudentFacility {
-  number: string;
-  title: string;
-  image: string;
-}
-
-interface StudentFacilitiesProps {
-  facilities?: StudentFacility[];
-}
-
-/* =========================================================
-   DEFAULT DATA
-========================================================= */
-
-const defaultFacilities: StudentFacility[] = [
+const facilities = [
   {
-    number: "01",
-    title: "Library",
-    image: "/images/infrastructure/student/library.webp",
-  },
-  {
-    number: "02",
     title: "Transport",
     image: "/images/infrastructure/student/transport.webp",
   },
   {
-    number: "03",
     title: "Hostel",
     image: "/images/infrastructure/student/hostel.webp",
   },
   {
-    number: "04",
-    title: "Sports Facilities",
-    image: "/images/infrastructure/student/sports.webp",
+    title: "Library",
+    image: "/images/infrastructure/library.webp",
   },
   {
-    number: "05",
-    title: "Cafeteria / Canteen",
-    image: "/images/infrastructure/student/cafeteria.webp",
+    title: "Sports Facilities",
+    image: "/images/infrastructure/sports.webp",
   },
 ];
 
-/* =========================================================
-   COMPONENT
-========================================================= */
+const facilityList = ["Library", "Transport", "Hostel", "Sports Facilities"];
 
-export default function StudentFacilities({
-  facilities = defaultFacilities,
-}: StudentFacilitiesProps) {
+export default function StudentFacilities() {
   const sectionRef = useRef<HTMLElement>(null);
-
-  const headingRef = useRef<HTMLDivElement>(null);
-  const introRef = useRef<HTMLParagraphElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -76,110 +40,53 @@ export default function StudentFacilities({
     if (!section) return;
 
     const context = gsap.context(() => {
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      const heading = headingRef.current;
-      const intro = introRef.current;
-      const grid = gridRef.current;
-
-      if (!heading || !intro || !grid) return;
+      const content = section.querySelector(
+        ".student-content",
+      ) as HTMLElement | null;
 
       const cards = Array.from(
-        grid.querySelectorAll<HTMLElement>(".student-facility-card"),
+        section.querySelectorAll<HTMLElement>(".student-facility-card"),
       );
 
-      /* =====================================================
-         REDUCED MOTION
-      ===================================================== */
+      if (!content || !cards.length) return;
 
-      if (reducedMotion) {
-        gsap.set([heading, intro, ...cards], {
-          clearProps: "all",
-        });
-
-        return;
-      }
-
-      /* =====================================================
-         INITIAL STATES
-      ===================================================== */
-
-      gsap.set(intro, {
-        opacity: 0,
-        y: 20,
-      });
-
-      gsap.set(cards, {
-        opacity: 0,
-        y: 35,
-      });
-
-      /* =====================================================
-         HEADING
-      ===================================================== */
-
-      const split = SplitText.create(heading, {
-        type: "lines",
-        mask: "lines",
-        autoSplit: true,
-      });
-
-      gsap.set(split.lines, {
-        yPercent: 105,
-      });
-
-      /* =====================================================
-         MAIN TIMELINE
-      ===================================================== */
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top 72%",
-          once: true,
-        },
-      });
-
-      /* HEADING */
-
-      timeline.to(
-        split.lines,
+      gsap.fromTo(
+        content,
         {
-          yPercent: 0,
-          duration: 0.85,
-          stagger: 0.08,
-          ease: "power4.out",
+          opacity: 0,
+          y: 35,
         },
-        0,
-      );
-
-      /* INTRO */
-
-      timeline.to(
-        intro,
         {
           opacity: 1,
           y: 0,
-          duration: 0.65,
-          ease: "power3.out",
+          duration: 0.8,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 75%",
+            once: true,
+          },
         },
-        0.25,
       );
 
-      /* CARDS */
-
-      timeline.to(
+      gsap.fromTo(
         cards,
         {
+          opacity: 0,
+          y: 30,
+        },
+        {
           opacity: 1,
           y: 0,
           duration: 0.65,
-          stagger: 0.09,
+          stagger: 0.08,
           ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 70%",
+            once: true,
+          },
         },
-        0.4,
       );
     }, section);
 
@@ -192,315 +99,265 @@ export default function StudentFacilities({
     <section
       ref={sectionRef}
       className="
-        overflow-hidden
         bg-gray-50
-        py-20
-        sm:py-24
-        lg:py-32
+        py-16
+        sm:py-20
+        lg:py-24
+        xl:py-28
       "
     >
       <Container>
-        {/* ===================================================
-            SECTION HEADER
-        =================================================== */}
-
         <div
           className="
             grid
-            gap-8
-            lg:grid-cols-[0.9fr_1.1fr]
-            lg:items-end
-            lg:gap-16
-            xl:gap-24
+            gap-10
+
+            lg:grid-cols-[1fr_1fr]
+            lg:gap-14
+
+            xl:grid-cols-[1fr_1fr]
+            xl:gap-20
           "
         >
-          {/* LEFT */}
+          {/* =================================================
+              LEFT CONTENT
+          ================================================= */}
 
-          <div ref={headingRef}>
-            <div
-              className="
-                mb-5
-                flex
-                items-center
-                gap-3
-                sm:mb-6
-              "
-            >
-              <span
-                aria-hidden="true"
-                className="
-                  h-1.5
-                  w-1.5
-                  shrink-0
-                  rounded-full
-                  bg-accent-400
-                  sm:h-2
-                  sm:w-2
-                "
-              />
-
-              <span
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.22em]
-                  text-primary-700
-                  sm:text-[11px]
-                "
-              >
-                Student Facilities
-              </span>
-            </div>
-
-            <SectionHeading as="h2" className="max-w-2xl">
-              Designed Around Student Life
-            </SectionHeading>
-          </div>
-
-          {/* RIGHT */}
-
-          <p
-            ref={introRef}
+          <div
             className="
-              max-w-xl
-              text-[14px]
-              leading-6
-              text-gray-500
-              sm:text-[15px]
-              sm:leading-7
-              lg:text-[16px]
-              lg:leading-8
+              student-content
+
+              lg:py-2
             "
           >
-            STCET provides essential facilities that support students&apos;
-            everyday needs and contribute to a comfortable college experience.
-          </p>
-        </div>
+            {/* TOP CONTENT */}
 
-        {/* ===================================================
-            FACILITY GRID
-        =================================================== */}
+            <div>
+              {/* LABEL */}
 
-        <div
-          ref={gridRef}
-          className="
-            mt-12
-            grid
-            gap-4
-            sm:mt-16
-            sm:grid-cols-2
-            sm:gap-5
-            lg:mt-20
-            lg:grid-cols-12
-            lg:gap-6
-          "
-        >
-          {facilities.map((facility, index) => {
-            /*
-             * First card is intentionally larger.
-             *
-             * Desktop:
-             * Card 01 → 7 columns
-             * Card 02 → 5 columns
-             * Card 03 → 4 columns
-             * Card 04 → 4 columns
-             * Card 05 → 4 columns
-             */
+              <div className="mb-5 flex items-center gap-3">
+                <span className="h-2 w-2 rounded-full bg-accent-400" />
 
-            const desktopSpan =
-              index === 0
-                ? "lg:col-span-7"
-                : index === 1
-                  ? "lg:col-span-5"
-                  : "lg:col-span-4";
+                <span
+                  className="
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-[0.22em]
+                    text-primary-800/45
+                  "
+                >
+                  Student Facilities
+                </span>
+              </div>
 
-            return (
+              {/* HEADING */}
+
+              <div className="max-w-xl">
+                <SectionHeading as="h2">
+                  Designed Around Student Life
+                </SectionHeading>
+              </div>
+
+              {/* DESCRIPTION */}
+
+              <p
+                className="
+                  mt-6
+                  max-w-lg
+                  text-[14px]
+                  leading-6
+                  text-gray-800
+
+                  sm:text-[15px]
+                  sm:leading-7
+                "
+              >
+                STCET provides essential facilities that support students&apos;
+                everyday needs and contribute to a comfortable college
+                experience.
+              </p>
+            </div>
+
+            {/* =================================================
+                FACILITY LIST
+            ================================================= */}
+
+            <div
+              className="
+                mt-10
+                border-t
+                border-primary-800/10
+                pt-6
+
+                lg:mt-12
+                lg:pt-7
+              "
+            >
+              <p
+                className="
+                  text-[11px]
+                  font-bold
+                  uppercase
+                  tracking-[0.08em]
+                  text-primary-800
+                "
+              >
+                Facilities include:
+              </p>
+
+              <div
+                className="
+                  mt-5
+                  grid
+                  grid-cols-2
+                  gap-x-8
+                  gap-y-4
+                "
+              >
+                {facilityList.map((item) => (
+                  <div
+                    key={item}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      text-[13px]
+                      text-gray-800
+                    "
+                  >
+                    <span
+                      className="
+                        h-2
+                        w-2
+                        shrink-0
+                        rounded-full
+                        bg-accent-400
+                      "
+                    />
+
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* =================================================
+              RIGHT — 2 × 2 IMAGE GRID
+          ================================================= */}
+
+          <div
+            className="
+              grid
+              grid-cols-2
+              gap-4
+            "
+          >
+            {facilities.map((facility, index) => (
               <article
-                key={`${facility.number}-${facility.title}`}
+                key={facility.title}
                 className={`
                   student-facility-card
                   group
-                  relative
-                  overflow-hidden
-                  ${desktopSpan}
+                  ${index === 0 ? "lg:translate-y-0" : ""}
+                  ${index === 1 ? "lg:translate-y-8" : ""}
+                  ${index === 2 ? "lg:-translate-y-2" : ""}
+                  ${index === 3 ? "lg:translate-y-6" : ""}
                 `}
               >
-                <div
-                  className={`
-                    relative
-                    overflow-hidden
-                    ${
-                      index === 0
-                        ? "aspect-[16/10] lg:aspect-[1.45/1]"
-                        : "aspect-[16/10]"
-                    }
-                  `}
-                >
-                  {/* IMAGE */}
+                {/* IMAGE */}
 
+                <div
+                  className="
+                    relative
+                    aspect-[1.25/1]
+                    overflow-hidden
+                    bg-gray-200
+                  "
+                >
                   <Image
                     src={facility.image}
                     alt={facility.title}
                     fill
                     sizes="
-                      (max-width: 639px) 100vw,
-                      (max-width: 1023px) 50vw,
-                      40vw
+                      (max-width: 640px) 50vw,
+                      (max-width: 1024px) 40vw,
+                      30vw
                     "
                     className="
                       object-cover
                       transition-transform
                       duration-700
                       ease-out
-                      group-hover:scale-[1.04]
+                      group-hover:scale-105
                     "
                   />
 
-                  {/* OVERLAY */}
+                  {/* subtle overlay */}
 
                   <div
                     className="
+                      pointer-events-none
                       absolute
                       inset-0
                       bg-linear-to-t
-                      from-primary-800/85
-                      via-primary-800/15
+                      from-black/35
+                      via-transparent
                       to-transparent
-                      transition-opacity
-                      duration-500
+                      opacity-70
                     "
                   />
 
-                  {/* HOVER OVERLAY */}
+                  {/* NUMBER */}
 
-                  <div
+                  <span
                     className="
                       absolute
-                      inset-0
-                      bg-primary-800/10
-                      opacity-0
-                      transition-opacity
-                      duration-500
-                      group-hover:opacity-100
-                    "
-                  />
-
-                  {/* =================================================
-                      NUMBER
-                  ================================================= */}
-
-                  <div
-                    className="
-                      absolute
-                      left-5
-                      top-5
-                      flex
-                      items-center
-                      gap-3
-                      sm:left-6
-                      sm:top-6
+                      left-4
+                      top-4
+                      font-mono
+                      text-[10px]
+                      font-bold
+                      tracking-[0.15em]
+                      text-white/80
                     "
                   >
-                    <span
-                      className="
-                        font-mono
-                        text-[10px]
-                        font-bold
-                        tracking-[0.15em]
-                        text-white/60
-                      "
-                    >
-                      {facility.number}
-                    </span>
+                    0{index + 1}
+                  </span>
+                </div>
 
-                    <span
-                      className="
-                        h-px
-                        w-7
-                        bg-white/30
-                        transition-all
-                        duration-500
-                        group-hover:w-11
-                        group-hover:bg-accent-400
-                      "
-                    />
-                  </div>
+                {/* TITLE */}
 
-                  {/* =================================================
-                      CONTENT
-                  ================================================= */}
-
-                  <div
+                <div className="mt-3 flex items-center justify-between">
+                  <h3
                     className="
-                      absolute
-                      bottom-0
-                      left-0
-                      right-0
-                      p-5
-                      sm:p-6
-                      lg:p-7
+                      text-[12px]
+                      font-bold
+                      text-primary-800
+
+                      sm:text-[13px]
                     "
                   >
-                    <div
-                      className="
-                        flex
-                        items-end
-                        justify-between
-                        gap-4
-                      "
-                    >
-                      <h3
-                        className="
-                          max-w-sm
-                          text-[20px]
-                          font-extrabold
-                          uppercase
-                          leading-[0.95]
-                          tracking-[-0.035em]
-                          text-white
-                          sm:text-[22px]
-                          lg:text-[26px]
-                        "
-                      >
-                        {facility.title}
-                      </h3>
+                    {facility.title}
+                  </h3>
 
-                      {/* ARROW */}
-
-                      <span
-                        aria-hidden="true"
-                        className="
-                          flex
-                          h-8
-                          w-8
-                          shrink-0
-                          translate-y-1
-                          items-center
-                          justify-center
-                          border
-                          border-white/30
-                          text-sm
-                          text-white
-                          opacity-70
-                          transition-all
-                          duration-500
-                          group-hover:translate-x-1
-                          group-hover:border-accent-400
-                          group-hover:bg-accent-400
-                          group-hover:opacity-100
-                          sm:h-9
-                          sm:w-9
-                        "
-                      >
-                        ↗
-                      </span>
-                    </div>
-                  </div>
+                  <span
+                    className="
+                      text-[13px]
+                      text-primary-800/30
+                      transition-all
+                      duration-300
+                      group-hover:translate-x-1
+                      group-hover:text-accent-400
+                    "
+                  >
+                    →
+                  </span>
                 </div>
               </article>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </Container>
     </section>

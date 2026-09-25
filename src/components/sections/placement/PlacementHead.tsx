@@ -1,29 +1,46 @@
 "use client";
 
+import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+
+const qualifications = [
+  "Qualification details",
+  "Professional experience",
+  "Relevant industry experience",
+];
 
 export default function PlacementHead() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return;
+
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(
+      const heading = section.querySelector(
         ".placement-head-heading",
       ) as HTMLElement | null;
 
-      const image = sectionRef.current?.querySelector(
+      const image = section.querySelector(
         ".placement-head-image",
       ) as HTMLElement | null;
 
-      const content = sectionRef.current?.querySelector(
+      const content = section.querySelector(
         ".placement-head-content",
       ) as HTMLElement | null;
+
+      const qualificationItems = Array.from(
+        section.querySelectorAll<HTMLElement>(".qualification-item"),
+      );
 
       if (!heading) return;
 
@@ -33,58 +50,79 @@ export default function PlacementHead() {
         autoSplit: true,
       });
 
+      gsap.set(split.lines, {
+        yPercent: 100,
+      });
+
+      gsap.set(image, {
+        opacity: 0,
+        y: 25,
+      });
+
+      gsap.set(content, {
+        opacity: 0,
+        y: 25,
+      });
+
+      gsap.set(qualificationItems, {
+        opacity: 0,
+        x: 15,
+      });
+
       ScrollTrigger.create({
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top 82%",
         once: true,
+
         onEnter: () => {
-          gsap.fromTo(
-            split.lines,
-            { yPercent: 100 },
-            {
-              yPercent: 0,
-              duration: 0.85,
-              stagger: 0.1,
-              ease: "power4.out",
-            },
-          );
+          gsap.to(split.lines, {
+            yPercent: 0,
+            duration: 0.85,
+            stagger: 0.1,
+            ease: "power4.out",
+          });
 
-          gsap.fromTo(
-            image,
-            { opacity: 0, y: 25 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.75,
-              delay: 0.2,
-              ease: "power3.out",
-            },
-          );
+          gsap.to(image, {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            delay: 0.2,
+            ease: "power3.out",
+          });
 
-          gsap.fromTo(
-            content,
-            { opacity: 0, y: 25 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.75,
-              delay: 0.3,
-              ease: "power3.out",
-            },
-          );
+          gsap.to(content, {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            delay: 0.3,
+            ease: "power3.out",
+          });
+
+          gsap.to(qualificationItems, {
+            opacity: 1,
+            x: 0,
+            duration: 0.5,
+            stagger: 0.08,
+            delay: 0.55,
+            ease: "power3.out",
+          });
         },
       });
 
       return () => split.revert();
-    }, sectionRef);
+    }, section);
 
     return () => context.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-white">
-      <Container className="py-20 sm:py-24 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
+    <section ref={sectionRef} className="bg-gray-100">
+      <Container className="py-14 sm:py-18 lg:py-20">
+        <div className="grid gap-12 lg:grid-cols-[0.55fr_1.45fr] lg:gap-20 xl:grid-cols-[0.6fr_1.4fr]">
+          {/* =========================================
+              LEFT — SECTION INTRO
+          ========================================= */}
+
           <div>
             <div className="mb-6 flex items-center gap-3">
               <span
@@ -97,26 +135,29 @@ export default function PlacementHead() {
               </span>
             </div>
 
-            <h2 className="placement-head-heading max-w-md font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 text-[32px] sm:text-[40px] lg:text-[48px]">
+            <SectionHeading as="h2">
               Guiding Students Towards Careers.
-            </h2>
+            </SectionHeading>
           </div>
 
-          <div className="grid gap-10 sm:grid-cols-[260px_1fr] sm:gap-12">
-            {/* Photo placeholder */}
-            <div className="placement-head-image">
-              <div className="relative aspect-[3/4] overflow-hidden border border-gray-200 bg-gray-50">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <span className="block text-3xl font-black tracking-tight text-primary-700/15">
-                      B. RAJESH
-                    </span>
+          {/* =========================================
+              RIGHT — PROFILE
+          ========================================= */}
 
-                    <span className="mt-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                      Photograph
-                    </span>
-                  </div>
-                </div>
+          <div className="grid items-start gap-8 sm:grid-cols-[220px_1fr] sm:gap-10 lg:grid-cols-[230px_1fr] lg:gap-14">
+            {/* =====================================
+                PHOTO
+            ===================================== */}
+
+            <div className="placement-head-image">
+              <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
+                <Image
+                  src="/images/placements/placeholder.webp"
+                  alt="Mr. B. Rajesh, Placement Cell"
+                  fill
+                  sizes="230px"
+                  className="object-cover"
+                />
               </div>
 
               <div className="mt-4 border-t border-gray-200 pt-4">
@@ -124,30 +165,48 @@ export default function PlacementHead() {
                   Mr. B. Rajesh
                 </p>
 
-                <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-accent-400">
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent-400">
                   Placement Cell
                 </p>
               </div>
             </div>
 
+            {/* =====================================
+                CONTENT
+            ===================================== */}
+
             <div className="placement-head-content max-w-2xl">
-              <p className="text-lg font-medium leading-8 text-gray-700 sm:text-2xl sm:leading-9">
-                The Placement Cell is headed by <strong>Mr. B. Rajesh</strong>{" "}
+              <p className="text-gray-800">
+                The Placement Cell is headed by{" "}
+                <strong className="font-semibold text-primary-700">
+                  Mr. B. Rajesh
+                </strong>{" "}
                 who will be working closely with students and departments to
                 identify career aspirations, strengthen employability skills and
                 facilitate opportunities for interaction with the industry.
               </p>
 
-              {/* Qualifications placeholder */}
-              <div className="mt-10 border-t border-gray-200 pt-7">
+              {/* Qualifications */}
+              <div className="border-t border-gray-300 pt-7 mt-7">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                  Qualifications
+                  Qualifications & Experience
                 </span>
 
-                <div className="mt-4 min-h-20 border border-dashed border-gray-300 bg-gray-50 px-5 py-4">
-                  <p className="text-sm leading-6 text-gray-400">
-                    Add qualifications and professional details here.
-                  </p>
+                <div className="mt-5">
+                  {qualifications.map((qualification, index) => (
+                    <div
+                      key={qualification}
+                      className="qualification-item flex items-center gap-4 border-b border-gray-200 py-4 first:pt-0"
+                    >
+                      <span className="text-[10px] font-bold text-accent-400">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+
+                      <span className="text-sm text-gray-700">
+                        {qualification}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

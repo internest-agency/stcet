@@ -146,7 +146,7 @@ export default function ChairmansMessage() {
         &ldquo;
       </div>
 
-      <Container className="relative z-10 py-20 sm:py-24 lg:py-32">
+      <Container className="relative z-10 py-14 sm:py-18 lg:py-20">
         <div className="grid gap-14 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20 xl:gap-28">
           {/* Left heading */}
           <div className="lg:sticky lg:top-32 lg:self-start">
@@ -255,9 +255,6 @@ export default function ChairmansMessage() {
           </div>
         </div>
       </Container>
-
-      {/* Bottom accent */}
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-accent-400" />
     </section>
   );
 }

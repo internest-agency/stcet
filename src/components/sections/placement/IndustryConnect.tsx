@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Container from "../../ui/Container";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +15,61 @@ const logoPlaceholders = [
   "Company Logo",
   "Company Logo",
   "Company Logo",
+];
+
+const recruiters = [
+  {
+    url: "/images/placements/recruiters/accenture-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/ashok-leyland-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/birla-soft-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/cognizant-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/hyundai-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/infosys-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/rane-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/royal-enfield-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/tcs-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/tessolve-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/texmo-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/wipro-logo.webp",
+    alt: "alt-text",
+  },
+  {
+    url: "/images/placements/recruiters/zoho-logo.webp",
+    alt: "alt-text",
+  },
 ];
 
 export default function IndustryConnect() {
@@ -50,8 +106,11 @@ export default function IndustryConnect() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="overflow-hidden bg-gray-50">
-      <Container className="pt-20 sm:pt-24 lg:pt-28">
+    <section
+      ref={sectionRef}
+      className="overflow-hidden bg-gray-50 py-10 sm:py-14 lg:py-18"
+    >
+      <Container className="">
         <div className="mb-8 flex items-center gap-3">
           <span
             aria-hidden="true"
@@ -64,23 +123,21 @@ export default function IndustryConnect() {
         </div>
       </Container>
 
-      <div className="border-y border-gray-200 py-7 sm:py-9">
-        <div ref={trackRef} className="flex w-max items-center">
-          {[...logoPlaceholders, ...logoPlaceholders].map((logo, index) => (
-            <div key={`${logo}-${index}`} className="flex items-center">
-              <div className="mx-5 flex h-16 w-40 items-center justify-center border border-gray-200 bg-white px-5 sm:mx-7 sm:h-20 sm:w-48">
-                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
-                  {logo}
-                </span>
-              </div>
-
-              <span
-                aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full bg-accent-400"
-              />
-            </div>
-          ))}
-        </div>
+      <div ref={trackRef} className="flex w-max items-center">
+        {[...recruiters, ...recruiters].map((recruiter, index) => (
+          <div
+            key={`recruiter-${index}`}
+            className="flex items-center border border-gray-300 mx-2"
+          >
+            <Image
+              src={recruiter.url}
+              className="w-45 h-18"
+              width={400}
+              height={160}
+              alt={recruiter.alt}
+            />
+          </div>
+        ))}
       </div>
     </section>
   );

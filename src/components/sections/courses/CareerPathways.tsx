@@ -198,25 +198,6 @@ function CareerCard({
           ))}
         </div>
       </div>
-
-      {/* HOVER ACCENT */}
-
-      <span
-        aria-hidden="true"
-        className="
-          absolute
-          bottom-0
-          left-0
-          z-20
-          h-1
-          w-0
-          bg-accent-400
-          transition-all
-          duration-500
-          ease-out
-          group-hover:w-full
-        "
-      />
     </article>
   );
 }

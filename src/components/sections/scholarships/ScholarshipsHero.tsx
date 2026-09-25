@@ -122,8 +122,6 @@ export default function ScholarshipsHero() {
           </div>
         </div>
       </Container>
-
-      <div className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

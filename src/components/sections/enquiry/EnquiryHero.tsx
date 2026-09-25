@@ -124,8 +124,6 @@ export default function EnquiryHero() {
           </div>
         </div>
       </Container>
-
-      <div className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

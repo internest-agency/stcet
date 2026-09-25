@@ -4,29 +4,22 @@ import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
 import Container from "@/src/components/ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
+import Breadcrumb from "../../ui/Breadcrumb";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger);
 
-interface InfrastructureHeroProps {
-  image?: string;
-  imageAlt?: string;
-}
-
-export default function InfrastructureHero({
-  image = "/images/infrastructure/hero.webp",
-  imageAlt = "STCET campus infrastructure",
-}: InfrastructureHeroProps) {
+export default function InfrastructureHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const imageInnerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
-  const metaRef = useRef<HTMLDivElement>(null);
+  const actionRef = useRef<HTMLButtonElement>(null);
+  const counterRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -34,176 +27,148 @@ export default function InfrastructureHero({
     if (!section) return;
 
     const context = gsap.context(() => {
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
       const image = imageRef.current;
-      const imageInner = imageInnerRef.current;
-      const content = contentRef.current;
       const eyebrow = eyebrowRef.current;
       const heading = headingRef.current;
       const description = descriptionRef.current;
-      const meta = metaRef.current;
+      const action = actionRef.current;
+      const counter = counterRef.current;
 
       if (
         !image ||
-        !imageInner ||
-        !content ||
         !eyebrow ||
         !heading ||
         !description ||
-        !meta
+        !action ||
+        !counter
       ) {
         return;
       }
 
-      /* =====================================================
-         REDUCED MOTION
-      ===================================================== */
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
 
       if (reducedMotion) {
-        gsap.set([eyebrow, heading, description, meta, image, imageInner], {
+        gsap.set([image, eyebrow, heading, description, action, counter], {
           clearProps: "all",
         });
 
         return;
       }
 
-      /* =====================================================
-         INITIAL STATE
-      ===================================================== */
+      /* ---------------------------------------------
+         INITIAL STATES
+      --------------------------------------------- */
+
+      gsap.set(image, {
+        scale: 1.08,
+      });
 
       gsap.set(eyebrow, {
         opacity: 0,
-        y: 18,
+        y: 20,
+      });
+
+      gsap.set(heading, {
+        opacity: 0,
+        y: 45,
       });
 
       gsap.set(description, {
         opacity: 0,
-        y: 24,
+        y: 25,
       });
 
-      gsap.set(meta, {
+      gsap.set(action, {
         opacity: 0,
-        y: 18,
+        y: 20,
       });
 
-      gsap.set(image, {
+      gsap.set(counter, {
         opacity: 0,
-        y: 30,
-        clipPath: "inset(0 0 100% 0)",
+        x: 20,
       });
 
-      gsap.set(imageInner, {
-        scale: 1.08,
-      });
-
-      /* =====================================================
-         HEADING SPLIT
-      ===================================================== */
-
-      const split = SplitText.create(heading, {
-        type: "lines",
-        mask: "lines",
-        autoSplit: true,
-      });
-
-      gsap.set(split.lines, {
-        yPercent: 105,
-      });
-
-      /* =====================================================
-         HERO TIMELINE
-      ===================================================== */
+      /* ---------------------------------------------
+         INTRO ANIMATION
+      --------------------------------------------- */
 
       const timeline = gsap.timeline({
-        defaults: {
-          ease: "power4.out",
-        },
+        delay: 0.1,
       });
-
-      /* IMAGE */
 
       timeline.to(
         image,
-        {
-          opacity: 1,
-          y: 0,
-          clipPath: "inset(0 0 0% 0)",
-          duration: 1.1,
-          ease: "power4.out",
-        },
-        0.05,
-      );
-
-      timeline.to(
-        imageInner,
         {
           scale: 1,
           duration: 1.5,
           ease: "power3.out",
         },
-        0.05,
+        0,
       );
-
-      /* EYEBROW */
 
       timeline.to(
         eyebrow,
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
+          duration: 0.5,
+          ease: "power3.out",
         },
-        0.35,
+        0.2,
       );
-
-      /* HEADING */
 
       timeline.to(
-        split.lines,
+        heading,
         {
-          yPercent: 0,
-          duration: 0.9,
-          stagger: 0.1,
+          opacity: 1,
+          y: 0,
+          duration: 0.85,
           ease: "power4.out",
         },
-        0.42,
+        0.3,
       );
-
-      /* DESCRIPTION */
 
       timeline.to(
         description,
         {
           opacity: 1,
           y: 0,
-          duration: 0.7,
+          duration: 0.6,
           ease: "power3.out",
         },
-        0.8,
+        0.65,
       );
 
-      /* META */
-
       timeline.to(
-        meta,
+        action,
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
+          duration: 0.5,
           ease: "power3.out",
         },
-        1.0,
+        0.85,
       );
 
-      /* =====================================================
-         SUBTLE IMAGE PARALLAX
-      ===================================================== */
+      timeline.to(
+        counter,
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.5,
+          ease: "power3.out",
+        },
+        0.9,
+      );
 
-      gsap.to(imageInner, {
-        yPercent: 4,
+      /* ---------------------------------------------
+         IMAGE PARALLAX
+      --------------------------------------------- */
+
+      gsap.to(image, {
+        yPercent: 5,
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -219,200 +184,183 @@ export default function InfrastructureHero({
     };
   }, []);
 
+  const handleExplore = () => {
+    const target = document.getElementById("campus-future");
+
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <section
       ref={sectionRef}
       className="
         relative
+        min-h-[680px]
+        h-[100svh]
         overflow-hidden
         bg-primary-800
-        text-white
       "
     >
-      <Container>
-        <div
-          ref={contentRef}
+      {/* =====================================================
+          DESKTOP RIGHT IMAGE
+      ===================================================== */}
+
+      <div
+        ref={imageRef}
+        className="
+          absolute
+          inset-0
+        "
+      >
+        <Image
+          src="/images/infrastructure/hero.webp"
+          alt="STCET campus"
+          fill
+          priority
+          sizes="52vw"
           className="
-            relative
-            flex
-            min-h-[calc(100svh-80px)]
-            flex-col
-            justify-end
-            pb-8
-            pt-24
-            sm:pb-10
-            sm:pt-28
-            lg:min-h-[calc(100svh-88px)]
-            lg:pb-14
-            lg:pt-32
+            object-cover
+            object-center
+            will-change-transform
           "
-        >
-          {/* =================================================
-              IMAGE
-          ================================================= */}
+        />
 
+        {/* Image edge gradient */}
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-linear-to-r
+            from-primary-800
+            via-primary-800/80
+            to-transparent
+          "
+        />
+      </div>
+
+      {/* =====================================================
+          MOBILE IMAGE
+      ===================================================== */}
+
+      <div
+        className="
+          absolute
+          inset-0
+          lg:hidden
+        "
+      >
+        <Image
+          src="/images/infrastructure/hero.webp"
+          alt="STCET campus"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-primary-800/70
+          "
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            inset-0
+            bg-linear-to-t
+            from-primary-800
+            via-primary-800/60
+            to-primary-800/20
+          "
+        />
+      </div>
+
+      {/* =====================================================
+          LEFT CONTENT AREA
+      ===================================================== */}
+
+      <div
+        className="
+          relative
+          z-10
+          flex
+          h-full
+          w-full
+          items-center
+          lg:w-[52%]
+        "
+      >
+        {/* angled transition to image */}
+
+        <div
+          aria-hidden="true"
+          className="
+            absolute
+            right-[-80px]
+            top-0
+            bottom-0
+            hidden
+            lg:block
+          "
+        />
+
+        <Container>
           <div
-            ref={imageRef}
             className="
               relative
-              mb-10
-              h-[42svh]
-              min-h-[300px]
-              w-full
-              overflow-hidden
-              sm:h-[48svh]
-              sm:min-h-[380px]
-              lg:absolute
-              lg:right-0
-              lg:top-14
-              lg:mb-0
-              lg:h-[68vh]
-              lg:w-[58%]
-              xl:h-[70vh]
+              z-20
+              max-w-[720px]
+
+              px-0
+              pt-24
+              pb-20
+
+              sm:pt-28
+
+              lg:pr-10
+              xl:pr-16
             "
           >
-            <div
-              ref={imageInnerRef}
-              className="
-                absolute
-                inset-0
-                will-change-transform
-              "
-            >
-              <Image
-                src={image}
-                alt={imageAlt}
-                fill
-                priority
-                sizes="
-                  (max-width: 639px) 100vw,
-                  (max-width: 1023px) 100vw,
-                  58vw
-                "
-                className="
-                  object-cover
-                "
-              />
+            <Breadcrumb
+              items={[
+                {
+                  label: "Infrastructure",
+                },
+              ]}
+              className="text-white/80 my-6"
+            />
 
-              {/* IMAGE OVERLAY */}
+            {/* =================================================
+                HEADING
+            ================================================= */}
 
-              <div
-                className="
-                  absolute
-                  inset-0
-                  bg-black/10
-                "
-              />
-
-              {/* EDGE GRADIENT */}
-
-              <div
-                className="
-                  absolute
-                  inset-0
-                  bg-linear-to-t
-                  from-primary-800/45
-                  via-transparent
-                  to-transparent
-                  lg:bg-linear-to-l
-                  lg:from-primary-800/20
-                  lg:via-transparent
-                  lg:to-transparent
-                "
-              />
-            </div>
-          </div>
-
-          {/* =================================================
-              TEXT CONTENT
-          ================================================= */}
-
-          <div
-            className="
-              relative
-              z-10
-              max-w-3xl
-              lg:w-[52%]
-              lg:max-w-2xl
-            "
-          >
-            {/* EYEBROW */}
-
-            <div
-              ref={eyebrowRef}
-              className="
-                mb-5
-                flex
-                items-center
-                gap-3
-                sm:mb-6
-              "
-            >
-              <span
-                aria-hidden="true"
-                className="
-                  h-1.5
-                  w-1.5
-                  shrink-0
-                  rounded-full
-                  bg-accent-400
-                  sm:h-2
-                  sm:w-2
-                "
-              />
-
-              <span
-                className="
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.22em]
-                  text-white/65
-                  sm:text-[11px]
-                "
-              >
-                Infrastructure
-              </span>
-            </div>
-
-            {/* HEADING */}
-
-            <h1
-              ref={headingRef}
-              className="
-                max-w-3xl
-                font-extrabold
-                uppercase
-                leading-[0.9]
-                tracking-[-0.055em]
-                text-white
-                text-[42px]
-                sm:text-[56px]
-                lg:text-[68px]
-                xl:text-[76px]
-                [perspective:900px]
-              "
-            >
+            <SectionHeading as="h1" className="text-white">
               Infrastructure That Inspires Learning
-            </h1>
+            </SectionHeading>
 
-            {/* DESCRIPTION */}
+            {/* =================================================
+                DESCRIPTION
+            ================================================= */}
 
             <p
               ref={descriptionRef}
               className="
-                mt-6
-                max-w-xl
-                text-[14px]
-                leading-6
-                text-white/65
-                sm:mt-7
-                sm:text-[15px]
-                sm:leading-7
-                lg:mt-8
-                lg:text-[17px]
-                lg:leading-8
-              "
+                text-gray-300
+                mt-7
+                max-w-[530px]
+                sm:mt-8"
             >
               A thoughtfully designed campus with academic spaces, laboratories
               and student facilities that support learning, exploration and a
@@ -420,63 +368,81 @@ export default function InfrastructureHero({
             </p>
 
             {/* =================================================
-                META / SCROLL INDICATOR
+                EXPLORE
             ================================================= */}
 
-            <div
-              ref={metaRef}
+            <button
+              ref={actionRef}
+              type="button"
+              onClick={handleExplore}
               className="
+                group
                 mt-8
                 flex
                 items-center
-                gap-5
+                gap-4
+
                 sm:mt-10
               "
             >
-              <div
+              <span
                 className="
-                  h-px
-                  w-10
-                  bg-white/30
-                  sm:w-14
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-white/35
+                  text-white
+                  transition-all
+                  duration-300
+
+                  group-hover:border-accent-400
+                  group-hover:bg-accent-400
+                  group-hover:text-primary-800
                 "
-              />
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className="
+                    h-3.5
+                    w-3.5
+                    transition-transform
+                    duration-300
+                    group-hover:translate-y-0.5
+                  "
+                >
+                  <path
+                    d="M10 4V16M5 11L10 16L15 11"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
 
               <span
                 className="
                   text-[9px]
                   font-bold
                   uppercase
-                  tracking-[0.2em]
-                  text-white/40
+                  tracking-[0.18em]
+                  text-white/65
+                  transition-colors
+                  duration-300
+                  group-hover:text-white
                 "
               >
-                Explore the campus
+                Explore Our Campus
               </span>
-            </div>
+            </button>
           </div>
-
-          {/* =================================================
-              DECORATIVE INDEX
-          ================================================= */}
-
-          <div
-            className="
-              absolute
-              bottom-8
-              right-0
-              hidden
-              font-mono
-              text-[10px]
-              tracking-[0.15em]
-              text-white/25
-              lg:block
-            "
-          >
-            01 / 01
-          </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </section>
   );
 }

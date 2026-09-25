@@ -956,7 +956,7 @@ export default function CurriculumExplorer({
               <div
                 className="
                   relative
-                  aspect-[16/10]
+                  aspect-16/10
                   overflow-hidden
                   border-b
                   border-gray-200

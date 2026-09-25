@@ -430,7 +430,7 @@ export default function CSEConceptualVisual({
               <SectionHeading
                 as="h2"
                 className="
-                  !text-white
+                  text-white!
                 "
               >
                 From Logic to the Digital World

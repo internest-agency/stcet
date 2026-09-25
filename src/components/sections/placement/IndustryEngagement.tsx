@@ -1,17 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
-const engagementAreas = [
+const industryInteractions = [
   "Career Talks",
   "Guest Sessions",
-  "Workshops",
+  "Industry Workshops",
   "Internships",
   "Industry Interactions",
   "Recruitment Drives",
@@ -26,199 +28,161 @@ export default function IndustryEngagement() {
 
     if (!section) return;
 
-    const splitInstances: SplitText[] = [];
-
     const context = gsap.context(() => {
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+      const elements = section.querySelectorAll(".industry-reveal");
 
-      const heading = section.querySelector<HTMLElement>(
-        ".industry-engagement-heading",
-      );
+      gsap.set(elements, {
+        opacity: 0,
+        y: 35,
+      });
 
-      const items = Array.from(
-        section.querySelectorAll<HTMLElement>(".engagement-item"),
-      );
+      gsap.to(elements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 75%",
+          once: true,
+        },
+      });
 
-      /*
-       * ============================================================
-       * REDUCED MOTION
-       * ============================================================
-       */
+      const image = section.querySelector(
+        ".industry-image",
+      ) as HTMLElement | null;
 
-      if (reducedMotion) {
-        gsap.set(
-          [heading, ...items].filter(
-            (element): element is HTMLElement => element !== null,
-          ),
+      if (image) {
+        gsap.fromTo(
+          image,
           {
-            clearProps: "all",
+            scale: 1.08,
+          },
+          {
+            scale: 1,
+            duration: 1.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 75%",
+              once: true,
+            },
           },
         );
-
-        return;
-      }
-
-      /*
-       * ============================================================
-       * HEADING REVEAL
-       * ============================================================
-       */
-
-      if (heading) {
-        const split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        splitInstances.push(split);
-
-        gsap.set(split.lines, {
-          yPercent: 100,
-        });
-
-        gsap.to(split.lines, {
-          yPercent: 0,
-          duration: 0.85,
-          stagger: 0.1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: heading,
-            start: "top 84%",
-            once: true,
-          },
-        });
-      }
-
-      /*
-       * ============================================================
-       * ENGAGEMENT ITEMS
-       * ============================================================
-       */
-
-      if (items.length) {
-        gsap.set(items, {
-          opacity: 0,
-          x: 20,
-        });
-
-        gsap.to(items, {
-          opacity: 1,
-          x: 0,
-          duration: 0.6,
-          stagger: 0.07,
-          delay: 0.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: items[0],
-            start: "top 88%",
-            once: true,
-          },
-        });
       }
     }, section);
 
     return () => {
-      splitInstances.forEach((split) => {
-        split.revert();
-      });
-
       context.revert();
     };
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-gray-50">
-      <Container className="py-20 sm:py-24 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
-          {/* =========================================================
-              INTRO
-          ========================================================== */}
+    <section ref={sectionRef} className="overflow-hidden bg-gray-100">
+      <Container>
+        <div className="py-14 sm:py-18 lg:py-20">
+          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
+            {/* ============================================
+                IMAGE
+            ============================================ */}
 
-          <div>
-            <div className="mb-6 flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-2 w-2 shrink-0 rounded-full bg-accent-400"
-              />
-
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-                Connecting Students with Industry
-              </span>
-            </div>
-
-            <h2 className="industry-engagement-heading max-w-md perspective-[900px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-primary-700 text-[32px] sm:text-[40px] lg:text-[48px]">
-              Connecting Students With Industry.
-            </h2>
-          </div>
-
-          {/* =========================================================
-              CONTENT
-          ========================================================== */}
-
-          <div>
-            <p className="max-w-3xl text-lg font-medium leading-8 text-gray-700 sm:text-2xl sm:leading-9">
-              The Placement Cell aims to develop meaningful connections with
-              companies and professionals across technology, engineering,
-              manufacturing, and other relevant sectors.
-            </p>
-
-            <p className="mt-8 max-w-3xl border-t border-gray-200 pt-8 text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
-              Students will be provided opportunities to engage with industry
-              through{" "}
-              <strong>
-                career talks, guest sessions, workshops, internships, industry
-                interactions, recruitment drives and pre-placement activities
-              </strong>
-              , wherever applicable.
-            </p>
-
-            {/* =======================================================
-                ENGAGEMENT AREAS
-            ======================================================== */}
-
-            <div className="mt-10 border-t border-gray-200">
-              {engagementAreas.map((item, index) => (
-                <div
-                  key={item}
-                  className="
-                    engagement-item
-                    group
-                    flex
-                    items-center
-                    gap-5
-                    border-b
-                    border-gray-200
-                    py-5
-                    transition-colors
-                    duration-300
-                    hover:bg-white
-                    sm:py-6
-                  "
-                >
-                  <span className="w-8 shrink-0 text-xs font-bold text-gray-400">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span className="flex-1 text-base font-bold text-gray-700 transition-colors duration-300 group-hover:text-primary-700 sm:text-lg">
-                    {item}
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    className="
-                      h-px
-                      w-0
-                      bg-accent-400
-                      transition-all
-                      duration-400
-                      group-hover:w-8
-                    "
+            <div className="industry-reveal order-2 lg:order-1">
+              <div className="relative overflow-hidden bg-gray-100">
+                <div className="relative aspect-[4/5]">
+                  <Image
+                    src="/images/placements/industry-connect.webp"
+                    alt="Students interacting with industry professionals"
+                    fill
+                    className="industry-image object-cover"
+                    sizes="(max-width: 1024px) 100vw, 45vw"
                   />
                 </div>
-              ))}
+              </div>
+            </div>
+
+            {/* ============================================
+                CONTENT
+            ============================================ */}
+
+            <div className="order-1 lg:order-2">
+              {/* Label */}
+
+              <div className="industry-reveal mb-6 flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 rounded-full bg-accent-400"
+                />
+
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+                  Industry Connect
+                </span>
+              </div>
+
+              {/* Heading */}
+
+              <div className="industry-reveal">
+                <SectionHeading as="h2">
+                  Connecting Students{" "}
+                  <span className="text-accent-400">with Industry</span>
+                </SectionHeading>
+              </div>
+
+              {/* Description */}
+
+              <p className="industry-reveal mt-7 max-w-xl  text-gray-600">
+                The Placement Cell aims to develop meaningful connections with
+                companies and professionals across technology, engineering,
+                manufacturing, and other relevant sectors.
+              </p>
+
+              <p className="industry-reveal mt-7 max-w-xl  text-gray-600">
+                Students will be provided opportunities to engage with industry
+                through career talks, guest sessions, workshops, internships,
+                industry interactions, recruitment drives and pre-placement
+                activities, wherever applicable.
+              </p>
+
+              {/* ============================================
+                  INDUSTRY INTERACTIONS
+              ============================================ */}
+
+              <div className="industry-reveal mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {industryInteractions.map((item, index) => (
+                  <div
+                    key={item}
+                    className="
+                      group
+                      flex
+                      items-center
+                      gap-4
+                      bg-gray-50
+                      px-5
+                      py-4
+                      transition-colors
+                      duration-300
+                      hover:bg-primary-800
+                    "
+                  >
+                    <span className="text-xs font-semibold text-accent-400">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+
+                    <span
+                      className="
+                        text-sm
+                        font-medium
+                        text-gray-700
+                        transition-colors
+                        duration-300
+                        group-hover:text-white
+                      "
+                    >
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

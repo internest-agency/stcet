@@ -1,277 +1,178 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { memo, useState } from "react";
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
-
-const outcomes = [
+const journeySteps = [
   {
     number: "01",
-    title: "Discover",
-    description: "Discover their strengths.",
+    title: "Discover Their Strengths",
+    description:
+      "Help students understand their interests, strengths and career aspirations.",
+    keyword: "Discover",
   },
   {
     number: "02",
-    title: "Build",
-    description: "Build relevant skills.",
+    title: "Build Relevant Skills",
+    description:
+      "Develop the technical, analytical, communication and professional skills required for the workplace.",
+    keyword: "Develop",
   },
   {
     number: "03",
-    title: "Gain",
-    description: "Gain practical exposure.",
+    title: "Gain Practical Exposure",
+    description:
+      "Connect learning with practical experiences through projects, internships, workshops and industry interactions.",
+    keyword: "Experience",
   },
   {
     number: "04",
-    title: "Develop",
-    description: "Develop professional confidence.",
+    title: "Develop Professional Confidence",
+    description:
+      "Prepare students to communicate effectively, participate in recruitment processes and approach professional opportunities with confidence.",
+    keyword: "Confidence",
   },
   {
     number: "05",
-    title: "Pursue",
-    description: "Pursue the right career opportunities.",
+    title: "Pursue the Right Career Opportunities",
+    description:
+      "Support students as they explore suitable career pathways and opportunities aligned with their skills and aspirations.",
+    keyword: "Opportunity",
   },
 ];
 
+/* -------------------------------------------------------
+   STATIC SECTION INTRO
+
+   This component never receives changing props.
+   React.memo prevents it from rendering again when
+   activeIndex changes.
+------------------------------------------------------- */
+
+const PlacementFutureIntro = memo(function PlacementFutureIntro() {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[0.5fr_1.8fr] lg:gap-20">
+      <div>
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+          07 — Placement Future
+        </span>
+      </div>
+
+      <div>
+        <SectionHeading as="h2">
+          From Learning to <span className="text-accent-400">Opportunity</span>
+        </SectionHeading>
+
+        <p className="mt-3 max-w-2xl text-gray-600">
+          Career readiness is a progressive journey. Students build their
+          capabilities step by step, connecting learning, practical exposure and
+          professional development with their future career goals.
+        </p>
+      </div>
+    </div>
+  );
+});
+
+PlacementFutureIntro.displayName = "PlacementFutureIntro";
+
+/* -------------------------------------------------------
+   MAIN COMPONENT
+------------------------------------------------------- */
+
 export default function PlacementFuture() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) return;
-
-    const splitInstances: SplitText[] = [];
-
-    const context = gsap.context(() => {
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      const heading = section.querySelector<HTMLElement>(
-        ".placement-future-heading",
-      );
-
-      const statement = section.querySelector<HTMLElement>(".future-statement");
-
-      const items = Array.from(
-        section.querySelectorAll<HTMLElement>(".future-outcome"),
-      );
-
-      /*
-       * ============================================================
-       * REDUCED MOTION
-       * ============================================================
-       */
-
-      if (reducedMotion) {
-        gsap.set(
-          [heading, statement, ...items].filter(
-            (element): element is HTMLElement => element !== null,
-          ),
-          {
-            clearProps: "all",
-          },
-        );
-
-        return;
-      }
-
-      /*
-       * ============================================================
-       * HEADING REVEAL
-       * ============================================================
-       */
-
-      if (heading) {
-        const split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        splitInstances.push(split);
-
-        gsap.set(split.lines, {
-          yPercent: 100,
-        });
-
-        gsap.to(split.lines, {
-          yPercent: 0,
-          duration: 0.85,
-          stagger: 0.1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: heading,
-            start: "top 84%",
-            once: true,
-          },
-        });
-      }
-
-      /*
-       * ============================================================
-       * STATEMENT REVEAL
-       * ============================================================
-       */
-
-      if (statement) {
-        gsap.set(statement, {
-          opacity: 0,
-          y: 20,
-        });
-
-        gsap.to(statement, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: statement,
-            start: "top 88%",
-            once: true,
-          },
-        });
-      }
-
-      /*
-       * ============================================================
-       * OUTCOME ITEMS
-       * ============================================================
-       */
-
-      if (items.length) {
-        gsap.set(items, {
-          opacity: 0,
-          y: 20,
-        });
-
-        gsap.to(items, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: items[0],
-            start: "top 88%",
-            once: true,
-          },
-        });
-      }
-    }, section);
-
-    return () => {
-      splitInstances.forEach((split) => {
-        split.revert();
-      });
-
-      context.revert();
-    };
-  }, []);
+  const activeStep = journeySteps[activeIndex];
 
   return (
-    <section ref={sectionRef} className="bg-primary-700 text-white">
-      <Container className="py-20 sm:py-24 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-20">
-          {/* =========================================================
-              INTRO
-          ========================================================== */}
+    <section className="overflow-hidden bg-gray-50 py-14 sm:py-18 lg:py-20">
+      <Container>
+        {/* STATIC INTRO */}
+
+        <PlacementFutureIntro />
+
+        {/* CAREER JOURNEY */}
+
+        <div className="mt-8 lg:mt-14 grid gap-10 lg:grid-cols-[0.45fr_1.55fr] lg:gap-16">
+          {/* NAVIGATION */}
 
           <div>
-            <div className="mb-6 flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-2 w-2 shrink-0 rounded-full bg-accent-400"
-              />
+            <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+              Career Journey
+            </p>
 
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-                Preparing for the Future
-              </span>
-            </div>
+            <nav className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+              {journeySteps.map((step, index) => {
+                const isActive = index === activeIndex;
 
-            <h2 className="placement-future-heading max-w-md perspective-[900px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-white text-[32px] sm:text-[40px] lg:text-[48px]">
-              Preparing For The Future.
-            </h2>
+                return (
+                  <button
+                    key={step.number}
+                    type="button"
+                    onClick={() => setActiveIndex(index)}
+                    aria-current={isActive ? "step" : undefined}
+                    className="group flex items-center gap-4 bg-transparent px-3 py-3 text-left lg:px-0 cursor-pointer"
+                  >
+                    <span
+                      className={`
+                        text-xs font-semibold transition-colors duration-200
+                        ${
+                          isActive
+                            ? "text-accent-400"
+                            : "text-gray-300 group-hover:text-accent-400"
+                        }
+                      `}
+                    >
+                      {step.number}
+                    </span>
+
+                    <span
+                      className={`
+                        text-sm font-medium transition-colors duration-200
+                        ${
+                          isActive
+                            ? "text-primary-800"
+                            : "text-gray-400 group-hover:text-primary-800"
+                        }
+                      `}
+                    >
+                      {step.keyword}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          {/* =========================================================
-              CONTENT
-          ========================================================== */}
+          {/* ACTIVE CONTENT */}
 
-          <div>
-            <div className="future-statement max-w-3xl">
-              <p className="text-lg font-medium leading-8 text-white sm:text-2xl sm:leading-9">
-                Our objective is not simply to prepare students for a placement
-                process, but to help them become{" "}
-                <strong>career-ready professionals</strong>.
-              </p>
+          <div className="bg-primary-800 px-7 py-6 sm:px-12 sm:py-10 lg:px-12 lg:py-10 xl:px-12">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-accent-400">
+                {activeStep.keyword}
+              </span>
 
-              <p className="mt-8 border-t border-white/15 pt-8 text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-                Through continuous training and guidance, the Placement Cell
-                seeks to help students:
-              </p>
+              <div className="mt-10 max-w-3xl">
+                <SectionHeading as="h3" className="text-white">
+                  {activeStep.title}
+                </SectionHeading>
+
+                <p className="mt-7 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">
+                  {activeStep.description}
+                </p>
+              </div>
             </div>
 
-            {/* =======================================================
-                OUTCOMES
-            ======================================================== */}
-
-            <div className="mt-8 border-t border-white/15">
-              {outcomes.map((item) => (
-                <div
-                  key={item.number}
-                  className="
-                    future-outcome
-                    group
-                    flex
-                    items-center
-                    gap-5
-                    border-b
-                    border-white/15
-                    px-4
-                    py-6
-                    transition-colors
-                    duration-300
-                    hover:bg-white/3
-                  "
-                >
-                  <span className="w-8 shrink-0 text-xs font-bold text-accent-400">
-                    {item.number}
-                  </span>
-
-                  <span className="text-xl font-extrabold text-white transition-transform duration-300 group-hover:translate-x-1 sm:text-2xl">
-                    {item.title}
-                  </span>
-
-                  <span className="ml-auto hidden text-sm text-white/50 sm:block">
-                    {item.description}
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    className="
-                      h-px
-                      w-0
-                      shrink-0
-                      bg-accent-400
-                      transition-all
-                      duration-400
-                      group-hover:w-8
-                    "
-                  />
-                </div>
-              ))}
+            <div className="mt-12">
+              <span className="text-xs uppercase tracking-[0.15em] text-white/30">
+                {activeStep.number} /{" "}
+                {journeySteps[journeySteps.length - 1].number}
+              </span>
             </div>
           </div>
         </div>
       </Container>
-
-      {/* Bottom accent */}
-      <div aria-hidden="true" className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

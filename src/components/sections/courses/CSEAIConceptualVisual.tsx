@@ -405,7 +405,7 @@ export default function CSEAIConceptualVisual({
                 </span>
               </div>
 
-              <SectionHeading as="h2" className="!text-white">
+              <SectionHeading as="h2" className="text-white!">
                 Teach the Machine
               </SectionHeading>
             </div>

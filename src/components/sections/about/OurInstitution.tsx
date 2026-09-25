@@ -180,7 +180,7 @@ export default function OurInstitution() {
 
   return (
     <section ref={sectionRef} className="overflow-hidden bg-gray-50">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="py-14 sm:py-18 lg:py-20">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}

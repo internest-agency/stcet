@@ -443,9 +443,6 @@ export default function WhyStudyHorizontal({
                         transition-[width,background-color]
                         duration-300
                         ease-out
-
-                        group-hover:w-full
-                        group-hover:bg-accent-500
                       "
                     />
 

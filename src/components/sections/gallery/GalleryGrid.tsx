@@ -359,13 +359,13 @@ export default function GalleryGrid() {
             ];
 
             const aspectClasses = [
-              "aspect-[16/10]",
+              "aspect-16/10",
               "aspect-[4/5]",
               "aspect-[4/5]",
-              "aspect-[16/10]",
+              "aspect-16/10",
               "aspect-[4/5]",
               "aspect-[4/5]",
-              "aspect-[16/10]",
+              "aspect-16/10",
               "aspect-[4/5]",
               "aspect-[16/9]",
             ];

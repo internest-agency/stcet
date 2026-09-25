@@ -423,7 +423,7 @@ export default function ITConceptualVisual({
                 </span>
               </div>
 
-              <SectionHeading as="h2" className="!text-white">
+              <SectionHeading as="h2" className="text-white!">
                 Build the Digital Infrastructure
               </SectionHeading>
             </div>

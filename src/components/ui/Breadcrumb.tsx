@@ -17,10 +17,7 @@ export default function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
       <ol className="flex flex-wrap items-center gap-2 text-sm">
         {/* Home */}
         <li className="flex items-center">
-          <Link
-            href="/"
-            className="text-gray-500 transition-colors duration-200 hover:text-primary-700"
-          >
+          <Link href="/" className="transition-colors duration-200">
             Home
           </Link>
         </li>
@@ -34,22 +31,15 @@ export default function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
               className="flex items-center gap-2"
             >
               <IoChevronForward
-                className="shrink-0 text-xs text-gray-400"
+                className="shrink-0 text-xs"
                 aria-hidden="true"
               />
 
               {item.href && !isLast ? (
-                <Link
-                  href={item.href}
-                  className="text-gray-500 transition-colors duration-200 hover:text-primary-700"
-                >
-                  {item.label}
-                </Link>
+                <Link href={item.href}>{item.label}</Link>
               ) : (
                 <span
-                  className={
-                    isLast ? "font-medium text-gray-900" : "text-gray-500"
-                  }
+                  className={isLast ? "font-medium" : ""}
                   aria-current={isLast ? "page" : undefined}
                 >
                   {item.label}

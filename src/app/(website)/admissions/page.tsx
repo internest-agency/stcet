@@ -1,19 +1,21 @@
 import AdmissionsHero from "@/src/components/sections/admissions/AdmissionsHero";
-import AdmissionOverview from "@/src/components/sections/admissions/AdmissionOverview";
-import TNEAProcess from "@/src/components/sections/admissions/TNEAProcess";
-import TNEACutoff from "@/src/components/sections/admissions/TNEACutoff";
+import WhySTCET from "@/src/components/sections/admissions/WhySTCET";
+import AdmissionRoutes from "@/src/components/sections/admissions/AdmissionRoutes";
 import ManagementQuota from "@/src/components/sections/admissions/ManagementQuota";
-import AdmissionEligibility from "@/src/components/sections/admissions/AdmissionEligibility";
+import ImportantInformation from "@/src/components/sections/admissions/ImportantInformation";
+import TNEAApplication from "@/src/components/sections/admissions/TNEAApplication";
+import TNEAAcademicRequirements from "@/src/components/sections/admissions/TNEAAcademicRequirements";
 
 export default function AdmissionsPage() {
   return (
     <>
       <AdmissionsHero />
-      <AdmissionOverview />
-      <TNEAProcess />
-      <TNEACutoff />
+      <WhySTCET />
+      <AdmissionRoutes />
+      <TNEAApplication />
+      <TNEAAcademicRequirements />
       <ManagementQuota />
-      <AdmissionEligibility />
+      <ImportantInformation />
     </>
   );
 }

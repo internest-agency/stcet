@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${josefinSans.variable} ${nunitoSans.variable} h-full antialiased`}
     >
-      <body>
+      <body suppressHydrationWarning>
         <Header />
         <SmoothScroll>
           <main>{children}</main>

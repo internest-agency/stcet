@@ -392,7 +392,7 @@ export default function EEEConceptualVisual({
                 </span>
               </div>
 
-              <SectionHeading as="h2" className="!text-white">
+              <SectionHeading as="h2" className="text-white!">
                 Powering Tomorrow
               </SectionHeading>
             </div>

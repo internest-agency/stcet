@@ -164,7 +164,7 @@ export default function OurTrust() {
 
   return (
     <section ref={sectionRef} className="overflow-hidden bg-white">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="py-14 sm:py-18 lg:py-20">
         {/* -------------------------------------------------
             INTRO
         ------------------------------------------------- */}
@@ -208,12 +208,6 @@ export default function OurTrust() {
               key={pillar.number}
               className="trust-pillar group relative grid border-b border-gray-200 py-8 sm:py-10 lg:grid-cols-[100px_0.65fr_1.35fr] lg:items-start lg:gap-10 lg:py-12"
             >
-              {/* Hover accent */}
-              <span
-                aria-hidden="true"
-                className="absolute bottom-0 left-0 h-0.5 w-0 bg-accent-400 transition-all duration-500 ease-out group-hover:w-full"
-              />
-
               {/* Number */}
               <div>
                 <span className="text-sm font-black tracking-[0.18em] text-gray-300 transition-colors duration-300 group-hover:text-primary-700">

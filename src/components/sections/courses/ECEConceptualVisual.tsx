@@ -392,7 +392,7 @@ export default function ECEConceptualVisual({
                 </span>
               </div>
 
-              <SectionHeading as="h2" className="!text-white">
+              <SectionHeading as="h2" className="text-white!">
                 Connect the World
               </SectionHeading>
             </div>

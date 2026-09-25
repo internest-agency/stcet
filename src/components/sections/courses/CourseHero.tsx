@@ -345,23 +345,6 @@ export default function CourseHero({
           </div>
         </div>
       </Container>
-
-      {/* ==========================================
-          BOTTOM ACCENT
-          ========================================== */}
-
-      <div
-        aria-hidden="true"
-        className="
-          absolute
-          bottom-0
-          left-0
-          z-20
-          h-1
-          w-full
-          bg-accent-400
-        "
-      />
     </section>
   );
 }

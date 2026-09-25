@@ -190,7 +190,7 @@ export default function VisionMission() {
       ref={sectionRef}
       className="overflow-hidden bg-primary-700 text-white"
     >
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="py-14 sm:py-18 lg:py-20">
         {/* -------------------------------------------------
             SECTION LABEL
         ------------------------------------------------- */}
@@ -273,12 +273,6 @@ export default function VisionMission() {
                 key={item.number}
                 className="mission-item group relative grid gap-5 border-b border-white/15 py-7 sm:grid-cols-[70px_1fr] sm:gap-8 sm:py-8 lg:grid-cols-[80px_1fr]"
               >
-                {/* Hover accent */}
-                <span
-                  aria-hidden="true"
-                  className="absolute bottom-0 left-0 h-0.5 w-0 bg-accent-400 transition-all duration-500 ease-out group-hover:w-full"
-                />
-
                 {/* Number */}
                 <div>
                   <span className="text-xs font-black tracking-[0.2em] text-white/35 transition-colors duration-300 group-hover:text-accent-400">
@@ -295,9 +289,6 @@ export default function VisionMission() {
           </div>
         </div>
       </Container>
-
-      {/* Bottom accent */}
-      <div className="h-1 w-full bg-accent-400" />
     </section>
   );
 }

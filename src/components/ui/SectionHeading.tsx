@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import type { ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
@@ -8,7 +9,7 @@ import { SplitText } from "gsap/SplitText";
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 interface SectionHeadingProps {
-  children: string;
+  children: ReactNode;
   className?: string;
   animate?: boolean;
   as?: "h1" | "h2" | "h3";
@@ -32,23 +33,11 @@ export default function SectionHeading({
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-      /*
-       * ==========================================
-       * SPLIT HEADING INTO CHARACTERS
-       * ==========================================
-       */
-
       const split = SplitText.create(heading, {
         type: "words",
         mask: "words",
         autoSplit: true,
       });
-
-      /*
-       * ==========================================
-       * REDUCED MOTION
-       * ==========================================
-       */
 
       if (reducedMotion) {
         gsap.set(split.words, {
@@ -58,24 +47,12 @@ export default function SectionHeading({
         return;
       }
 
-      /*
-       * ==========================================
-       * INITIAL STATE
-       * ==========================================
-       */
-
       gsap.set(split.words, {
         opacity: 0,
         yPercent: 110,
         rotateX: -70,
         transformOrigin: "50% 100%",
       });
-
-      /*
-       * ==========================================
-       * CHARACTER ANIMATION
-       * ==========================================
-       */
 
       gsap.to(split.words, {
         opacity: 1,
@@ -90,12 +67,6 @@ export default function SectionHeading({
           once: true,
         },
       });
-
-      /*
-       * ==========================================
-       * CLEANUP
-       * ==========================================
-       */
 
       return () => {
         split.revert();
@@ -114,19 +85,21 @@ export default function SectionHeading({
   } as const;
 
   const headingClasses = `
-  font-extrabold
-  uppercase
-  leading-snug
-  text-primary-700
-  [perspective:800px]
-  ${headingSizes[as]}
-  ${className}
-`;
+    font-extrabold
+    uppercase
+    leading-snug
+    text-primary-700
+    [perspective:800px]
+    ${headingSizes[as]}
+    ${className}
+  `;
+
+  const content = <>{children}</>;
 
   if (as === "h1") {
     return (
       <h1 ref={headingRef} className={headingClasses}>
-        {children}
+        {content}
       </h1>
     );
   }
@@ -134,14 +107,14 @@ export default function SectionHeading({
   if (as === "h3") {
     return (
       <h3 ref={headingRef} className={headingClasses}>
-        {children}
+        {content}
       </h3>
     );
   }
 
   return (
     <h2 ref={headingRef} className={headingClasses}>
-      {children}
+      {content}
     </h2>
   );
 }

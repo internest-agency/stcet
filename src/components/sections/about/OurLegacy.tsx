@@ -107,7 +107,7 @@ export default function OurLegacy() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-white">
-      <Container className="py-20 sm:py-24 lg:py-32">
+      <Container className="py-14 sm:py-18 lg:py-20">
         <div className="grid gap-14 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20 xl:gap-28">
           {/* Left editorial column */}
           <div className="lg:sticky lg:top-32 lg:self-start">
