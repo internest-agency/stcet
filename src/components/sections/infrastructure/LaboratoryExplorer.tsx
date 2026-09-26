@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 
 import Container from "@/src/components/ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
@@ -46,7 +45,7 @@ export default function LaboratoryExplorer() {
             <span className="h-2 w-2 rounded-full bg-accent-400" />
 
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary-800/45">
-              05 — Laboratory Explorer
+              Laboratory Explorer
             </span>
           </div>
           <SectionHeading as="h2" className="max-w-5xl">

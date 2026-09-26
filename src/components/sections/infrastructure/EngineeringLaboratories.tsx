@@ -57,7 +57,7 @@ export default function EngineeringLaboratories() {
               <span className="h-2 w-2 rounded-full bg-accent-400" />
 
               <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/45">
-                04 — Engineering Laboratories
+                Engineering Laboratories
               </span>
             </div>
 

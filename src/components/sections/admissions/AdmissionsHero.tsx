@@ -80,7 +80,7 @@ export default function AdmissionsHero() {
               <Button
                 href={"#tnea-journey"}
                 variant="accent"
-                size="sm"
+                size="md"
                 rightIcon={<FaCircleArrowRight />}
               >
                 Explore Admission Process
@@ -88,7 +88,7 @@ export default function AdmissionsHero() {
               <Button
                 href={"#management-quota"}
                 variant="primary"
-                size="sm"
+                size="md"
                 rightIcon={<FaCircleArrowRight />}
               >
                 Enquire Now

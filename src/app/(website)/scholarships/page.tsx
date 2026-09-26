@@ -1,15 +1,21 @@
 import ScholarshipsHero from "@/src/components/sections/scholarships/ScholarshipsHero";
 import ScholarshipOverview from "@/src/components/sections/scholarships/ScholarshipOverview";
-import ScholarshipSchemes from "@/src/components/sections/scholarships/ScholarshipSchemes";
-import ScholarshipNote from "@/src/components/sections/scholarships/ScholarshipNote";
+import GovernmentSchemes from "@/src/components/sections/scholarships/GovernmentSchemes";
+import CommunitySupport from "@/src/components/sections/enquiry/CommunitySupport";
+import AICTEPragati from "@/src/components/sections/scholarships/AICTEPragati";
+import ScholarshipAtAGlance from "@/src/components/sections/enquiry/ScholarshipAtAGlance";
+import ScholarshipImportantNote from "@/src/components/sections/scholarships/ScholarshipImportantNote";
 
 export default function ScholarshipsPage() {
   return (
     <>
       <ScholarshipsHero />
       <ScholarshipOverview />
-      <ScholarshipSchemes />
-      <ScholarshipNote />
+      <GovernmentSchemes />
+      <CommunitySupport />
+      <AICTEPragati />
+      <ScholarshipAtAGlance />
+      <ScholarshipImportantNote />
     </>
   );
 }

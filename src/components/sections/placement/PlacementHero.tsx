@@ -193,7 +193,7 @@ export default function PlacementHero() {
               className="py-16 sm:py-20 lg:py-24 lg:pr-16 xl:pr-24"
             >
               {/* Breadcrumb */}
-              <div className="placement-breadcrumb mb-12">
+              <div className="placement-breadcrumb mt-4 mb-6">
                 <Breadcrumb
                   items={[
                     {

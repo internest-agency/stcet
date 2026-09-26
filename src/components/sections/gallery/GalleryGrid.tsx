@@ -1,477 +1,527 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-import Container from "../../ui/Container";
+gsap.registerPlugin(ScrollTrigger);
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+type GalleryCategory =
+  | "All"
+  | "Campus"
+  | "Academics"
+  | "Library"
+  | "Hostel"
+  | "Student Life";
 
-type GalleryItem = {
-  number: string;
+interface GalleryItem {
+  id: number;
   title: string;
+  category: Exclude<GalleryCategory, "All">;
   image: string;
-};
+}
+
+const categories: GalleryCategory[] = [
+  "All",
+  "Campus",
+  "Academics",
+  "Library",
+  "Hostel",
+  "Student Life",
+];
 
 const galleryItems: GalleryItem[] = [
   {
-    number: "01",
+    id: 1,
     title: "Engineering Block",
+    category: "Campus",
     image: "/images/gallery/stcet-engineering-block-entrance.jpg",
   },
   {
-    number: "02",
+    id: 2,
     title: "Computer Laboratory",
+    category: "Academics",
     image: "/images/gallery/stcet-computer-lab-1.jpg",
   },
   {
-    number: "03",
+    id: 3,
     title: "Classroom",
+    category: "Academics",
     image: "/images/gallery/stcet-classroom.jpg",
   },
   {
-    number: "04",
+    id: 4,
     title: "College Library",
+    category: "Library",
     image: "/images/gallery/stcet-college-library.jpg",
   },
   {
-    number: "05",
+    id: 5,
     title: "Digital Library",
+    category: "Library",
     image: "/images/gallery/stcet-library-computer.jpg",
   },
   {
-    number: "06",
+    id: 6,
     title: "Boys Hostel",
+    category: "Hostel",
     image: "/images/gallery/stcet-boys-hostel.jpg",
   },
   {
-    number: "07",
+    id: 7,
     title: "Girls Hostel",
+    category: "Hostel",
     image: "/images/gallery/stcet-girls-hostel.jpg",
   },
   {
-    number: "08",
+    id: 8,
     title: "Girls Hostel Interior",
+    category: "Hostel",
     image: "/images/gallery/stcet-girls-hostel-inside-1.jpg",
   },
   {
-    number: "09",
+    id: 9,
     title: "Dining Hall",
+    category: "Student Life",
     image: "/images/gallery/stcet-dining-hall.jpg",
   },
 ];
 
 export default function GalleryGrid() {
   const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("All");
+
+  const filteredItems = useMemo(() => {
+    if (activeCategory === "All") {
+      return galleryItems;
+    }
+
+    return galleryItems.filter((item) => item.category === activeCategory);
+  }, [activeCategory]);
 
   useLayoutEffect(() => {
-    const context = gsap.context(() => {
-      const section = sectionRef.current;
+    const section = sectionRef.current;
+    const stage = stageRef.current;
+    const grid = gridRef.current;
 
-      if (!section) return;
+    if (!section || !stage || !grid) {
+      return;
+    }
 
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+    const cards = Array.from(
+      grid.querySelectorAll<HTMLElement>(".gallery-card"),
+    );
 
-      const eyebrow = section.querySelector(".gallery-eyebrow");
-      const heading = section.querySelector(".gallery-heading");
-      const intro = section.querySelector(".gallery-intro");
-      const grid = section.querySelector(".gallery-grid");
-      const cards = gsap.utils.toArray<HTMLElement>(".gallery-card");
+    if (!cards.length) {
+      return;
+    }
 
-      if (prefersReducedMotion) {
-        gsap.set([eyebrow, heading, intro, cards], {
-          clearProps: "all",
-        });
+    const ctx = gsap.context(() => {
+      /*
+       * ----------------------------------------------------
+       * DESTINATION POSITIONS
+       * ----------------------------------------------------
+       */
 
-        return;
-      }
+      const stageRect = stage.getBoundingClientRect();
 
-      /* --------------------------------------------------
-         EYEBROW
-      -------------------------------------------------- */
+      const destinations = cards.map((card) => {
+        const rect = card.getBoundingClientRect();
 
-      if (eyebrow) {
-        ScrollTrigger.create({
-          trigger: eyebrow,
-          start: "top 90%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              eyebrow,
-              {
-                opacity: 0,
-                y: 18,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.65,
-                ease: "power3.out",
-              },
-            );
-          },
-        });
-      }
+        return {
+          x: rect.left - stageRect.left + rect.width / 2,
 
-      /* --------------------------------------------------
-         HEADING
-      -------------------------------------------------- */
+          y: rect.top - stageRect.top + rect.height / 2,
 
-      if (heading) {
-        const split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        ScrollTrigger.create({
-          trigger: heading,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              split.lines,
-              {
-                yPercent: 110,
-              },
-              {
-                yPercent: 0,
-                duration: 1,
-                stagger: 0.1,
-                ease: "power4.out",
-              },
-            );
-          },
-        });
-      }
-
-      /* --------------------------------------------------
-         INTRO
-      -------------------------------------------------- */
-
-      if (intro) {
-        ScrollTrigger.create({
-          trigger: intro,
-          start: "top 90%",
-          once: true,
-          onEnter: () => {
-            gsap.fromTo(
-              intro,
-              {
-                opacity: 0,
-                y: 25,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-              },
-            );
-          },
-        });
-      }
-
-      /* --------------------------------------------------
-         GRID
-      -------------------------------------------------- */
-
-      if (grid) {
-        ScrollTrigger.create({
-          trigger: grid,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            cards.forEach((card, index) => {
-              const imageWrap = card.querySelector(".gallery-image-wrap");
-
-              const image = card.querySelector(".gallery-image");
-
-              const info = card.querySelector(".gallery-info");
-
-              /* Card entrance */
-              gsap.fromTo(
-                card,
-                {
-                  opacity: 0,
-                  y: 60,
-                },
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.85,
-                  delay: index * 0.07,
-                  ease: "power3.out",
-                },
-              );
-
-              /* Image clip reveal */
-              if (imageWrap) {
-                gsap.fromTo(
-                  imageWrap,
-                  {
-                    clipPath: "inset(12% 0% 12% 0%)",
-                  },
-                  {
-                    clipPath: "inset(0% 0% 0% 0%)",
-                    duration: 1.1,
-                    delay: index * 0.07,
-                    ease: "power4.out",
-                  },
-                );
-              }
-
-              /* Image movement */
-              if (image) {
-                gsap.fromTo(
-                  image,
-                  {
-                    scale: 1.12,
-                    yPercent: 4,
-                  },
-                  {
-                    scale: 1,
-                    yPercent: 0,
-                    duration: 1.2,
-                    delay: index * 0.07,
-                    ease: "power3.out",
-                  },
-                );
-              }
-
-              /* Info entrance */
-              if (info) {
-                gsap.fromTo(
-                  info,
-                  {
-                    opacity: 0,
-                    y: 12,
-                  },
-                  {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.6,
-                    delay: index * 0.07 + 0.35,
-                    ease: "power3.out",
-                  },
-                );
-              }
-            });
-          },
-        });
-      }
-
-      /* --------------------------------------------------
-         PARALLAX
-      -------------------------------------------------- */
-
-      cards.forEach((card) => {
-        const image = card.querySelector(".gallery-image");
-
-        if (!image) return;
-
-        gsap.to(image, {
-          yPercent: -5,
-          ease: "none",
-          scrollTrigger: {
-            trigger: card,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
+          width: rect.width,
+          height: rect.height,
+        };
       });
-    }, sectionRef);
 
-    return () => context.revert();
-  }, []);
+      /*
+       * ----------------------------------------------------
+       * HIDE DESTINATION CARDS
+       * ----------------------------------------------------
+       */
+
+      gsap.set(cards, {
+        opacity: 0,
+      });
+
+      /*
+       * ----------------------------------------------------
+       * CREATE FLOATING BALLS
+       * ----------------------------------------------------
+       */
+
+      const floatingCards: HTMLElement[] = [];
+
+      cards.forEach((card, index) => {
+        const clone = card.cloneNode(true) as HTMLElement;
+
+        clone.classList.remove("gallery-card");
+
+        clone.classList.add("gallery-floating-card");
+
+        clone.style.position = "absolute";
+        clone.style.left = "0";
+        clone.style.top = "0";
+        clone.style.zIndex = String(100 + index);
+        clone.style.pointerEvents = "none";
+
+        stage.appendChild(clone);
+
+        floatingCards.push(clone);
+
+        /*
+         * Start from bottom center.
+         */
+        gsap.set(clone, {
+          x: stageRect.width / 2,
+          y: stageRect.height - 30,
+
+          xPercent: -50,
+          yPercent: -50,
+
+          width: 52,
+          height: 52,
+
+          borderRadius: "50%",
+
+          overflow: "hidden",
+
+          opacity: 0,
+
+          scale: 1,
+
+          rotation: 0,
+        });
+
+        /*
+         * Hide card content while it is a ball.
+         */
+        const content = clone.querySelector<HTMLElement>(
+          ".gallery-card-content",
+        );
+
+        if (content) {
+          gsap.set(content, {
+            opacity: 0,
+          });
+        }
+
+        /*
+         * Slightly zoom image while it is a ball.
+         */
+        const image = clone.querySelector<HTMLElement>(".gallery-image");
+
+        if (image) {
+          gsap.set(image, {
+            scale: 1.15,
+          });
+        }
+      });
+
+      /*
+       * ----------------------------------------------------
+       * SCROLL ANIMATION
+       * ----------------------------------------------------
+       *
+       * NO PIN.
+       *
+       * The section itself provides the animation distance.
+       */
+
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+
+          start: "top 55%",
+
+          end: () => {
+            /*
+             * Keep the scroll distance controlled.
+             *
+             * Previously this was too large.
+             */
+            return `+=${Math.max(1000, filteredItems.length * 190)}`;
+          },
+
+          scrub: 0.8,
+
+          invalidateOnRefresh: true,
+        },
+      });
+
+      /*
+       * ----------------------------------------------------
+       * ARRANGE ONE BY ONE
+       * ----------------------------------------------------
+       */
+
+      floatingCards.forEach((floatingCard, index) => {
+        const destination = destinations[index];
+
+        if (!destination) {
+          return;
+        }
+
+        /*
+         * Each image gets a compact timeline slot.
+         */
+        const start = index * 1;
+
+        /*
+         * 1. Appear as small ball
+         */
+        timeline.to(
+          floatingCard,
+          {
+            opacity: 1,
+            duration: 0.12,
+            ease: "none",
+          },
+          start,
+        );
+
+        /*
+         * 2. Move from bottom center
+         */
+        timeline.to(
+          floatingCard,
+          {
+            x: destination.x,
+            y: destination.y,
+
+            duration: 0.65,
+
+            ease: "power3.inOut",
+          },
+          start + 0.05,
+        );
+
+        /*
+         * 3. Expand from ball into card
+         */
+        timeline.to(
+          floatingCard,
+          {
+            width: destination.width,
+            height: destination.height,
+
+            borderRadius: "16px",
+
+            duration: 0.35,
+
+            ease: "power3.out",
+          },
+          start + 0.55,
+        );
+
+        /*
+         * 4. Image settles
+         */
+        const image = floatingCard.querySelector<HTMLElement>(".gallery-image");
+
+        if (image) {
+          timeline.to(
+            image,
+            {
+              scale: 1,
+
+              duration: 0.3,
+
+              ease: "power2.out",
+            },
+            start + 0.55,
+          );
+        }
+
+        /*
+         * 5. Show title/category
+         */
+        const content = floatingCard.querySelector<HTMLElement>(
+          ".gallery-card-content",
+        );
+
+        if (content) {
+          timeline.to(
+            content,
+            {
+              opacity: 1,
+
+              duration: 0.2,
+
+              ease: "power2.out",
+            },
+            start + 0.8,
+          );
+        }
+
+        /*
+         * 6. Reveal actual grid card.
+         *
+         * The grid now becomes the final static gallery.
+         */
+        timeline.set(
+          cards[index],
+          {
+            opacity: 1,
+          },
+          start + 0.95,
+        );
+
+        /*
+         * 7. Remove floating copy.
+         */
+        timeline.set(
+          floatingCard,
+          {
+            opacity: 0,
+          },
+          start + 1,
+        );
+      });
+
+      /*
+       * ----------------------------------------------------
+       * CLEANUP
+       * ----------------------------------------------------
+       */
+
+      return () => {
+        floatingCards.forEach((floatingCard) => {
+          floatingCard.remove();
+        });
+      };
+    }, section);
+
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+
+    return () => {
+      ctx.revert();
+
+      stage.querySelectorAll(".gallery-floating-card").forEach((element) => {
+        element.remove();
+      });
+    };
+  }, [filteredItems]);
 
   return (
-    <section ref={sectionRef} className="overflow-hidden bg-gray-0">
-      <Container className="pt-28 pb-20 sm:pt-32 sm:pb-24 lg:pt-36 lg:pb-32">
-        {/* =================================================
+    <section ref={sectionRef} className="relative overflow-hidden bg-gray-50">
+      <div
+        ref={stageRef}
+        className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24"
+      >
+        {/* ==================================================
             HEADER
-        ================================================= */}
-        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 xl:gap-28">
-          {/* Heading */}
-          <div>
-            <div className="gallery-eyebrow mb-6 flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-2 w-2 rounded-full bg-accent-400"
-              />
+        ================================================== */}
 
-              <span className="text-xs font-bold uppercase tracking-[0.22em] text-primary-700">
-                Campus Gallery
-              </span>
-            </div>
+        <div className="mb-10 flex flex-col gap-7 lg:mb-12 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-gray-500">
+              Campus Gallery
+            </p>
 
-            <div className="overflow-hidden">
-              <h1 className="gallery-heading max-w-2xl text-4xl font-extrabold uppercase leading-[0.98] tracking-[-0.045em] text-gray-900 sm:text-5xl lg:text-6xl xl:text-7xl">
-                A closer look
-                <br />
-                at life at STCET.
-              </h1>
-            </div>
-          </div>
+            <h2 className="text-4xl font-medium tracking-tight text-primary-800 sm:text-5xl lg:text-6xl">
+              Explore STCET
+            </h2>
 
-          {/* Introduction */}
-          <div className="flex items-end lg:pb-2">
-            <div>
-              <span
-                aria-hidden="true"
-                className="mb-6 block h-px w-14 bg-accent-400"
-              />
-
-              <p className="gallery-intro max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
-                Explore the spaces and experiences that shape everyday life at
-                S. Thangapazham College of Engineering and Technology — from
-                classrooms and laboratories to libraries, hostels and campus
-                facilities.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* =================================================
-            GALLERY GRID
-        ================================================= */}
-        <div className="gallery-grid mt-16 grid grid-cols-1 gap-x-5 gap-y-12 sm:mt-20 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-14 lg:mt-28 lg:grid-cols-12 lg:gap-x-7 lg:gap-y-20">
-          {galleryItems.map((item, index) => {
-            /*
-             * Editorial asymmetric layout
-             */
-            const layoutClasses = [
-              "lg:col-span-7",
-              "lg:col-span-5 lg:pt-24",
-              "lg:col-span-5",
-              "lg:col-span-7 lg:pt-20",
-              "lg:col-span-6",
-              "lg:col-span-6 lg:pt-28",
-              "lg:col-span-7",
-              "lg:col-span-5 lg:pt-20",
-              "lg:col-span-8 lg:mx-auto lg:col-start-3",
-            ];
-
-            const aspectClasses = [
-              "aspect-16/10",
-              "aspect-[4/5]",
-              "aspect-[4/5]",
-              "aspect-16/10",
-              "aspect-[4/5]",
-              "aspect-[4/5]",
-              "aspect-16/10",
-              "aspect-[4/5]",
-              "aspect-[16/9]",
-            ];
-
-            return (
-              <article
-                key={item.number}
-                className={`gallery-card group ${layoutClasses[index]}`}
-              >
-                {/* Image */}
-                <div
-                  className={`gallery-image-wrap relative overflow-hidden bg-primary-800 ${aspectClasses[index]}`}
-                >
-                  <Image
-                    src={item.image}
-                    alt={`${item.title} - S. Thangapazham College of Engineering and Technology`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 60vw"
-                    className="gallery-image object-cover will-change-transform"
-                  />
-
-                  {/* Dark gradient */}
-                  <div className="absolute inset-0 bg-linear-to-t from-primary-900/80 via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
-
-                  {/* Number */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute left-5 top-5 text-xs font-black tracking-[0.2em] text-white/70 transition-colors duration-300 group-hover:text-white sm:left-6 sm:top-6"
-                  >
-                    {item.number}
-                  </span>
-
-                  {/* Title on image */}
-                  <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6">
-                    <div className="flex items-center gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="h-px w-8 bg-accent-400 transition-all duration-500 group-hover:w-12"
-                      />
-
-                      <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
-                        STCET
-                      </span>
-                    </div>
-
-                    <h2 className="mt-2 text-xl font-extrabold tracking-[-0.02em] text-white sm:text-2xl">
-                      {item.title}
-                    </h2>
-                  </div>
-
-                  {/* Hover frame */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-3 border border-white/0 transition-all duration-500 group-hover:inset-5 group-hover:border-white/20"
-                  />
-                </div>
-
-                {/* Information */}
-                <div className="gallery-info flex items-center justify-between border-b border-gray-200 py-4 sm:py-5">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
-                    {item.number} /{" "}
-                    {String(galleryItems.length).padStart(2, "0")}
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-accent-400 transition-transform duration-300 group-hover:scale-150"
-                  />
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        {/* =================================================
-            CLOSING STATEMENT
-        ================================================= */}
-        <div className="relative mt-20 overflow-hidden border-y border-gray-200 py-12 sm:mt-28 sm:py-16 lg:mt-36 lg:py-20">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-4 -top-12 select-none text-[11rem] font-black leading-none tracking-[-0.08em] text-primary-700/[0.035] sm:-right-8 sm:text-[16rem] lg:text-[20rem]"
-          >
-            09
-          </span>
-
-          <div className="relative z-10 grid gap-6 lg:grid-cols-[100px_1fr] lg:gap-10">
-            <div className="flex items-start">
-              <div className="flex items-center gap-3 lg:flex-col lg:items-start lg:gap-4">
-                <span
-                  aria-hidden="true"
-                  className="h-2 w-2 rounded-full bg-accent-400"
-                />
-
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                  Campus Life
-                </span>
-              </div>
-            </div>
-
-            <p className="max-w-4xl text-2xl font-extrabold leading-[1.3] tracking-tight text-primary-700 sm:text-3xl lg:text-4xl lg:leading-[1.25]">
-              Every space at STCET is part of a larger journey — learning,
-              discovering, collaborating and growing together.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg">
+              Explore the campus, academic spaces, laboratories, student
+              facilities and everyday college life.
             </p>
           </div>
+
+          {/* ==================================================
+              FILTER
+          ================================================== */}
+
+          <div className="flex flex-wrap gap-2 lg:max-w-xl lg:justify-end">
+            {categories.map((category) => {
+              const isActive = activeCategory === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveCategory(category)}
+                  className={[
+                    "rounded-full px-5 py-2.5 text-sm",
+                    "transition-colors duration-300",
+                    isActive
+                      ? "bg-primary-800 text-white"
+                      : "bg-white text-gray-600 hover:bg-gray-100",
+                  ].join(" ")}
+                >
+                  {category}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </Container>
+
+        {/* ==================================================
+            DESTINATION GRID
+        ================================================== */}
+
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+        >
+          {filteredItems.map((item, index) => (
+            <article key={item.id} className="gallery-card relative">
+              <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-200">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="
+                      (max-width: 640px) 100vw,
+                      (max-width: 1024px) 50vw,
+                      33vw
+                    "
+                  className="gallery-image object-cover"
+                />
+
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
+
+                <div className="gallery-card-content absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <p className="mb-1 text-xs uppercase tracking-[0.16em] text-white/70">
+                        {item.category}
+                      </p>
+
+                      <h3 className="text-lg font-medium text-white sm:text-xl">
+                        {item.title}
+                      </h3>
+                    </div>
+
+                    <span className="shrink-0 text-sm text-white/60">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {filteredItems.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="text-gray-500">
+              No gallery images available in this category.
+            </p>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

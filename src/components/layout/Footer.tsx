@@ -42,31 +42,28 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm sm:text-base">
               <li>
                 <Link
-                  href="/aicte-approval"
+                  href="/iqac"
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
-                  AICTE Approval
+                  IQAC
                 </Link>
               </li>
-
               <li>
                 <Link
-                  href="/anna-university-affiliation"
+                  href="/anti-ragging-committee"
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
-                  Anna University Affiliation
+                  Anti Ragging Committee
                 </Link>
               </li>
-
               <li>
                 <Link
-                  href="/anti-ragging"
+                  href="/grievance-redressal-committee"
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
-                  Anti-Ragging Committee
+                  Grievance Redressal Committee
                 </Link>
               </li>
-
               <li>
                 <Link
                   href="/internal-complaints-committee"
@@ -75,13 +72,12 @@ export default function Footer() {
                   Internal Complaints Committee (ICC)
                 </Link>
               </li>
-
               <li>
                 <Link
-                  href="/grievance-redressal"
+                  href="/sc-st-cell"
                   className="text-white/80 transition-colors duration-200 hover:text-white"
                 >
-                  Grievance Redressal Cell
+                  SC/ST Cell
                 </Link>
               </li>
             </ul>

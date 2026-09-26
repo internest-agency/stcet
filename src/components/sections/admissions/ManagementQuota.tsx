@@ -33,7 +33,7 @@ export default function ManagementQuota() {
             <Button
               href={"/enquire-now"}
               variant="primary"
-              size="sm"
+              size="md"
               rightIcon={<BsArrowRightCircleFill />}
             >
               Enquire Now

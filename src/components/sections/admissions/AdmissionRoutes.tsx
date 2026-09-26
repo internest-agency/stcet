@@ -77,7 +77,7 @@ export default function AdmissionRoutes() {
                 <Button
                   href={route.href}
                   variant="accent"
-                  size="sm"
+                  size="md"
                   rightIcon={<FaCircleArrowRight />}
                 >
                   {route.button}

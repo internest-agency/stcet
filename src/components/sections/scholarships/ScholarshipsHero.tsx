@@ -1,127 +1,243 @@
 "use client";
 
+import Image from "next/image";
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-import Container from "../../ui/Container";
+import Container from "@/src/components/ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 import Breadcrumb from "../../ui/Breadcrumb";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
-export default function ScholarshipsHero() {
+export default function PlacementHero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const content = contentRef.current;
+    const image = imageRef.current;
+
+    if (!section || !content || !image) return;
+
     const context = gsap.context(() => {
-      const heading = sectionRef.current?.querySelector(
-        ".scholarships-hero-heading",
-      );
+      const breadcrumb = content.querySelector(
+        ".placement-breadcrumb",
+      ) as HTMLElement | null;
 
-      if (!heading) return;
+      const eyebrow = content.querySelector(
+        ".placement-eyebrow",
+      ) as HTMLElement | null;
 
-      const split = SplitText.create(heading, {
-        type: "lines",
-        mask: "lines",
-        autoSplit: true,
+      const heading = content.querySelector(
+        ".placement-heading",
+      ) as HTMLElement | null;
+
+      const description = content.querySelector(
+        ".placement-description",
+      ) as HTMLElement | null;
+
+      const meta = content.querySelector(
+        ".placement-meta",
+      ) as HTMLElement | null;
+
+      const contentElements = [
+        breadcrumb,
+        eyebrow,
+        heading,
+        description,
+        meta,
+      ].filter((element): element is HTMLElement => element !== null);
+
+      /*
+       * Initial content state
+       */
+      gsap.set(contentElements, {
+        opacity: 0,
+        y: 25,
       });
 
-      ScrollTrigger.create({
-        trigger: heading,
-        start: "top 85%",
-        once: true,
-        onEnter: () => {
-          gsap.fromTo(
-            split.lines,
-            { yPercent: 100 },
-            {
-              yPercent: 0,
-              duration: 0.9,
-              stagger: 0.1,
-              ease: "power4.out",
-            },
-          );
+      /*
+       * Initial image state
+       */
+      gsap.set(image, {
+        opacity: 0,
+        clipPath: "inset(0 0 0 100%)",
+      });
+
+      /*
+       * Hero entrance
+       */
+      const entrance = gsap.timeline({
+        defaults: {
+          ease: "power3.out",
+        },
+        scrollTrigger: {
+          trigger: section,
+          start: "top 80%",
+          once: true,
         },
       });
 
-      gsap.fromTo(
-        ".scholarships-hero-copy",
-        { opacity: 0, y: 25 },
+      entrance.to(
+        image,
         {
           opacity: 1,
-          y: 0,
-          duration: 0.8,
-          delay: 0.25,
-          ease: "power3.out",
+          clipPath: "inset(0 0 0 0%)",
+          duration: 1,
+          ease: "power4.out",
         },
+        0,
       );
 
-      gsap.fromTo(
-        ".scholarships-hero-label",
-        { opacity: 0, x: -20 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.7,
-          ease: "power3.out",
-        },
-      );
-    }, sectionRef);
+      if (breadcrumb) {
+        entrance.to(
+          breadcrumb,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+          },
+          0.15,
+        );
+      }
+
+      if (eyebrow) {
+        entrance.to(
+          eyebrow,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.55,
+          },
+          0.2,
+        );
+      }
+
+      if (heading) {
+        entrance.to(
+          heading,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            ease: "power4.out",
+          },
+          0.25,
+        );
+      }
+
+      if (description) {
+        entrance.to(
+          description,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+          },
+          0.4,
+        );
+      }
+
+      if (meta) {
+        entrance.to(
+          meta,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+          },
+          0.5,
+        );
+      }
+
+      /*
+       * Subtle image parallax
+       */
+      const imageElement = image.querySelector<HTMLElement>(".placement-image");
+
+      if (imageElement) {
+        gsap.to(imageElement, {
+          yPercent: -4,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+    }, section);
 
     return () => context.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-gray-50">
-      <Container className="py-16 sm:py-20 lg:py-28">
-        <Breadcrumb
-          items={[
-            {
-              label: "Scholarships & Fee Support",
-            },
-          ]}
-          className="mb-14"
-        />
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden bg-primary-800 text-white"
+    >
+      <div className="grid min-h-[680px] lg:min-h-[760px] lg:grid-cols-2">
+        {/* =========================================================
+            LEFT — CONTENT
+        ========================================================= */}
 
-        <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-          <div className="scholarships-hero-label">
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-2 w-2 rounded-full bg-accent-400"
-              />
+        <div className="flex items-center">
+          <Container>
+            <div
+              ref={contentRef}
+              className="py-16 sm:py-20 lg:py-24 lg:pr-16 xl:pr-24"
+            >
+              {/* Breadcrumb */}
+              <div className="placement-breadcrumb mt-4 mb-6">
+                <Breadcrumb
+                  items={[
+                    {
+                      label: "Scholarships & Fee Support",
+                    },
+                  ]}
+                />
+              </div>
 
-              <span className="text-xs font-bold uppercase tracking-[0.22em] text-gray-500">
-                Scholarships & Fee Support
-              </span>
-            </div>
+              {/* Heading */}
+              <SectionHeading as="h1" className="placement-heading text-white">
+                Scholarships & Fee{" "}
+                <span className="text-accent-400">Support</span>
+              </SectionHeading>
 
-            <div className="mt-8 hidden h-px w-20 bg-accent-400 lg:block" />
-          </div>
-
-          <div>
-            <h1 className="scholarships-hero-heading max-w-4xl text-4xl font-extrabold uppercase leading-[1.02] tracking-[-0.045em] text-primary-700 sm:text-5xl lg:text-6xl xl:text-7xl">
-              Supporting
-              <br />
-              Your Engineering
-              <br />
-              Journey.
-            </h1>
-
-            <div className="scholarships-hero-copy mt-8 max-w-3xl">
-              <p className="text-lg leading-8 text-gray-600 sm:text-xl sm:leading-9">
-                Students at STCET may be eligible for a range of{" "}
-                <strong className="font-bold text-gray-800">
-                  Government of Tamil Nadu, Government of India and AICTE
-                  scholarship and fee-support schemes
-                </strong>
-                , subject to the applicable eligibility criteria.
+              {/* Description */}
+              <p className="placement-description mt-8 max-w-xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+                Financial support opportunities that help eligible students
+                access engineering education at STCET.
               </p>
             </div>
+          </Container>
+        </div>
+
+        {/* =========================================================
+            RIGHT — IMAGE
+        ========================================================= */}
+
+        <div
+          ref={imageRef}
+          className="relative min-h-[500px] overflow-hidden lg:min-h-0"
+        >
+          <div className="placement-image absolute -inset-y-[4%] left-0 right-0">
+            <Image
+              src="/images/placements/placement-hero.webp"
+              alt="Engineering students preparing for their professional careers"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

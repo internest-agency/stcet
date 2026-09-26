@@ -203,7 +203,11 @@ export default function EnquiryForm() {
   };
 
   return (
-    <section ref={sectionRef} className="bg-gray-50 py-8 sm:py-12 lg:py-16">
+    <section
+      id="application"
+      ref={sectionRef}
+      className="bg-gray-50 py-14 sm:py-18 lg:py-20"
+    >
       <Container>
         <div className="mx-auto max-w-5xl">
           {/* ================================================= */}
@@ -220,11 +224,11 @@ export default function EnquiryForm() {
                 {/* Title */}
                 <div>
                   <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-                    STCET Enquiry Form
+                    2026–27
                   </span>
 
                   <h2 className="mt-3 text-3xl font-extrabold uppercase leading-tight tracking-[-0.035em] text-primary-700 sm:text-4xl">
-                    2026–27
+                    STCET Enquiry Form
                   </h2>
 
                   <p className="mt-3 max-w-xl text-sm leading-6 text-gray-500">

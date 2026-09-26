@@ -6,6 +6,8 @@ import { FiArrowUpRight, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
 
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
+import Button from "../../ui/Button";
+import { FaArrowCircleRight } from "react-icons/fa";
 
 const contactDetails = {
   address: {
@@ -346,29 +348,15 @@ export default function ContactMain() {
 
               {/* Submit */}
               <div className="mt-10">
-                <button
+                <Button
+                  as="button"
                   type="submit"
-                  className="
-                    inline-flex
-                    items-center
-                    gap-3
-                    bg-primary-800
-                    px-7
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    tracking-[0.12em]
-                    text-white
-                    transition-colors
-                    duration-200
-                    hover:bg-accent-400
-                  "
+                  variant="primary"
+                  size="md"
+                  rightIcon={<FaArrowCircleRight />}
                 >
-                  <span>Send Message</span>
-
-                  <FiArrowUpRight aria-hidden="true" className="text-lg" />
-                </button>
+                  Send Message
+                </Button>
               </div>
             </form>
           </div>

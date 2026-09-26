@@ -26,7 +26,7 @@ export default function ExperienceSTCET() {
               A campus designed to give students the spaces and resources they
               need to learn, explore and grow.
             </p>
-            <Button href="/enquire-now" variant="accent" size="sm">
+            <Button href="/enquire-now" variant="accent" size="md">
               Take a Campus Tour
             </Button>
           </div>

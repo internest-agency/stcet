@@ -97,7 +97,7 @@ export default function CampusFutureSection() {
               <span className="h-2 w-2 rounded-full bg-accent-400" />
 
               <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary-800/45">
-                02 — The Campus
+                The Campus
               </span>
             </div>
 
