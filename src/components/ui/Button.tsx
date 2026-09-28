@@ -14,14 +14,15 @@ interface BaseProps {
   rightIcon?: React.ReactNode;
 }
 
-interface LinkButtonProps extends BaseProps {
+interface LinkButtonProps
+  extends
+    BaseProps,
+    Omit<
+      React.AnchorHTMLAttributes<HTMLAnchorElement>,
+      "className" | "children" | "href"
+    > {
   as?: "link";
   href: LinkProps["href"];
-  target?: React.HTMLAttributeAnchorTarget;
-  rel?: string;
-  download?: boolean | string;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  "aria-label"?: string;
 }
 
 interface NativeButtonProps
@@ -49,9 +50,15 @@ const Button = React.forwardRef<
     children,
   } = props;
 
+  /*
+   * Base styles
+   */
   const baseStyles =
     "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2";
 
+  /*
+   * Variant styles
+   */
   const variantStyles: Record<ButtonVariant, string> = {
     primary:
       "bg-primary-700 text-white hover:bg-primary-800 focus:ring-primary-500",
@@ -63,12 +70,18 @@ const Button = React.forwardRef<
       "bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-400",
   };
 
+  /*
+   * Size styles
+   */
   const sizeStyles: Record<ButtonSize, string> = {
     sm: "px-4 py-2.5 text-sm",
     md: "px-6 py-3 text-base",
     lg: "px-8 py-4 text-lg",
   };
 
+  /*
+   * Final classes
+   */
   const classes = [
     baseStyles,
     variantStyles[variant],
@@ -78,6 +91,9 @@ const Button = React.forwardRef<
     .filter(Boolean)
     .join(" ");
 
+  /*
+   * Button content
+   */
   const content = (
     <>
       {leftIcon && (
@@ -96,24 +112,57 @@ const Button = React.forwardRef<
     </>
   );
 
+  /*
+   * ---------------------------------------------------------
+   * Native Button
+   * ---------------------------------------------------------
+   */
   if (props.as === "button") {
+    const {
+      as: _as,
+      variant: _variant,
+      size: _size,
+      className: _className,
+      children: _children,
+      leftIcon: _leftIcon,
+      rightIcon: _rightIcon,
+      ...buttonProps
+    } = props;
+
     return (
       <button
         ref={ref as React.Ref<HTMLButtonElement>}
         className={classes}
-        {...props}
+        {...buttonProps}
       >
         {content}
       </button>
     );
   }
 
+  /*
+   * ---------------------------------------------------------
+   * Link Button
+   * ---------------------------------------------------------
+   */
+  const {
+    as: _as,
+    variant: _variant,
+    size: _size,
+    className: _className,
+    children: _children,
+    href,
+    leftIcon: _leftIcon,
+    rightIcon: _rightIcon,
+    ...linkProps
+  } = props;
+
   return (
     <Link
       ref={ref as React.Ref<HTMLAnchorElement>}
-      href={props.href}
+      href={href}
       className={classes}
-      {...props}
+      {...linkProps}
     >
       {content}
     </Link>
