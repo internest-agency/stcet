@@ -1,13 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export interface WhyStudyReason {
   number: string;
@@ -29,243 +32,504 @@ export default function WhyStudyHorizontal({
   reasons,
 }: WhyStudyHorizontalProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    const viewport = viewportRef.current;
-    const track = trackRef.current;
-    const progress = progressRef.current;
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
 
-    if (!section || !viewport || !track) return;
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-    const ctx = gsap.context(() => {
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+  /*
+   * =========================================================
+   * DRAG STATE
+   * =========================================================
+   */
 
-      /*
-       * ==================================================
-       * HEADER HEIGHT
-       * ==================================================
-       */
+  const isDraggingRef = useRef(false);
 
-      const getHeaderHeight = () => {
-        const header = document.querySelector<HTMLElement>("header");
+  const pointerIdRef = useRef<number | null>(null);
 
-        return header?.getBoundingClientRect().height ?? 0;
-      };
+  const startXRef = useRef(0);
 
-      /*
-       * ==================================================
-       * INTRO ANIMATION
-       * ==================================================
-       */
+  const startScrollLeftRef = useRef(0);
 
-      if (!reducedMotion) {
-        const introItems =
-          section.querySelectorAll<HTMLElement>("[data-intro-item]");
+  const lastXRef = useRef(0);
 
-        gsap.fromTo(
-          introItems,
-          {
-            y: 24,
-          },
-          {
-            y: 0,
-            duration: 0.8,
-            stagger: 0.08,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 80%",
-              once: true,
-            },
-          },
-        );
-      }
+  const lastTimeRef = useRef(0);
 
-      /*
-       * ==================================================
-       * HORIZONTAL DISTANCE
-       * ==================================================
-       */
+  const velocityRef = useRef(0);
 
-      const getDistance = () => {
-        const viewportWidth = viewport.getBoundingClientRect().width;
+  const animationFrameRef = useRef<number | null>(null);
 
-        const trackWidth = track.scrollWidth;
+  /*
+   * =========================================================
+   * UPDATE BUTTON STATE
+   * =========================================================
+   */
 
-        return Math.max(0, trackWidth - viewportWidth);
-      };
+  const updateScrollState = useCallback(() => {
+    const carousel = carouselRef.current;
 
-      /*
-       * ==================================================
-       * REDUCED MOTION
-       * ==================================================
-       */
+    if (!carousel) {
+      return;
+    }
 
-      if (reducedMotion) {
-        gsap.set(track, {
-          x: 0,
-          clearProps: "transform",
-        });
+    const maxScroll = carousel.scrollWidth - carousel.clientWidth;
 
-        if (progress) {
-          gsap.set(progress, {
-            scaleX: 1,
-          });
-        }
+    setCanScrollLeft(carousel.scrollLeft > 2);
+
+    setCanScrollRight(carousel.scrollLeft < maxScroll - 2);
+  }, []);
+
+  /*
+   * =========================================================
+   * STOP INERTIA
+   * =========================================================
+   */
+
+  const stopInertia = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+
+      animationFrameRef.current = null;
+    }
+
+    velocityRef.current = 0;
+  }, []);
+
+  /*
+   * =========================================================
+   * START INERTIA
+   * =========================================================
+   */
+
+  const startInertia = useCallback(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    let velocity = velocityRef.current;
+
+    /*
+     * Don't start inertia for a very small movement.
+     */
+
+    if (Math.abs(velocity) < 0.1) {
+      velocityRef.current = 0;
+      return;
+    }
+
+    const animate = () => {
+      const currentCarousel = carouselRef.current;
+
+      if (!currentCarousel) {
+        animationFrameRef.current = null;
 
         return;
       }
 
       /*
-       * ==================================================
-       * HORIZONTAL CAROUSEL
-       * ==================================================
-       *
-       * Only the carousel track moves.
-       *
-       * Cards themselves are never faded or scaled.
+       * Apply velocity.
        */
 
-      const horizontalTween = gsap.to(track, {
-        x: () => -getDistance(),
+      currentCarousel.scrollLeft -= velocity;
 
-        ease: "none",
+      /*
+       * Friction.
+       *
+       * Smaller value = longer glide.
+       * Larger value = stops faster.
+       */
 
-        scrollTrigger: {
-          /*
-           * Use the carousel itself as the trigger.
-           * The section should NOT trigger the pin.
-           */
-          trigger: viewport,
+      velocity *= 0.94;
 
-          /*
-           * Start pinning when the TOP of the carousel
-           * reaches 30% from the top of the viewport.
-           */
-          start: "top 30%",
+      velocityRef.current = velocity;
 
-          /*
-           * Scroll for the complete horizontal distance.
-           */
-          end: () => {
-            const distance = getDistance();
+      updateScrollState();
 
-            return `+=${distance}`;
-          },
+      /*
+       * Stop at the edges.
+       */
 
-          /*
-           * Pin the entire section while the carousel
-           * moves horizontally.
-           */
-          pin: section,
+      const maxScroll =
+        currentCarousel.scrollWidth - currentCarousel.clientWidth;
 
-          pinSpacing: true,
+      if (
+        currentCarousel.scrollLeft <= 0 ||
+        currentCarousel.scrollLeft >= maxScroll
+      ) {
+        velocityRef.current = 0;
 
-          scrub: 1,
+        animationFrameRef.current = null;
 
-          anticipatePin: 1,
+        return;
+      }
 
-          invalidateOnRefresh: true,
+      /*
+       * Continue while there is meaningful velocity.
+       */
 
-          onUpdate: (self) => {
-            if (!progress) return;
+      if (Math.abs(velocity) > 0.1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        velocityRef.current = 0;
 
-            gsap.set(progress, {
-              scaleX: self.progress,
-            });
-          },
+        animationFrameRef.current = null;
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [updateScrollState]);
+
+  /*
+   * =========================================================
+   * BUTTON SCROLL
+   * =========================================================
+   */
+
+  const scrollCarousel = useCallback(
+    (direction: "left" | "right") => {
+      const carousel = carouselRef.current;
+
+      if (!carousel) {
+        return;
+      }
+
+      stopInertia();
+
+      const card = carousel.querySelector<HTMLElement>(".why-study-card");
+
+      if (!card) {
+        return;
+      }
+
+      const cardWidth = card.getBoundingClientRect().width;
+
+      const styles = window.getComputedStyle(carousel);
+
+      const gap = parseFloat(styles.columnGap) || parseFloat(styles.gap) || 24;
+
+      const distance = cardWidth + gap;
+
+      carousel.scrollBy({
+        left: direction === "right" ? distance : -distance,
+        behavior: "smooth",
+      });
+    },
+    [stopInertia],
+  );
+
+  /*
+   * =========================================================
+   * POINTER DOWN
+   * =========================================================
+   */
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    /*
+     * Only respond to the primary mouse button.
+     */
+
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    stopInertia();
+
+    isDraggingRef.current = true;
+
+    pointerIdRef.current = event.pointerId;
+
+    startXRef.current = event.clientX;
+
+    startScrollLeftRef.current = carousel.scrollLeft;
+
+    lastXRef.current = event.clientX;
+
+    lastTimeRef.current = performance.now();
+
+    velocityRef.current = 0;
+
+    carousel.setPointerCapture(event.pointerId);
+
+    carousel.classList.add("is-dragging");
+  };
+
+  /*
+   * =========================================================
+   * POINTER MOVE
+   * =========================================================
+   */
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel || !isDraggingRef.current) {
+      return;
+    }
+
+    /*
+     * Make sure this is the pointer
+     * that started the drag.
+     */
+
+    if (pointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    const currentX = event.clientX;
+
+    const currentTime = performance.now();
+
+    /*
+     * Distance from drag start.
+     */
+
+    const distance = currentX - startXRef.current;
+
+    /*
+     * Directly follow the pointer.
+     */
+
+    carousel.scrollLeft = startScrollLeftRef.current - distance;
+
+    /*
+     * Calculate velocity.
+     */
+
+    const deltaX = currentX - lastXRef.current;
+
+    const deltaTime = currentTime - lastTimeRef.current;
+
+    if (deltaTime > 0) {
+      const instantVelocity = deltaX / deltaTime;
+
+      /*
+       * Smooth the velocity rather than
+       * using only the latest movement.
+       */
+
+      velocityRef.current = velocityRef.current * 0.65 + instantVelocity * 0.35;
+    }
+
+    lastXRef.current = currentX;
+
+    lastTimeRef.current = currentTime;
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * POINTER UP
+   * =========================================================
+   */
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    if (pointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    isDraggingRef.current = false;
+
+    pointerIdRef.current = null;
+
+    if (carousel.hasPointerCapture(event.pointerId)) {
+      carousel.releasePointerCapture(event.pointerId);
+    }
+
+    carousel.classList.remove("is-dragging");
+
+    /*
+     * Convert pointer velocity into
+     * smooth momentum.
+     *
+     * The negative value is required
+     * because scrollLeft moves opposite
+     * to pointer movement.
+     */
+
+    velocityRef.current *= 32;
+
+    startInertia();
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * POINTER CANCEL
+   * =========================================================
+   */
+
+  const handlePointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    isDraggingRef.current = false;
+
+    pointerIdRef.current = null;
+
+    if (carousel.hasPointerCapture(event.pointerId)) {
+      carousel.releasePointerCapture(event.pointerId);
+    }
+
+    carousel.classList.remove("is-dragging");
+
+    stopInertia();
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * INTRO ANIMATION
+   * =========================================================
+   */
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) {
+      return;
+    }
+
+    const context = gsap.context(() => {
+      const items = section.querySelectorAll<HTMLElement>("[data-intro-item]");
+
+      if (!items.length) {
+        return;
+      }
+
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (reducedMotion) {
+        gsap.set(items, {
+          opacity: 1,
+          y: 0,
+        });
+
+        return;
+      }
+
+      gsap.fromTo(
+        items,
+        {
+          opacity: 0,
+          y: 24,
         },
-      });
-
-      void horizontalTween;
-
-      /*
-       * ==================================================
-       * REFRESH
-       * ==================================================
-       */
-
-      const refresh = () => {
-        ScrollTrigger.refresh();
-      };
-
-      window.addEventListener("resize", refresh);
-
-      /*
-       * Refresh after initial layout.
-       */
-
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
-
-      /*
-       * Refresh again after fonts/images/layout settle.
-       */
-
-      const refreshTimeout = window.setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 300);
-
-      /*
-       * ==================================================
-       * CLEANUP
-       * ==================================================
-       */
-
-      return () => {
-        window.removeEventListener("resize", refresh);
-
-        window.clearTimeout(refreshTimeout);
-      };
-    }, sectionRef);
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: "power3.out",
+        },
+      );
+    }, section);
 
     return () => {
-      ctx.revert();
+      context.revert();
     };
   }, []);
+
+  /*
+   * =========================================================
+   * SCROLL STATE
+   * =========================================================
+   */
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    updateScrollState();
+
+    const handleScroll = () => {
+      updateScrollState();
+    };
+
+    const handleResize = () => {
+      updateScrollState();
+    };
+
+    carousel.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      carousel.removeEventListener("scroll", handleScroll);
+
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [reasons, updateScrollState]);
+
+  /*
+   * =========================================================
+   * CLEANUP
+   * =========================================================
+   */
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
 
   return (
     <section
       ref={sectionRef}
       className="
-        relative
-        min-h-[calc(100svh-80px)]
         overflow-hidden
         bg-gray-100
         text-gray-900
       "
     >
-      <Container className="relative z-10">
+      <Container>
         <div
           className="
-            flex
-            min-h-[calc(100svh-80px)]
-            flex-col
-            py-10
-            sm:py-12
-            lg:py-14
+            py-16
+            sm:py-20
+            lg:py-24
           "
         >
           {/* =================================================
-              HEADING AREA
-              ================================================= */}
+              HEADER
+          ================================================= */}
 
-          <div
-            className="
-              shrink-0
-              lg:max-w-5xl
-            "
-          >
-            {/* ---------------------------------------------
-                LABEL
-                --------------------------------------------- */}
+          <div className="max-w-5xl">
+            {/* Label */}
 
             <div
               data-intro-item
@@ -278,12 +542,13 @@ export default function WhyStudyHorizontal({
               "
             >
               <span
+                aria-hidden="true"
                 className="
                   h-2
                   w-2
                   shrink-0
                   rounded-full
-                  bg-accent-500
+                  bg-accent-400
                 "
               />
 
@@ -300,9 +565,7 @@ export default function WhyStudyHorizontal({
               </span>
             </div>
 
-            {/* ---------------------------------------------
-                HEADING
-                --------------------------------------------- */}
+            {/* Heading */}
 
             <div data-intro-item>
               <SectionHeading
@@ -316,9 +579,7 @@ export default function WhyStudyHorizontal({
               </SectionHeading>
             </div>
 
-            {/* ---------------------------------------------
-                INTRO
-                --------------------------------------------- */}
+            {/* Description */}
 
             <p
               data-intro-item
@@ -326,13 +587,13 @@ export default function WhyStudyHorizontal({
                 mt-5
                 max-w-2xl
                 text-[14px]
-                font-medium
                 leading-6
-                text-gray-700
+                text-gray-600
                 sm:mt-6
                 sm:text-[15px]
                 sm:leading-7
                 lg:text-[16px]
+                lg:leading-7
               "
             >
               {intro}
@@ -340,13 +601,11 @@ export default function WhyStudyHorizontal({
           </div>
 
           {/* =================================================
-              CAROUSEL AREA
-              ================================================= */}
+              CAROUSEL
+          ================================================= */}
 
-          <div className="mt-8">
-            {/* ---------------------------------------------
-                DIVIDER
-                --------------------------------------------- */}
+          <div className="mt-10 sm:mt-12 lg:mt-14">
+            {/* Divider */}
 
             <div
               className="
@@ -357,209 +616,334 @@ export default function WhyStudyHorizontal({
               "
             />
 
-            {/* ---------------------------------------------
-                CAROUSEL VIEWPORT
-                --------------------------------------------- */}
+            {/* Toolbar */}
 
             <div
-              ref={viewportRef}
               className="
-                relative
-                w-full
-                overflow-visible
+                mb-5
+                flex
+                items-center
+                justify-between
+                gap-4
               "
             >
-              {/* -----------------------------------------
-                  CAROUSEL TRACK
-                  ----------------------------------------- */}
-
-              <div
-                ref={trackRef}
+              <p
                 className="
-                  flex
-                  w-max
-                  gap-4
-                  pr-[20vw]
-                  will-change-transform
-                  sm:gap-5
-                  sm:pr-[15vw]
-                  lg:gap-6
-                  lg:pr-[10vw]
+                  text-xs
+                  font-medium
+                  uppercase
+                  tracking-[0.16em]
+                  text-gray-500
                 "
               >
-                {reasons.map((reason) => (
-                  <article
-                    key={reason.number}
-                    className="
+                Explore the benefits
+              </p>
+
+              {/* Navigation */}
+
+              <div
+                className="
+                  flex
+                  items-center
+                  gap-2
+                "
+              >
+                {/* Previous */}
+
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel("left")}
+                  disabled={!canScrollLeft}
+                  aria-label="Previous benefit"
+                  className="
+                    flex
+                    size-11
+                    items-center
+                    justify-center
+                    rounded-full
+                    border
+                    border-gray-300
+                    bg-white
+                    text-primary-800
+                    transition-all
+                    duration-300
+                    hover:border-primary-800
+                    hover:bg-primary-800
+                    hover:text-white
+                    disabled:cursor-not-allowed
+                    disabled:opacity-30
+                  "
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M15 18L9 12L15 6"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {/* Next */}
+
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel("right")}
+                  disabled={!canScrollRight}
+                  aria-label="Next benefit"
+                  className="
+                    flex
+                    size-11
+                    items-center
+                    justify-center
+                    rounded-full
+                    border
+                    border-gray-300
+                    bg-white
+                    text-primary-800
+                    transition-all
+                    duration-300
+                    hover:border-primary-800
+                    hover:bg-primary-800
+                    hover:text-white
+                    disabled:cursor-not-allowed
+                    disabled:opacity-30
+                  "
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M9 18L15 12L9 6"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* =================================================
+                CAROUSEL VIEWPORT
+            ================================================= */}
+
+            <div
+              ref={carouselRef}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
+              className="
+                why-study-carousel
+                flex
+                cursor-grab
+                select-none
+                gap-4
+                overflow-x-auto
+                overscroll-x-contain
+                pb-5
+                snap-x
+                snap-mandatory
+                touch-pan-x
+                scrollbar-none
+                sm:gap-5
+                lg:gap-6
+              "
+            >
+              {reasons.map((reason) => (
+                <article
+                  key={reason.number}
+                  className="
+                      why-study-card
                       group
                       relative
                       flex
                       h-[250px]
-                      w-[78vw]
+                      w-[82vw]
                       max-w-[390px]
                       shrink-0
+                      snap-start
                       flex-col
                       overflow-hidden
-
                       border
                       border-gray-300
-
                       bg-white
-
                       p-6
-
-                      shadow-[0_8px_30px_rgba(15,23,42,0.05)]
-
-                      transition-[background-color,border-color,box-shadow]
+                      transition-all
                       duration-300
                       ease-out
-
+                      hover:border-primary-800
                       hover:bg-primary-800
                       hover:shadow-[0_14px_40px_rgba(15,23,42,0.10)]
-
                       sm:h-[285px]
                       sm:w-[55vw]
                       sm:max-w-[430px]
                       sm:p-7
-
                       lg:h-[305px]
                       lg:w-[430px]
                       lg:p-8
                     "
-                  >
-                    {/* -----------------------------------
-                        TOP ACCENT LINE
-                        ----------------------------------- */}
+                >
+                  {/* Accent */}
 
-                    <span
-                      className="
+                  <span
+                    aria-hidden="true"
+                    className="
                         absolute
                         left-0
                         top-0
                         h-[3px]
                         w-20
                         bg-accent-400
-
-                        transition-[width,background-color]
+                        transition-all
                         duration-300
-                        ease-out
+                        group-hover:w-32
                       "
-                    />
+                  />
 
-                    {/* -----------------------------------
-                        NUMBER
-                        ----------------------------------- */}
+                  {/* Number */}
 
-                    <div>
-                      <span
-                        className="
-                          font-mono
-                          text-[11px]
-                          font-bold
-                          tracking-[0.16em]
-                          text-primary-700
+                  <span
+                    className="
+                        font-mono
+                        text-[11px]
+                        font-bold
+                        tracking-[0.16em]
+                        text-primary-700
+                        transition-colors
+                        duration-300
+                        group-hover:text-white
+                      "
+                  >
+                    {reason.number}
+                  </span>
 
-                          transition-colors
-                          duration-300
+                  {/* Content */}
 
-                          group-hover:text-white
-                        "
-                      >
-                        {reason.number}
-                      </span>
-                    </div>
-
-                    {/* -----------------------------------
-                        CONTENT
-                        ----------------------------------- */}
-
-                    <div className="mt-auto">
-                      {/* Title */}
-
-                      <h3
-                        className="
+                  <div className="mt-auto">
+                    <h3
+                      className="
                           max-w-[360px]
                           text-[23px]
                           font-extrabold
                           leading-[1.08]
                           tracking-[-0.025em]
                           text-primary-800
-
                           transition-colors
                           duration-300
-
                           group-hover:text-white
-
                           sm:text-[26px]
-
                           lg:text-[29px]
                         "
-                      >
-                        {reason.title}
-                      </h3>
+                    >
+                      {reason.title}
+                    </h3>
 
-                      {/* Description */}
-
-                      <p
-                        className="
+                    <p
+                      className="
                           mt-3
                           max-w-[370px]
                           text-[13px]
-                          font-medium
                           leading-5
                           text-gray-600
-
                           transition-colors
                           duration-300
-
                           group-hover:text-white/90
-
                           sm:mt-4
                           sm:text-[14px]
                           sm:leading-6
                         "
-                      >
-                        {reason.description}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                    >
+                      {reason.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
             </div>
 
             {/* =================================================
-                PROGRESS
-                ================================================= */}
+                FOOTER
+            ================================================= */}
 
-            <div className="mt-6 sm:mt-7">
-              {/* Progress track */}
-
-              <div
+            <div
+              className="
+                mt-2
+                flex
+                items-center
+                justify-between
+              "
+            >
+              <span
                 className="
-                  relative
-                  h-[2px]
-                  w-full
-                  overflow-hidden
-                  bg-gray-300
+                  text-[11px]
+                  font-medium
+                  uppercase
+                  tracking-[0.14em]
+                  text-gray-400
                 "
               >
-                <div
-                  ref={progressRef}
-                  className="
-                    absolute
-                    inset-y-0
-                    left-0
-                    w-full
-                    origin-left
-                    scale-x-0
-                    bg-primary-700
-                  "
-                />
-              </div>
+                Drag or swipe to explore
+              </span>
+
+              <span
+                className="
+                  text-[11px]
+                  font-medium
+                  text-gray-400
+                "
+              >
+                {reasons.length} benefits
+              </span>
             </div>
           </div>
         </div>
       </Container>
+
+      {/* =====================================================
+          SCROLLBAR
+      ===================================================== */}
+
+      <style>{`
+        .scrollbar-none {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .scrollbar-none::-webkit-scrollbar {
+          display: none;
+        }
+
+        .why-study-carousel {
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .why-study-carousel.is-dragging {
+          scroll-snap-type: none;
+          cursor: grabbing !important;
+        }
+
+        .why-study-carousel.is-dragging
+          .why-study-card {
+          cursor: grabbing;
+        }
+
+        .why-study-card {
+          -webkit-user-drag: none;
+        }
+      `}</style>
     </section>
   );
 }

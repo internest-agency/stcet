@@ -1,14 +1,17 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Image from "next/image";
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const trainingAreas = [
   {
@@ -71,45 +74,408 @@ const trainingAreas = [
 
 export default function CareerReadiness() {
   const sectionRef = useRef<HTMLElement>(null);
-  const horizontalSectionRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  /*
+   * =========================================================
+   * CAROUSEL BUTTON STATE
+   * =========================================================
+   */
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  /*
+   * =========================================================
+   * DRAG STATE
+   * =========================================================
+   */
+
+  const isDraggingRef = useRef(false);
+
+  const pointerIdRef = useRef<number | null>(null);
+
+  const startXRef = useRef(0);
+
+  const startScrollLeftRef = useRef(0);
+
+  const lastXRef = useRef(0);
+
+  const lastTimeRef = useRef(0);
+
+  const velocityRef = useRef(0);
+
+  const animationFrameRef = useRef<number | null>(null);
+
+  /*
+   * =========================================================
+   * UPDATE CAROUSEL STATE
+   * =========================================================
+   */
+
+  const updateScrollState = useCallback(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+
+    setCanScrollLeft(carousel.scrollLeft > 2);
+
+    setCanScrollRight(carousel.scrollLeft < maxScroll - 2);
+  }, []);
+
+  /*
+   * =========================================================
+   * STOP INERTIA
+   * =========================================================
+   */
+
+  const stopInertia = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+
+      animationFrameRef.current = null;
+    }
+
+    velocityRef.current = 0;
+  }, []);
+
+  /*
+   * =========================================================
+   * START INERTIA
+   * =========================================================
+   */
+
+  const startInertia = useCallback(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    let velocity = velocityRef.current;
+
+    /*
+     * Ignore extremely small movement.
+     */
+
+    if (Math.abs(velocity) < 0.1) {
+      velocityRef.current = 0;
+      return;
+    }
+
+    const animate = () => {
+      const currentCarousel = carouselRef.current;
+
+      if (!currentCarousel) {
+        animationFrameRef.current = null;
+        return;
+      }
+
+      /*
+       * Move the carousel using velocity.
+       */
+
+      currentCarousel.scrollLeft -= velocity;
+
+      /*
+       * Friction.
+       *
+       * 0.94 gives a smooth natural glide.
+       */
+
+      velocity *= 0.94;
+
+      velocityRef.current = velocity;
+
+      updateScrollState();
+
+      /*
+       * Stop when reaching either edge.
+       */
+
+      const maxScroll =
+        currentCarousel.scrollWidth - currentCarousel.clientWidth;
+
+      if (
+        currentCarousel.scrollLeft <= 0 ||
+        currentCarousel.scrollLeft >= maxScroll
+      ) {
+        velocityRef.current = 0;
+
+        animationFrameRef.current = null;
+
+        return;
+      }
+
+      /*
+       * Continue the momentum animation.
+       */
+
+      if (Math.abs(velocity) > 0.1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        velocityRef.current = 0;
+
+        animationFrameRef.current = null;
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [updateScrollState]);
+
+  /*
+   * =========================================================
+   * BUTTON SCROLL
+   * =========================================================
+   */
+
+  const scrollCarousel = useCallback(
+    (direction: "left" | "right") => {
+      const carousel = carouselRef.current;
+
+      if (!carousel) {
+        return;
+      }
+
+      stopInertia();
+
+      const card = carousel.querySelector<HTMLElement>(".career-slide");
+
+      if (!card) {
+        return;
+      }
+
+      const cardWidth = card.getBoundingClientRect().width;
+
+      const styles = window.getComputedStyle(carousel);
+
+      const gap = parseFloat(styles.columnGap) || parseFloat(styles.gap) || 8;
+
+      const distance = cardWidth + gap;
+
+      carousel.scrollBy({
+        left: direction === "right" ? distance : -distance,
+        behavior: "smooth",
+      });
+    },
+    [stopInertia],
+  );
+
+  /*
+   * =========================================================
+   * POINTER DOWN
+   * =========================================================
+   */
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    /*
+     * Only use the primary mouse button.
+     */
+
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    stopInertia();
+
+    isDraggingRef.current = true;
+
+    pointerIdRef.current = event.pointerId;
+
+    startXRef.current = event.clientX;
+
+    startScrollLeftRef.current = carousel.scrollLeft;
+
+    lastXRef.current = event.clientX;
+
+    lastTimeRef.current = performance.now();
+
+    velocityRef.current = 0;
+
+    carousel.setPointerCapture(event.pointerId);
+
+    carousel.classList.add("is-dragging");
+  };
+
+  /*
+   * =========================================================
+   * POINTER MOVE
+   * =========================================================
+   */
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel || !isDraggingRef.current) {
+      return;
+    }
+
+    if (pointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    const currentX = event.clientX;
+
+    const currentTime = performance.now();
+
+    /*
+     * Distance from where dragging started.
+     */
+
+    const distance = currentX - startXRef.current;
+
+    /*
+     * Move the native carousel.
+     */
+
+    carousel.scrollLeft = startScrollLeftRef.current - distance;
+
+    /*
+     * Calculate current velocity.
+     */
+
+    const deltaX = currentX - lastXRef.current;
+
+    const deltaTime = currentTime - lastTimeRef.current;
+
+    if (deltaTime > 0) {
+      const instantVelocity = deltaX / deltaTime;
+
+      /*
+       * Smooth the velocity calculation.
+       */
+
+      velocityRef.current = velocityRef.current * 0.65 + instantVelocity * 0.35;
+    }
+
+    lastXRef.current = currentX;
+
+    lastTimeRef.current = currentTime;
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * POINTER UP
+   * =========================================================
+   */
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    if (pointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    isDraggingRef.current = false;
+
+    pointerIdRef.current = null;
+
+    if (carousel.hasPointerCapture(event.pointerId)) {
+      carousel.releasePointerCapture(event.pointerId);
+    }
+
+    carousel.classList.remove("is-dragging");
+
+    /*
+     * Convert drag velocity into
+     * momentum.
+     */
+
+    velocityRef.current *= 32;
+
+    startInertia();
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * POINTER CANCEL
+   * =========================================================
+   */
+
+  const handlePointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    isDraggingRef.current = false;
+
+    pointerIdRef.current = null;
+
+    if (carousel.hasPointerCapture(event.pointerId)) {
+      carousel.releasePointerCapture(event.pointerId);
+    }
+
+    carousel.classList.remove("is-dragging");
+
+    stopInertia();
+
+    updateScrollState();
+  };
+
+  /*
+   * =========================================================
+   * INTRO ANIMATION
+   * =========================================================
+   */
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    const horizontalSection = horizontalSectionRef.current;
-    const track = trackRef.current;
 
-    if (!section || !horizontalSection || !track) return;
+    if (!section) {
+      return;
+    }
 
     const context = gsap.context(() => {
-      const eyebrow = section.querySelector(
-        ".career-eyebrow",
-      ) as HTMLElement | null;
+      const eyebrow = section.querySelector<HTMLElement>(".career-eyebrow");
 
-      const heading = section.querySelector(
-        ".career-heading",
-      ) as HTMLElement | null;
+      const heading = section.querySelector<HTMLElement>(".career-heading");
 
-      const intro = section.querySelector(
-        ".career-intro",
-      ) as HTMLElement | null;
+      const intro = section.querySelector<HTMLElement>(".career-intro");
 
-      const slides = Array.from(
-        section.querySelectorAll<HTMLElement>(".career-slide"),
-      );
+      if (!eyebrow || !heading || !intro) {
+        return;
+      }
 
-      if (!eyebrow || !heading || !intro || !slides.length) return;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
 
-      /* ============================================
-         INTRO ANIMATION
-      ============================================ */
+      if (reducedMotion) {
+        gsap.set([eyebrow, heading, intro], {
+          opacity: 1,
+          y: 0,
+        });
+
+        return;
+      }
 
       gsap.set([eyebrow, heading, intro], {
         opacity: 0,
         y: 30,
       });
 
-      const introTimeline = gsap.timeline({
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top 75%",
@@ -117,7 +483,7 @@ export default function CareerReadiness() {
         },
       });
 
-      introTimeline
+      timeline
         .to(eyebrow, {
           opacity: 1,
           y: 0,
@@ -144,120 +510,6 @@ export default function CareerReadiness() {
           },
           "-=0.45",
         );
-
-      /* ============================================
-         HORIZONTAL DISTANCE
-      ============================================ */
-
-      const getDistance = () => {
-        const distance = track.scrollWidth - horizontalSection.clientWidth;
-
-        return Math.max(0, distance);
-      };
-
-      /* ============================================
-         HORIZONTAL SCROLL + PIN
-      ============================================ */
-
-      const horizontalTween = gsap.to(track, {
-        x: () => -getDistance(),
-        ease: "none",
-
-        scrollTrigger: {
-          trigger: section,
-
-          // Pin exactly when the carousel reaches
-          // the top of the viewport.
-          start: "top top",
-
-          // Vertical scroll distance equals
-          // horizontal movement distance.
-          end: () => `+=${getDistance()}`,
-
-          pin: true,
-          scrub: 1,
-
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-
-          // Prevent the pinned section from jumping
-          // when ScrollTrigger refreshes.
-          pinSpacing: true,
-        },
-      });
-
-      /* ============================================
-         SLIDE CONTENT ANIMATION
-      ============================================ */
-
-      slides.forEach((slide, index) => {
-        const content = slide.querySelector(
-          ".career-slide-content",
-        ) as HTMLElement | null;
-
-        if (!content) return;
-
-        gsap.set(content, {
-          opacity: index === 0 ? 1 : 0.35,
-          y: index === 0 ? 0 : 20,
-        });
-
-        ScrollTrigger.create({
-          trigger: slide,
-          containerAnimation: horizontalTween,
-
-          start: "left 70%",
-          end: "right 30%",
-
-          onEnter: () => {
-            gsap.to(content, {
-              opacity: 1,
-              y: 0,
-              duration: 0.45,
-              ease: "power3.out",
-              overwrite: true,
-            });
-          },
-
-          onEnterBack: () => {
-            gsap.to(content, {
-              opacity: 1,
-              y: 0,
-              duration: 0.45,
-              ease: "power3.out",
-              overwrite: true,
-            });
-          },
-
-          onLeave: () => {
-            gsap.to(content, {
-              opacity: 0.35,
-              y: 20,
-              duration: 0.35,
-              ease: "power2.out",
-              overwrite: true,
-            });
-          },
-
-          onLeaveBack: () => {
-            gsap.to(content, {
-              opacity: 0.35,
-              y: 20,
-              duration: 0.35,
-              ease: "power2.out",
-              overwrite: true,
-            });
-          },
-        });
-      });
-
-      /* ============================================
-         REFRESH AFTER IMAGES / LAYOUT
-      ============================================ */
-
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
     }, section);
 
     return () => {
@@ -265,28 +517,117 @@ export default function CareerReadiness() {
     };
   }, []);
 
+  /*
+   * =========================================================
+   * CAROUSEL STATE
+   * =========================================================
+   */
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    updateScrollState();
+
+    const handleScroll = () => {
+      updateScrollState();
+    };
+
+    const handleResize = () => {
+      updateScrollState();
+    };
+
+    carousel.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      carousel.removeEventListener("scroll", handleScroll);
+
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [updateScrollState]);
+
+  /*
+   * =========================================================
+   * CLEANUP
+   * =========================================================
+   */
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  /*
+   * =========================================================
+   * RENDER
+   * =========================================================
+   */
+
   return (
     <section
       ref={sectionRef}
-      className="overflow-hidden bg-primary-800 py-14 sm:py-16 lg:py-20"
+      className="
+        overflow-hidden
+        bg-primary-800
+        py-14
+        sm:py-16
+        lg:py-20
+      "
     >
-      {/* ============================================
+      {/* =====================================================
           SECTION INTRO
-      ============================================ */}
+      ===================================================== */}
 
       <Container>
         <div className="mb-12">
-          <div className="grid gap-10 lg:grid-cols-[0.6fr_1.4fr] lg:gap-20">
+          <div
+            className="
+              grid
+              gap-10
+              lg:grid-cols-[0.6fr_1.4fr]
+              lg:gap-20
+            "
+          >
             {/* Label */}
 
             <div>
-              <div className="career-eyebrow flex items-center gap-3">
+              <div
+                className="
+                  career-eyebrow
+                  flex
+                  items-center
+                  gap-3
+                "
+              >
                 <span
                   aria-hidden="true"
-                  className="h-2 w-2 rounded-full bg-accent-400"
+                  className="
+                    h-2
+                    w-2
+                    rounded-full
+                    bg-accent-400
+                  "
                 />
 
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+                <span
+                  className="
+                    text-xs
+                    font-bold
+                    uppercase
+                    tracking-[0.2em]
+                    text-gray-400
+                  "
+                >
                   Career Readiness
                 </span>
               </div>
@@ -295,12 +636,29 @@ export default function CareerReadiness() {
             {/* Heading */}
 
             <div>
-              <SectionHeading as="h2" className="career-heading text-white">
+              <SectionHeading
+                as="h2"
+                className="
+                  career-heading
+                  text-white
+                "
+              >
                 Building Career{" "}
                 <span className="text-accent-400">Readiness</span>
               </SectionHeading>
 
-              <p className="career-intro mt-7 max-w-2xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+              <p
+                className="
+                  career-intro
+                  mt-7
+                  max-w-2xl
+                  text-base
+                  leading-7
+                  text-white/80
+                  sm:text-lg
+                  sm:leading-8
+                "
+              >
                 Placement preparation begins well before the final year.
                 Students are encouraged to progressively develop the technical,
                 analytical and interpersonal skills expected in today's
@@ -311,16 +669,163 @@ export default function CareerReadiness() {
         </div>
       </Container>
 
-      {/* ============================================
-          HORIZONTAL TRAINING CAROUSEL
-      ============================================ */}
+      {/* =====================================================
+          TRAINING CAROUSEL
+      ===================================================== */}
+
       <Container>
-        <div ref={horizontalSectionRef} className="relative overflow-hidden">
-          <div ref={trackRef} className="flex gap-2 h-full w-max">
+        <div className="relative">
+          {/* Carousel controls */}
+
+          <div
+            className="
+              mb-5
+              flex
+              items-center
+              justify-end
+              gap-2
+            "
+          >
+            {/* Previous */}
+
+            <button
+              type="button"
+              onClick={() => scrollCarousel("left")}
+              disabled={!canScrollLeft}
+              aria-label="Previous training area"
+              className="
+                flex
+                size-11
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/20
+                bg-white/10
+                text-white
+                transition-all
+                duration-300
+                hover:border-accent-400
+                hover:bg-accent-400
+                hover:text-primary-800
+                disabled:cursor-not-allowed
+                disabled:opacity-30
+              "
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {/* Next */}
+
+            <button
+              type="button"
+              onClick={() => scrollCarousel("right")}
+              disabled={!canScrollRight}
+              aria-label="Next training area"
+              className="
+                flex
+                size-11
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/20
+                bg-white/10
+                text-white
+                transition-all
+                duration-300
+                hover:border-accent-400
+                hover:bg-accent-400
+                hover:text-primary-800
+                disabled:cursor-not-allowed
+                disabled:opacity-30
+              "
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 18L15 12L9 6"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* =================================================
+              CAROUSEL
+          ================================================= */}
+
+          <div
+            ref={carouselRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
+            className="
+              career-carousel
+              flex
+              cursor-grab
+              select-none
+              gap-2
+              overflow-x-auto
+              overscroll-x-contain
+              pb-5
+              snap-x
+              snap-mandatory
+              touch-pan-x
+              scrollbar-none
+            "
+          >
             {trainingAreas.map((item) => (
               <article
                 key={item.number}
-                className="career-slide flex items-center h-auto max-w-lg border-r border-gray-200 py-3 sm:py-5 lg:py-8 px-7 sm:px-10 lg:px-16 bg-gray-50"
+                className="
+                    career-slide
+                    group
+                    flex
+                    h-auto
+                    min-h-[330px]
+                    w-[82vw]
+                    max-w-lg
+                    shrink-0
+                    snap-start
+                    items-center
+                    border-r
+                    border-gray-200
+                    bg-gray-50
+                    px-7
+                    py-8
+                    sm:min-h-[350px]
+                    sm:w-[62vw]
+                    sm:px-10
+                    sm:py-10
+                    lg:min-h-[390px]
+                    lg:w-[540px]
+                    lg:px-16
+                    lg:py-12
+                  "
               >
                 <div className="career-slide-content max-w-2xl">
                   {/* Icon */}
@@ -331,31 +836,113 @@ export default function CareerReadiness() {
                       width={56}
                       height={56}
                       alt=""
-                      className="h-14 w-14 object-contain"
+                      draggable={false}
+                      className="
+                          h-14
+                          w-14
+                          object-contain
+                        "
                     />
                   </div>
 
                   {/* Heading */}
 
-                  <SectionHeading as="h3" className="career-slide-heading">
+                  <SectionHeading
+                    as="h3"
+                    className="
+                        career-slide-heading
+                      "
+                  >
                     {item.title}
                   </SectionHeading>
 
                   {/* Description */}
 
-                  <p className="mt-5 max-w-xl text-base leading-7 text-gray-600">
+                  <p
+                    className="
+                        mt-5
+                        max-w-xl
+                        text-base
+                        leading-7
+                        text-gray-600
+                      "
+                  >
                     {item.description}
                   </p>
                 </div>
               </article>
             ))}
+          </div>
 
-            {/* End spacing */}
+          {/* Drag hint */}
 
-            <div aria-hidden="true" className="w-[10vw] shrink-0" />
+          <div
+            className="
+              mt-3
+              flex
+              items-center
+              justify-between
+            "
+          >
+            <span
+              className="
+                text-[10px]
+                font-medium
+                uppercase
+                tracking-[0.16em]
+                text-white/40
+              "
+            >
+              Drag or swipe to explore
+            </span>
+
+            <span
+              className="
+                text-[10px]
+                font-medium
+                uppercase
+                tracking-[0.16em]
+                text-white/40
+              "
+            >
+              {trainingAreas.length} areas
+            </span>
           </div>
         </div>
       </Container>
+
+      {/* =====================================================
+          CAROUSEL CSS
+      ===================================================== */}
+
+      <style>{`
+        .scrollbar-none {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .scrollbar-none::-webkit-scrollbar {
+          display: none;
+        }
+
+        .career-carousel {
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .career-carousel.is-dragging {
+          scroll-snap-type: none;
+          cursor: grabbing !important;
+        }
+
+        .career-carousel.is-dragging
+          .career-slide {
+          cursor: grabbing;
+        }
+
+        .career-slide {
+          -webkit-user-drag: none;
+        }
+      `}</style>
     </section>
   );
 }
