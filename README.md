@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+For MySQL, Prisma, and the staged STCET admin setup, see [ADMIN_SETUP.md](./ADMIN_SETUP.md).
+
 ## Getting Started
 
 First, run the development server:

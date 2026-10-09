@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
@@ -10,6 +12,10 @@ import CurriculumExplorer, {
 import WhyStudy, {
   type WhyStudyReason,
 } from "@/src/components/sections/courses/WhyStudy";
+import {
+  getPublishedCourseMetadata,
+  getPublishedCoursePageData,
+} from "@/src/lib/queries/courses";
 
 const careerGroups: CareerGroup[] = [
   {
@@ -145,14 +151,62 @@ const whyStudyDept: WhyStudyReason[] = [
   },
 ];
 
-export default function ComputerScienceEngineeringPage() {
+const opportunities = [
+  "Generative AI",
+  "Computer Vision",
+  "Natural Language Processing",
+  "Robotics",
+  "Intelligent Automation",
+  "Data Analytics",
+  "Deep Learning",
+  "Responsible AI",
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const course = await getPublishedCourseMetadata("computer-science-ai-ml");
+  const title =
+    course?.seoTitle || "Computer Science and Engineering (AI & ML) | STCET";
+  const description =
+    course?.metaDescription ||
+    "Computer Science and Engineering (AI & ML) at STCET.";
+
+  return {
+    title,
+    description,
+    ...(course?.canonicalUrl
+      ? { alternates: { canonical: course.canonicalUrl } }
+      : {}),
+    ...(course
+      ? { robots: { index: !course.noIndex, follow: !course.noIndex } }
+      : {}),
+    openGraph: {
+      title,
+      description,
+      ...(course?.ogImage ? { images: [course.ogImage] } : {}),
+    },
+  };
+}
+
+export default async function ComputerScienceEngineeringPage() {
+  const pageData = await getPublishedCoursePageData("computer-science-ai-ml", {
+    name: "Computer Science and Engineering (AI & ML)",
+    tagline: "Learn. Predict. Innovate.",
+    description: "",
+    heroImage: "/images/cse-ai-ml-hero-bg.webp",
+    slides: curriculum,
+    opportunities,
+    reasons: whyStudyDept,
+    careerGroups,
+  });
+  if (!pageData) notFound();
+
   return (
     <>
       <CourseHero
-        image="/images/cse-ai-ml-hero-bg.webp"
+        image={pageData.heroImage}
         programmeLabel="B.E. Programme"
-        heading="Computer Science and Engineering (AI & ML)"
-        tagline="Learn. Predict. Innovate."
+        heading={pageData.name}
+        tagline={pageData.tagline}
         breadcrumbItems={[
           {
             label: "Courses",
@@ -166,29 +220,33 @@ export default function ComputerScienceEngineeringPage() {
       <CourseOverview
         label="About the Programme"
         heading="Computing is at the heart of today's digital world."
-        paragraphs={[
-          {
-            content:
-              "Artificial Intelligence and Machine Learning are transforming the way technology interacts with the world. From intelligent applications and automation to healthcare, finance, transportation and communication, AI is becoming an integral part of modern life.",
-          },
-          {
-            content: (
-              <>
-                The{" "}
-                <strong className="font-extrabold text-primary-700">
-                  B.E. Computer Science and Engineering (Artificial Intelligence
-                  &amp; Machine Learning)
-                </strong>{" "}
-                programme at STCET brings together the foundations of computer
-                science with the principles and applications of AI and ML.
-                Students develop a strong understanding of computing while
-                learning how machines can process information, identify
-                patterns, learn from data and support intelligent
-                decision-making.
-              </>
-            ),
-          },
-        ]}
+        paragraphs={
+          pageData.description
+            ? [{ content: pageData.description }]
+            : [
+                {
+                  content:
+                    "Artificial Intelligence and Machine Learning are transforming the way technology interacts with the world. From intelligent applications and automation to healthcare, finance, transportation and communication, AI is becoming an integral part of modern life.",
+                },
+                {
+                  content: (
+                    <>
+                      The{" "}
+                      <strong className="font-extrabold text-primary-700">
+                        B.E. Computer Science and Engineering (Artificial
+                        Intelligence &amp; Machine Learning)
+                      </strong>{" "}
+                      programme at STCET brings together the foundations of
+                      computer science with the principles and applications of
+                      AI and ML. Students develop a strong understanding of
+                      computing while learning how machines can process
+                      information, identify patterns, learn from data and
+                      support intelligent decision-making.
+                    </>
+                  ),
+                },
+              ]
+        }
         keyStatement="Turn data into intelligence. Turn intelligence into impact"
       />
       <CurriculumExplorer
@@ -197,33 +255,24 @@ export default function ComputerScienceEngineeringPage() {
                 programming, artificial intelligence, machine learning, data
                 analytics, deep learning, natural language processing and
                 computer vision."
-        slides={curriculum}
+        slides={pageData.slides}
       />
       <OpportunityAreas
         title="Explore the possibilities of intelligent technology."
-        data={[
-          "Generative AI",
-          "Computer Vision",
-          "Natural Language Processing",
-          "Robotics",
-          "Intelligent Automation",
-          "Data Analytics",
-          "Deep Learning",
-          "Responsible AI",
-        ]}
+        data={pageData.opportunities}
       />
       <WhyStudy
         label="Why Study CSE (AI+ML) at STCET"
         heading="Build the skills to shape the future of intelligent technology."
         intro="Develop a strong foundation in computer science while building specialised knowledge and practical skills in artificial intelligence and machine learning."
-        reasons={whyStudyDept}
+        reasons={pageData.reasons}
       />
       <CareerPathways
         careerTitle="Explore careers at the forefront of AI and ML."
         careerIntro="Graduates can explore opportunities across software and
                 technology organisations as well as sectors increasingly
                 adopting intelligent systems."
-        careerGroups={careerGroups}
+        careerGroups={pageData.careerGroups}
       />
     </>
   );

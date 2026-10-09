@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
@@ -10,6 +12,10 @@ import WhyStudy, {
   type WhyStudyReason,
 } from "@/src/components/sections/courses/WhyStudy";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
+import {
+  getPublishedCourseMetadata,
+  getPublishedCoursePageData,
+} from "@/src/lib/queries/courses";
 
 const careerGroups: CareerGroup[] = [
   {
@@ -157,14 +163,68 @@ const whyStudyDept: WhyStudyReason[] = [
   },
 ];
 
-export default function ComputerScienceEngineeringPage() {
+const opportunities = [
+  "Renewable Energy",
+  "Electric Vehicles",
+  "Smart Grids",
+  "Power Electronics",
+  "Industrial Automation",
+  "Energy Management",
+  "Battery Technologies",
+  "Control Systems",
+  "Smart Electrical Systems",
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const course = await getPublishedCourseMetadata(
+    "electrical-electronics-engineering",
+  );
+  const title =
+    course?.seoTitle || "Electrical and Electronics Engineering | STCET";
+  const description =
+    course?.metaDescription ||
+    "Electrical and Electronics Engineering at STCET.";
+
+  return {
+    title,
+    description,
+    ...(course?.canonicalUrl
+      ? { alternates: { canonical: course.canonicalUrl } }
+      : {}),
+    ...(course
+      ? { robots: { index: !course.noIndex, follow: !course.noIndex } }
+      : {}),
+    openGraph: {
+      title,
+      description,
+      ...(course?.ogImage ? { images: [course.ogImage] } : {}),
+    },
+  };
+}
+
+export default async function ComputerScienceEngineeringPage() {
+  const pageData = await getPublishedCoursePageData(
+    "electrical-electronics-engineering",
+    {
+      name: "Electrical and Electronics Engineering",
+      tagline: "Powering Technology. Enabling Tomorrow.",
+      description: "",
+      heroImage: "/images/eee-hero-bg.webp",
+      slides: curriculum,
+      opportunities,
+      reasons: whyStudyDept,
+      careerGroups,
+    },
+  );
+  if (!pageData) notFound();
+
   return (
     <>
       <CourseHero
-        image="/images/eee-hero-bg.webp"
+        image={pageData.heroImage}
         programmeLabel="B.E. Programme"
-        heading="Electrical and Electronics Engineering"
-        tagline="Powering Technology. Enabling Tomorrow."
+        heading={pageData.name}
+        tagline={pageData.tagline}
         breadcrumbItems={[
           {
             label: "Courses",
@@ -178,29 +238,33 @@ export default function ComputerScienceEngineeringPage() {
       <CourseOverview
         label="About the Programme"
         heading="Powering Technology. Enabling Tomorrow."
-        paragraphs={[
-          {
-            content:
-              "Electricity powers modern life—from homes and industries to transportation, communication and emerging digital infrastructure. Electrical and Electronics Engineering plays a central role in designing, controlling and managing the systems that make this possible.",
-          },
-          {
-            content: (
-              <>
-                The{" "}
-                <strong className="font-extrabold text-primary-700">
-                  B.E. Electrical and Electronics Engineering{" "}
-                </strong>
-                programme at STCET provides students with a strong foundation in
-                electrical systems, electronics, power technologies, control
-                systems and automation.
-              </>
-            ),
-          },
-          {
-            content:
-              "The programme combines fundamental engineering principles with contemporary applications, preparing students to understand and develop systems that generate, transmit, control and efficiently use electrical energy.",
-          },
-        ]}
+        paragraphs={
+          pageData.description
+            ? [{ content: pageData.description }]
+            : [
+                {
+                  content:
+                    "Electricity powers modern life—from homes and industries to transportation, communication and emerging digital infrastructure. Electrical and Electronics Engineering plays a central role in designing, controlling and managing the systems that make this possible.",
+                },
+                {
+                  content: (
+                    <>
+                      The{" "}
+                      <strong className="font-extrabold text-primary-700">
+                        B.E. Electrical and Electronics Engineering{" "}
+                      </strong>
+                      programme at STCET provides students with a strong
+                      foundation in electrical systems, electronics, power
+                      technologies, control systems and automation.
+                    </>
+                  ),
+                },
+                {
+                  content:
+                    "The programme combines fundamental engineering principles with contemporary applications, preparing students to understand and develop systems that generate, transmit, control and efficiently use electrical energy.",
+                },
+              ]
+        }
         keyStatement="Engineering intelligence to understand energy, shape electronic systems and build solutions that power a smarter world."
       />
       <CurriculumExplorer
@@ -208,21 +272,11 @@ export default function ComputerScienceEngineeringPage() {
         intro="Students develop knowledge across electrical systems,
                 electronics, power technologies, control systems,
                 instrumentation, automation and emerging energy technologies."
-        slides={curriculum}
+        slides={pageData.slides}
       />
       <OpportunityAreas
         title="Find your place in the technologies powering the world ahead."
-        data={[
-          "Renewable Energy",
-          "Electric Vehicles",
-          "Smart Grids",
-          "Power Electronics",
-          "Industrial Automation",
-          "Energy Management",
-          "Battery Technologies",
-          "Control Systems",
-          "Smart Electrical Systems",
-        ]}
+        data={pageData.opportunities}
       />
       <WhyStudy
         label="Why Study EEE at STCET"
@@ -230,14 +284,14 @@ export default function ComputerScienceEngineeringPage() {
         intro="Develop a strong foundation in electrical engineering while
                 building practical knowledge across electronics, automation,
                 energy technologies and modern electrical systems."
-        reasons={whyStudyDept}
+        reasons={pageData.reasons}
       />
       <CareerPathways
         careerTitle="Build your future in electrical engineering."
         careerIntro="EEE graduates can pursue opportunities across core electrical
                 industries, infrastructure, manufacturing, automation, energy
                 and technology."
-        careerGroups={careerGroups}
+        careerGroups={pageData.careerGroups}
       />
     </>
   );

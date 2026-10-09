@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import CurriculumExplorer, {
   type CurriculumSlide,
@@ -10,6 +12,10 @@ import WhyStudy, {
   type WhyStudyReason,
 } from "@/src/components/sections/courses/WhyStudy";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
+import {
+  getPublishedCourseMetadata,
+  getPublishedCoursePageData,
+} from "@/src/lib/queries/courses";
 
 const careerGroups: CareerGroup[] = [
   {
@@ -165,14 +171,60 @@ const whyStudyDept: WhyStudyReason[] = [
   },
 ];
 
-export default function ComputerScienceEngineeringPage() {
+const opportunities = [
+  "Cloud Computing",
+  "Cybersecurity",
+  "Data Analytics",
+  "AI Applications",
+  "Enterprise Technology",
+  "Internet of Things",
+  "Digital Transformation",
+  "Web & Mobile Technologies",
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const course = await getPublishedCourseMetadata("information-technology");
+  const title = course?.seoTitle || "Information Technology | STCET";
+  const description =
+    course?.metaDescription || "Information Technology at STCET.";
+
+  return {
+    title,
+    description,
+    ...(course?.canonicalUrl
+      ? { alternates: { canonical: course.canonicalUrl } }
+      : {}),
+    ...(course
+      ? { robots: { index: !course.noIndex, follow: !course.noIndex } }
+      : {}),
+    openGraph: {
+      title,
+      description,
+      ...(course?.ogImage ? { images: [course.ogImage] } : {}),
+    },
+  };
+}
+
+export default async function ComputerScienceEngineeringPage() {
+  const pageData = await getPublishedCoursePageData("information-technology", {
+    name: "Information Technology",
+    tagline: "Transforming Information. Enabling Innovation.",
+    description: "",
+    heroImage: "/images/cse-ai-ml-hero-bg.webp",
+    slides: curriculum,
+    opportunities,
+    reasons: whyStudyDept,
+    careerGroups,
+  });
+  if (!pageData) notFound();
+
   return (
     <>
       <CourseHero
-        image="/images/cse-ai-ml-hero-bg.webp"
+        image={pageData.heroImage}
         programmeLabel="B.Tech. Programme"
-        heading="Information Technology"
-        tagline="Transforming Information. Enabling Innovation."
+        heading={pageData.name}
+        tagline={pageData.tagline}
         breadcrumbItems={[
           {
             label: "Courses",
@@ -186,44 +238,39 @@ export default function ComputerScienceEngineeringPage() {
       <CourseOverview
         label="About the Programme"
         heading="Technology That Solves Real-World Problems"
-        paragraphs={[
-          {
-            content:
-              "Information Technology is the technology layer behind the digital services people and organisations use every day. From cloud platforms and enterprise applications to cybersecurity, databases and digital services, IT connects technology with real-world needs.",
-          },
-          {
-            content: (
-              <>
-                The{" "}
-                <strong className="font-extrabold text-primary-700">
-                  B.Tech. Information Technology
-                </strong>{" "}
-                programme at STCET focuses on the development, management and
-                application of computing technologies to solve problems across
-                businesses, industries and society.
-              </>
-            ),
-          },
-        ]}
+        paragraphs={
+          pageData.description
+            ? [{ content: pageData.description }]
+            : [
+                {
+                  content:
+                    "Information Technology is the technology layer behind the digital services people and organisations use every day. From cloud platforms and enterprise applications to cybersecurity, databases and digital services, IT connects technology with real-world needs.",
+                },
+                {
+                  content: (
+                    <>
+                      The{" "}
+                      <strong className="font-extrabold text-primary-700">
+                        B.Tech. Information Technology
+                      </strong>{" "}
+                      programme at STCET focuses on the development, management
+                      and application of computing technologies to solve
+                      problems across businesses, industries and society.
+                    </>
+                  ),
+                },
+              ]
+        }
         keyStatement="While sharing a strong foundation with computer science, Information Technology places particular emphasis on using technology to develop, deploy and manage solutions in real-world environments."
       />
       <CurriculumExplorer
         title="Learn how technology works, and how to put it to work."
         intro="The programme progresses from programming and data structures to databases, web technologies, software engineering, networking, cloud computing, cybersecurity, data analytics and emerging technologies."
-        slides={curriculum}
+        slides={pageData.slides}
       />
       <OpportunityAreas
         title="Explore the technology landscape shaping what comes next."
-        data={[
-          "Cloud Computing",
-          "Cybersecurity",
-          "Data Analytics",
-          "AI Applications",
-          "Enterprise Technology",
-          "Internet of Things",
-          "Digital Transformation",
-          "Web & Mobile Technologies",
-        ]}
+        data={pageData.opportunities}
       />
       <WhyStudy
         label="Why Study IT at STCET"
@@ -231,14 +278,14 @@ export default function ComputerScienceEngineeringPage() {
         intro="Build a strong foundation in information technology while
                 developing practical skills to apply contemporary digital
                 technologies and create meaningful solutions."
-        reasons={whyStudyDept}
+        reasons={pageData.reasons}
       />
       <CareerPathways
         careerTitle="From code to cloud, find your path in I.T."
         careerIntro="The broad nature of Information Technology allows graduates to
                 work across software, technology services and digital
                 businesses."
-        careerGroups={careerGroups}
+        careerGroups={pageData.careerGroups}
       />
     </>
   );

@@ -2,8 +2,11 @@ import GalleryGrid from "@/src/components/sections/gallery/GalleryGrid";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
+import { getPublicGalleryData } from "@/src/lib/queries/gallery";
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const gallery = await getPublicGalleryData();
+
   return (
     <>
       <EditorialHero
@@ -24,7 +27,7 @@ export default function GalleryPage() {
           everyday life at S. Thangapazham College of Engineering & Technology.
         </p>
       </EditorialHero>
-      <GalleryGrid />
+      <GalleryGrid items={gallery.items} categories={gallery.categories} />
     </>
   );
 }

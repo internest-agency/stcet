@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
 import CareerPathways, {
@@ -10,6 +12,10 @@ import WhyStudy, {
   type WhyStudyReason,
 } from "@/src/components/sections/courses/WhyStudy";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
+import {
+  getPublishedCourseMetadata,
+  getPublishedCoursePageData,
+} from "@/src/lib/queries/courses";
 
 const careerGroups: CareerGroup[] = [
   {
@@ -157,14 +163,67 @@ const whyStudyDept: WhyStudyReason[] = [
   },
 ];
 
-export default function ComputerScienceEngineeringPage() {
+const opportunities = [
+  "Internet of Things",
+  "Embedded Systems",
+  "VLSI",
+  "Robotics",
+  "Automotive Electronics",
+  "Wireless Technologies",
+  "Signal & Image Processing",
+  "Smart Devices",
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const course = await getPublishedCourseMetadata(
+    "electronics-communication-engineering",
+  );
+  const title =
+    course?.seoTitle || "Electronics and Communication Engineering | STCET";
+  const description =
+    course?.metaDescription ||
+    "Electronics and Communication Engineering at STCET.";
+
+  return {
+    title,
+    description,
+    ...(course?.canonicalUrl
+      ? { alternates: { canonical: course.canonicalUrl } }
+      : {}),
+    ...(course
+      ? { robots: { index: !course.noIndex, follow: !course.noIndex } }
+      : {}),
+    openGraph: {
+      title,
+      description,
+      ...(course?.ogImage ? { images: [course.ogImage] } : {}),
+    },
+  };
+}
+
+export default async function ComputerScienceEngineeringPage() {
+  const pageData = await getPublishedCoursePageData(
+    "electronics-communication-engineering",
+    {
+      name: "Electronics and Communication Engineering",
+      tagline: "Connecting Ideas. Powering Innovation.",
+      description: "",
+      heroImage: "/images/ece-hero-bg.webp",
+      slides: curriculum,
+      opportunities,
+      reasons: whyStudyDept,
+      careerGroups,
+    },
+  );
+  if (!pageData) notFound();
+
   return (
     <>
       <CourseHero
-        image="/images/ece-hero-bg.webp"
+        image={pageData.heroImage}
         programmeLabel="B.E. Programme"
-        heading="Electronics and Communication Engineering"
-        tagline="Connecting Ideas. Powering Innovation."
+        heading={pageData.name}
+        tagline={pageData.tagline}
         breadcrumbItems={[
           {
             label: "Courses",
@@ -178,49 +237,44 @@ export default function ComputerScienceEngineeringPage() {
       <CourseOverview
         label="About the Programme"
         heading="Connecting Ideas. Powering Innovation."
-        paragraphs={[
-          {
-            content:
-              "From smartphones and communication networks to satellites, healthcare equipment, automobiles and intelligent devices, electronics and communication technologies are transforming the way the world connects and functions.",
-          },
-          {
-            content: (
-              <>
-                The{" "}
-                <strong className="font-extrabold text-primary-700">
-                  B.E. Electronics and Communication Engineering
-                </strong>{" "}
-                programme at STCET combines electronics, communication,
-                computing and signal technologies to prepare students for a
-                broad range of technological applications.
-              </>
-            ),
-          },
-          {
-            content:
-              "Students develop an understanding of how electronic systems are designed, how information is processed and transmitted, and how hardware and software work together to create connected systems.",
-          },
-        ]}
+        paragraphs={
+          pageData.description
+            ? [{ content: pageData.description }]
+            : [
+                {
+                  content:
+                    "From smartphones and communication networks to satellites, healthcare equipment, automobiles and intelligent devices, electronics and communication technologies are transforming the way the world connects and functions.",
+                },
+                {
+                  content: (
+                    <>
+                      The{" "}
+                      <strong className="font-extrabold text-primary-700">
+                        B.E. Electronics and Communication Engineering
+                      </strong>{" "}
+                      programme at STCET combines electronics, communication,
+                      computing and signal technologies to prepare students for
+                      a broad range of technological applications.
+                    </>
+                  ),
+                },
+                {
+                  content:
+                    "Students develop an understanding of how electronic systems are designed, how information is processed and transmitted, and how hardware and software work together to create connected systems.",
+                },
+              ]
+        }
       />
       <CurriculumExplorer
         title="Engineer the Technologies that connect the world."
         intro="The programme progresses from electronic devices and circuits to
                 communication systems, signal processing, embedded technologies,
                 networking, wireless communication, VLSI and control systems."
-        slides={curriculum}
+        slides={pageData.slides}
       />
       <OpportunityAreas
         title="Open doors to diverse careeers in Electronics & Communication."
-        data={[
-          "Internet of Things",
-          "Embedded Systems",
-          "VLSI",
-          "Robotics",
-          "Automotive Electronics",
-          "Wireless Technologies",
-          "Signal & Image Processing",
-          "Smart Devices",
-        ]}
+        data={pageData.opportunities}
       />
       <WhyStudy
         label="Why Study ECE at STCET"
@@ -228,14 +282,14 @@ export default function ComputerScienceEngineeringPage() {
         intro="Build a strong foundation in electronics and communication while
                 developing practical knowledge across hardware, software and
                 emerging technologies."
-        reasons={whyStudyDept}
+        reasons={pageData.reasons}
       />
       <CareerPathways
         careerTitle="Explore Futures in Tech"
         careerIntro="ECE graduates have the flexibility to explore careers across
                 electronics, communication, embedded systems, technology and
                 software."
-        careerGroups={careerGroups}
+        careerGroups={pageData.careerGroups}
       />
     </>
   );

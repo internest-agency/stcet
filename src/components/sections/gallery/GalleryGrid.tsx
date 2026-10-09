@@ -4,104 +4,30 @@ import Image from "next/image";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { GalleryItem } from "@/src/lib/content/gallery";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type GalleryCategory =
-  | "All"
-  | "Campus"
-  | "Academics"
-  | "Library"
-  | "Hostel"
-  | "Student Life";
-
-interface GalleryItem {
-  id: number;
-  title: string;
-  category: Exclude<GalleryCategory, "All">;
-  image: string;
-}
-
-const categories: GalleryCategory[] = [
-  "All",
-  "Campus",
-  "Academics",
-  "Library",
-  "Hostel",
-  "Student Life",
-];
-
-const galleryItems: GalleryItem[] = [
-  {
-    id: 1,
-    title: "Engineering Block",
-    category: "Campus",
-    image: "/images/gallery/stcet-engineering-block-entrance.jpg",
-  },
-  {
-    id: 2,
-    title: "Computer Laboratory",
-    category: "Academics",
-    image: "/images/gallery/stcet-computer-lab-1.jpg",
-  },
-  {
-    id: 3,
-    title: "Classroom",
-    category: "Academics",
-    image: "/images/gallery/stcet-classroom.jpg",
-  },
-  {
-    id: 4,
-    title: "College Library",
-    category: "Library",
-    image: "/images/gallery/stcet-college-library.jpg",
-  },
-  {
-    id: 5,
-    title: "Digital Library",
-    category: "Library",
-    image: "/images/gallery/stcet-library-computer.jpg",
-  },
-  {
-    id: 6,
-    title: "Boys Hostel",
-    category: "Hostel",
-    image: "/images/gallery/stcet-boys-hostel.jpg",
-  },
-  {
-    id: 7,
-    title: "Girls Hostel",
-    category: "Hostel",
-    image: "/images/gallery/stcet-girls-hostel.jpg",
-  },
-  {
-    id: 8,
-    title: "Girls Hostel Interior",
-    category: "Hostel",
-    image: "/images/gallery/stcet-girls-hostel-inside-1.jpg",
-  },
-  {
-    id: 9,
-    title: "Dining Hall",
-    category: "Student Life",
-    image: "/images/gallery/stcet-dining-hall.jpg",
-  },
-];
-
-export default function GalleryGrid() {
+export default function GalleryGrid({
+  items,
+  categories,
+}: {
+  items: GalleryItem[];
+  categories: string[];
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("All");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
 
   const filteredItems = useMemo(() => {
     if (activeCategory === "All") {
-      return galleryItems;
+      return items;
     }
 
-    return galleryItems.filter((item) => item.category === activeCategory);
-  }, [activeCategory]);
+    return items.filter((item) => item.category === activeCategory);
+  }, [activeCategory, items]);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -477,7 +403,7 @@ export default function GalleryGrid() {
         >
           {filteredItems.map((item, index) => (
             <article key={item.id} className="gallery-card relative">
-              <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-200">
+              <div className="group relative aspect-3/4 overflow-hidden rounded-2xl bg-gray-200">
                 <Image
                   src={item.image}
                   alt={item.title}

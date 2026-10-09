@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CourseHero from "@/src/components/sections/courses/CourseHero";
 import CourseOverview from "@/src/components/sections/courses/CourseOverview";
 import OpportunityAreas from "@/src/components/sections/courses/OpportunityAreas";
@@ -10,6 +12,10 @@ import CurriculumExplorer, {
 import WhyStudy, {
   type WhyStudyReason,
 } from "@/src/components/sections/courses/WhyStudy";
+import {
+  getPublishedCourseMetadata,
+  getPublishedCoursePageData,
+} from "@/src/lib/queries/courses";
 
 const careerGroups: CareerGroup[] = [
   {
@@ -147,14 +153,66 @@ const whyStudyDept: WhyStudyReason[] = [
   },
 ];
 
-export default function ComputerScienceEngineeringPage() {
+const opportunities = [
+  "Software Development",
+  "Cloud Computing",
+  "Cybersecurity",
+  "Data Engineering",
+  "Artificial Intelligence",
+  "Web Technologies",
+  "Mobile Applications",
+  "DevOps",
+  "Emerging Computing Technologies",
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const course = await getPublishedCourseMetadata(
+    "computer-science-engineering",
+  );
+  const title = course?.seoTitle || "Computer Science and Engineering | STCET";
+  const description =
+    course?.metaDescription || "Computer Science and Engineering at STCET.";
+
+  return {
+    title,
+    description,
+    ...(course?.canonicalUrl
+      ? { alternates: { canonical: course.canonicalUrl } }
+      : {}),
+    ...(course
+      ? { robots: { index: !course.noIndex, follow: !course.noIndex } }
+      : {}),
+    openGraph: {
+      title,
+      description,
+      ...(course?.ogImage ? { images: [course.ogImage] } : {}),
+    },
+  };
+}
+
+export default async function ComputerScienceEngineeringPage() {
+  const pageData = await getPublishedCoursePageData(
+    "computer-science-engineering",
+    {
+      name: "Computer Science and Engineering",
+      tagline: "Think. Build. Transform.",
+      description: "",
+      heroImage: "/images/cse-hero-bg.webp",
+      slides: curriculum,
+      opportunities,
+      reasons: whyStudyDept,
+      careerGroups,
+    },
+  );
+  if (!pageData) notFound();
+
   return (
     <>
       <CourseHero
-        image="/images/cse-hero-bg.webp"
+        image={pageData.heroImage}
         programmeLabel="B.E. Programme"
-        heading="Computer Science and Engineering"
-        tagline="Think. Build. Transform."
+        heading={pageData.name}
+        tagline={pageData.tagline}
         breadcrumbItems={[
           {
             label: "Courses",
@@ -168,26 +226,31 @@ export default function ComputerScienceEngineeringPage() {
       <CourseOverview
         label="About the Programme"
         heading="Computing is at the heart of today's digital world."
-        paragraphs={[
-          {
-            content:
-              "Software, cloud platforms, mobile applications, cybersecurity, artificial intelligence and digital services all depend on computing technologies.",
-          },
-          {
-            content: (
-              <>
-                The{" "}
-                <strong className="font-extrabold text-primary-700">
-                  B.E. Computer Science and Engineering
-                </strong>{" "}
-                programme at STCET provides students with a strong foundation in
-                computing, programming and software development while developing
-                the analytical and problem-solving abilities required to address
-                real-world challenges.,
-              </>
-            ),
-          },
-        ]}
+        paragraphs={
+          pageData.description
+            ? [{ content: pageData.description }]
+            : [
+                {
+                  content:
+                    "Software, cloud platforms, mobile applications, cybersecurity, artificial intelligence and digital services all depend on computing technologies.",
+                },
+                {
+                  content: (
+                    <>
+                      The{" "}
+                      <strong className="font-extrabold text-primary-700">
+                        B.E. Computer Science and Engineering
+                      </strong>{" "}
+                      programme at STCET provides students with a strong
+                      foundation in computing, programming and software
+                      development while developing the analytical and
+                      problem-solving abilities required to address real-world
+                      challenges.,
+                    </>
+                  ),
+                },
+              ]
+        }
         keyStatement="The programme is designed to help students understand not only how technology works, but how it can be used to create solutions."
       />
       <CurriculumExplorer
@@ -195,21 +258,11 @@ export default function ComputerScienceEngineeringPage() {
         intro="The programme progresses from core programming and computational
                 concepts to software development, systems, networking, cloud
                 computing, cybersecurity and emerging technologies."
-        slides={curriculum}
+        slides={pageData.slides}
       />
       <OpportunityAreas
         title="Explore the technologies shaping what comes next."
-        data={[
-          "Software Development",
-          "Cloud Computing",
-          "Cybersecurity",
-          "Data Engineering",
-          "Artificial Intelligence",
-          "Web Technologies",
-          "Mobile Applications",
-          "DevOps",
-          "Emerging Computing Technologies",
-        ]}
+        data={pageData.opportunities}
       />
       <WhyStudy
         label="Why Study CSE at STCET"
@@ -217,13 +270,13 @@ export default function ComputerScienceEngineeringPage() {
         intro="A strong foundation in computing gives students the knowledge,
                 practical skills and flexibility to explore different areas of
                 technology."
-        reasons={whyStudyDept}
+        reasons={pageData.reasons}
       />
       <CareerPathways
         careerTitle="From Learning to Leading What's Next."
         careerIntro="Computer Science opens pathways across software, cloud systems,
                 data, cybersecurity and emerging technology domains."
-        careerGroups={careerGroups}
+        careerGroups={pageData.careerGroups}
       />
     </>
   );
