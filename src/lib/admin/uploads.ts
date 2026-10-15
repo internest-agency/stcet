@@ -12,6 +12,7 @@ export {
   parseUploadCategory,
   storeImageStream,
   UnsupportedImageError,
+  UploadStorageError,
   UploadTooLargeError,
   type UploadCategory,
 } from "./upload-storage";

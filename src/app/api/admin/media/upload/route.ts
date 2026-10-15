@@ -12,6 +12,30 @@ import { getPrismaClient } from "@/src/lib/prisma";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Surface the real filesystem/prisma cause in logs (EACCES, EROFS, ENOSPC,
+// ECONNRESET, ...) without leaking it to the client. Never includes file
+// contents or credentials.
+function describeError(error: unknown) {
+  if (error instanceof Error) {
+    const details: Record<string, unknown> = {
+      name: error.name,
+      message: error.message,
+    };
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code) details.code = code;
+    const syscall = (error as NodeJS.ErrnoException).syscall;
+    if (syscall) details.syscall = syscall;
+    if (error.cause instanceof Error) {
+      const causeCode = (error.cause as NodeJS.ErrnoException).code;
+      details.cause = causeCode
+        ? `${error.cause.name} ${causeCode}: ${error.cause.message}`
+        : `${error.cause.name}: ${error.cause.message}`;
+    }
+    return details;
+  }
+  return { message: typeof error === "string" ? error : "Unknown error" };
+}
+
 function isSameOrigin(request: Request) {
   const originHeader = request.headers.get("origin");
   const host =
@@ -89,7 +113,10 @@ export async function POST(request: Request) {
         { status: 415 },
       );
     }
-    console.error("Image upload could not be stored.");
+    console.error(
+      "[media-upload] image could not be stored",
+      describeError(error),
+    );
     return Response.json({ error: "Image upload failed." }, { status: 500 });
   }
 
@@ -102,7 +129,11 @@ export async function POST(request: Request) {
         uploadedById: admin.id,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error(
+      "[media-upload] stored image could not be registered",
+      describeError(error),
+    );
     await removeUnregisteredUpload(uploaded.path);
     return Response.json(
       { error: "Image could not be registered." },

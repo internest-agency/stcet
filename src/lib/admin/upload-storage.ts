@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { createWriteStream, createReadStream } from "node:fs";
+import { constants, createWriteStream, createReadStream } from "node:fs";
 import {
+  access,
   chmod,
   lstat,
   mkdir,
@@ -47,6 +48,12 @@ export class UploadTooLargeError extends Error {}
 export class UnsupportedImageError extends Error {}
 export class InvalidUploadError extends Error {}
 
+// Thrown when the upload directory itself cannot be created or written to
+// (read-only deploy directory, missing permissions, wrong UPLOADS_DIR). Kept
+// separate from the validation errors so the API can log the real filesystem
+// cause instead of a generic "upload failed".
+export class UploadStorageError extends Error {}
+
 export function getUploadLimit() {
   const configured = Number(process.env.UPLOAD_MAX_BYTES ?? 5 * 1024 * 1024);
   return Number.isSafeInteger(configured) && configured > 0
@@ -59,6 +66,40 @@ export function getUploadRoot() {
     /*turbopackIgnore: true*/
     process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads"),
   );
+}
+
+/**
+ * Creates the upload root if needed and verifies it is writable. Returns the
+ * resolved absolute path, or throws an UploadStorageError that names the
+ * directory and preserves the underlying filesystem error.
+ */
+export async function ensureUploadRoot() {
+  const root = getUploadRoot();
+  try {
+    await mkdir(root, { recursive: true, mode: 0o750 });
+    await access(root, constants.W_OK);
+  } catch (error) {
+    throw new UploadStorageError(
+      `Upload directory "${root}" is not writable. Check UPLOADS_DIR and its filesystem permissions.`,
+      { cause: error },
+    );
+  }
+  return root;
+}
+
+/**
+ * Non-throwing readiness probe used by startup diagnostics. Never throws so it
+ * is safe to call during instrumentation.
+ */
+export async function checkStorageReadiness() {
+  const root = getUploadRoot();
+  try {
+    await mkdir(root, { recursive: true, mode: 0o750 });
+    await access(root, constants.W_OK);
+    return { ok: true as const, root };
+  } catch (error) {
+    return { ok: false as const, root, error };
+  }
 }
 
 export function parseUploadCategory(
@@ -111,7 +152,15 @@ export async function storeImageStream(
   const root = getUploadRoot();
   const directory = path.resolve(root, category);
   if (!pathWithinRoot(root, directory)) throw new InvalidUploadError();
-  await mkdir(directory, { recursive: true, mode: 0o750 });
+  await ensureUploadRoot();
+  try {
+    await mkdir(directory, { recursive: true, mode: 0o750 });
+  } catch (error) {
+    throw new UploadStorageError(
+      `Upload directory "${directory}" is not writable. Check UPLOADS_DIR and its filesystem permissions.`,
+      { cause: error },
+    );
+  }
 
   const temporaryPath = path.join(directory, `.upload-${randomUUID()}.tmp`);
   let size = 0;

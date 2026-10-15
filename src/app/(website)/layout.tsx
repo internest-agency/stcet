@@ -5,6 +5,7 @@ import HashScroll from "@/src/components/ui/HashScroll";
 import SmoothScroll from "@/src/components/ui/SmoothScroll";
 import WhatsAppChat from "@/src/components/ui/WhatsAppChat";
 import { getSiteSettings } from "@/src/lib/admin/settings";
+import { getSiteUrl } from "@/src/lib/site-url";
 
 export default async function WebsiteLayout({
   children,
@@ -14,7 +15,7 @@ export default async function WebsiteLayout({
   const settings = await getSiteSettings();
 
   const favicon = settings.faviconPath
-    ? `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}${settings.faviconPath}`
+    ? `${getSiteUrl()}${settings.faviconPath}`
     : undefined;
 
   return (

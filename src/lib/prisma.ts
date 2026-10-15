@@ -51,6 +51,16 @@ function reportDatabaseError(error: unknown) {
   console.error(`[prisma] database connection error: ${signature}`);
 }
 
+function readPositiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function readNonNegativeInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
 
@@ -59,25 +69,44 @@ function createPrismaClient() {
   }
 
   const url = new URL(databaseUrl);
-  const connectionLimit = Number(process.env.DATABASE_CONNECTION_LIMIT ?? 5);
-  const connectionTimeout = Number(
-    process.env.DATABASE_CONNECT_TIMEOUT_MS ?? 5000,
+  const connectionLimit = readPositiveInt(
+    process.env.DATABASE_CONNECTION_LIMIT,
+    5,
   );
-  const timeoutMs =
-    Number.isInteger(connectionTimeout) && connectionTimeout > 0
-      ? connectionTimeout
-      : 5000;
+  const timeoutMs = readPositiveInt(
+    process.env.DATABASE_CONNECT_TIMEOUT_MS,
+    5000,
+  );
+  const minimumIdle = Math.min(
+    readNonNegativeInt(process.env.DATABASE_MIN_IDLE, 0),
+    connectionLimit,
+  );
+  const idleTimeoutMs = readPositiveInt(
+    process.env.DATABASE_IDLE_TIMEOUT_MS,
+    60_000,
+  );
+  const pingTimeout = readPositiveInt(
+    process.env.DATABASE_PING_TIMEOUT_MS,
+    1000,
+  );
 
-  const adapter = new PrismaMariaDb({
+  // Built as a standalone object (not an inline literal) so `pingTimeout` is
+  // accepted: it is a real driver option but is missing from the bundled
+  // mariadb type definitions, which otherwise trips the excess-property check.
+  const poolConfig = {
     host: url.hostname,
     port: Number(url.port || 3306),
     user: decodeURIComponent(url.username),
     password: decodeURIComponent(url.password),
     database: decodeURIComponent(url.pathname.slice(1)),
-    connectionLimit:
-      Number.isInteger(connectionLimit) && connectionLimit > 0
-        ? connectionLimit
-        : 5,
+    connectionLimit,
+    minimumIdle,
+    // The driver measures idleTimeout in SECONDS. Keeping it below the server's
+    // wait_timeout (commonly 300s) lets the pool retire idle sockets itself
+    // rather than reusing ones the server has already closed, which is what
+    // surfaces as "read ECONNRESET" on a busy shared host.
+    idleTimeout: Math.max(1, Math.round(idleTimeoutMs / 1000)),
+    pingTimeout,
     connectTimeout: timeoutMs,
     acquireTimeout: timeoutMs,
     queryTimeout: timeoutMs,
@@ -85,7 +114,9 @@ function createPrismaClient() {
       error: reportDatabaseError,
       warning: () => {},
     },
-  });
+  };
+
+  const adapter = new PrismaMariaDb(poolConfig);
 
   return new PrismaClient({ adapter });
 }

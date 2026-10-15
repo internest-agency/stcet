@@ -7,6 +7,27 @@ export const dynamic = "force-dynamic";
 
 const allowedContentTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
+// A registered media row whose file is missing means the storage directory was
+// not deployed/persisted (a much more useful signal than a bare 404). Log it,
+// but throttle so a page full of broken images does not flood the logs.
+const MISSING_FILE_LOG_INTERVAL_MS = 60_000;
+let lastMissingFileLog: { signature: string; loggedAt: number } | null = null;
+
+function reportRegisteredButMissing(reference: string, reason: string) {
+  const signature = `${reason}:${reference}`;
+  const now = Date.now();
+  if (
+    lastMissingFileLog?.signature === signature &&
+    now - lastMissingFileLog.loggedAt < MISSING_FILE_LOG_INTERVAL_MS
+  ) {
+    return;
+  }
+  lastMissingFileLog = { signature, loggedAt: now };
+  console.error(
+    `[uploads] "${reference}" is registered in the database but ${reason}.`,
+  );
+}
+
 export async function GET(
   _request: Request,
   context: { params: Promise<{ path: string[] }> },
@@ -28,7 +49,15 @@ export async function GET(
     }
 
     const storedFile = await openManagedUpload(reference);
-    if (!storedFile || storedFile.size !== asset.size) {
+    if (!storedFile) {
+      reportRegisteredButMissing(reference, "its file is missing from storage");
+      return new Response(null, { status: 404 });
+    }
+    if (storedFile.size !== asset.size) {
+      reportRegisteredButMissing(
+        reference,
+        "its stored file size does not match the database",
+      );
       return new Response(null, { status: 404 });
     }
 

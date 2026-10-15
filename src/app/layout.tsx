@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Josefin_Sans, Nunito_Sans } from "next/font/google";
+import { getSiteUrl } from "@/src/lib/site-url";
 import "./globals.css";
 
 const josefinSans = Josefin_Sans({
@@ -13,6 +14,7 @@ const nunitoSans = Nunito_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "STCET | College Website",
   description: "A modern college website built with Next.js",
 };
