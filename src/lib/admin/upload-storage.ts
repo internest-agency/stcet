@@ -61,11 +61,39 @@ export function getUploadLimit() {
     : 5 * 1024 * 1024;
 }
 
+/**
+ * Returns true when UPLOADS_DIR is set to an absolute path.
+ * Used by startup diagnostics to distinguish a missing variable from a
+ * misconfigured relative path (e.g. "./uploads" copied from .env.example).
+ */
+export function isUploadDirAbsolute() {
+  const dir = process.env.UPLOADS_DIR;
+  return Boolean(dir && path.isAbsolute(dir));
+}
+
 export function getUploadRoot() {
-  return path.resolve(
+  const configured =
     /*turbopackIgnore: true*/
-    process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads"),
-  );
+    process.env.UPLOADS_DIR;
+
+  if (configured) {
+    if (!path.isAbsolute(configured)) {
+      // A relative UPLOADS_DIR is almost certainly a misconfiguration in
+      // production (e.g. "./uploads" copied from .env.example). path.resolve
+      // would silently anchor it to process.cwd(), which on Hostinger is the
+      // read-only internal build directory (/368e0f76285bc013/files/hbuilds).
+      // Log clearly so the operator knows exactly what to fix.
+      console.error(
+        `[uploads] UPLOADS_DIR is set to a relative path ("${configured}"). ` +
+          `On managed hosts this resolves inside the read-only deploy directory. ` +
+          `Set UPLOADS_DIR to an absolute path such as /home/<user>/uploads.`,
+      );
+    }
+    return path.resolve(configured);
+  }
+
+  // No UPLOADS_DIR configured — fall back to <cwd>/uploads for local dev only.
+  return path.join(process.cwd(), "uploads");
 }
 
 /**
