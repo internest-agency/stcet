@@ -19,7 +19,6 @@ import {
   type Readable as NodeReadable,
 } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { fileTypeFromFile } from "file-type";
 
 export const UPLOAD_CATEGORIES = [
   "courses/heroes",
@@ -41,6 +40,37 @@ const MIME_EXTENSIONS: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+
+// Magic-byte signatures for the only three formats the app accepts. Detection
+// runs in-process on the first bytes of the incoming stream instead of using
+// the `file-type` package: that package dynamically imports `strtok3`, which
+// Next.js bundles into .next/server/chunks where the dynamic import cannot be
+// resolved at runtime on some hosts (ERR_MODULE_NOT_FOUND "Cannot find package
+// 'strtok3'"), which broke every image upload in production.
+const PNG_SIGNATURE = Buffer.from([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+]);
+const JPEG_SIGNATURE = Buffer.from([0xff, 0xd8, 0xff]);
+const RIFF_SIGNATURE = Buffer.from("RIFF", "ascii");
+const WEBP_SIGNATURE = Buffer.from("WEBP", "ascii");
+const SIGNATURE_BYTES = 12;
+
+function sniffImageMime(header: Buffer): string | null {
+  if (header.length >= 8 && header.subarray(0, 8).equals(PNG_SIGNATURE)) {
+    return "image/png";
+  }
+  if (header.length >= 3 && header.subarray(0, 3).equals(JPEG_SIGNATURE)) {
+    return "image/jpeg";
+  }
+  if (
+    header.length >= 12 &&
+    header.subarray(0, 4).equals(RIFF_SIGNATURE) &&
+    header.subarray(8, 12).equals(WEBP_SIGNATURE)
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
 
 const UUID_FILENAME =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(jpg|png|webp)$/;
@@ -180,11 +210,21 @@ export async function storeImageStream(
   const temporaryPath = path.join(directory, `.upload-${randomUUID()}.tmp`);
   let size = 0;
   const limit = getUploadLimit();
+  const header = Buffer.alloc(SIGNATURE_BYTES);
+  let headerLength = 0;
   const limiter = new Transform({
     transform(chunk: Buffer, _encoding, callback) {
       size += chunk.length;
-      if (size > limit) callback(new UploadTooLargeError());
-      else callback(null, chunk);
+      if (size > limit) {
+        callback(new UploadTooLargeError());
+        return;
+      }
+      if (headerLength < SIGNATURE_BYTES) {
+        const take = Math.min(SIGNATURE_BYTES - headerLength, chunk.length);
+        chunk.copy(header, headerLength, 0, take);
+        headerLength += take;
+      }
+      callback(null, chunk);
     },
   });
 
@@ -197,9 +237,9 @@ export async function storeImageStream(
 
     if (size === 0) throw new InvalidUploadError();
 
-    const detected = await fileTypeFromFile(temporaryPath);
-    const extension = detected ? MIME_EXTENSIONS[detected.mime] : undefined;
-    if (!detected || !extension) throw new UnsupportedImageError();
+    const detectedMime = sniffImageMime(header.subarray(0, headerLength));
+    const extension = detectedMime ? MIME_EXTENSIONS[detectedMime] : undefined;
+    if (!detectedMime || !extension) throw new UnsupportedImageError();
 
     const fileName = `${randomUUID()}.${extension}`;
     const finalPath = path.join(
@@ -212,7 +252,7 @@ export async function storeImageStream(
 
     return {
       path: `/uploads/${category}/${fileName}`,
-      contentType: detected.mime,
+      contentType: detectedMime,
       size,
     };
   } catch (error) {

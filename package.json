@@ -16,6 +16,9 @@
     "admin:bootstrap": "tsx scripts/bootstrap-admin.ts",
     "faculty:import": "tsx scripts/import-faculty.ts",
     "media:cleanup": "tsx scripts/cleanup-uploads.ts",
+    "media:test": "tsx scripts/upload-e2e.ts",
+    "e2e:http": "tsx scripts/upload-http-e2e.ts",
+    "e2e:seed-admin": "tsx scripts/seed-e2e-admin.ts",
     "db:connectivity": "tsx scripts/prisma-connectivity.ts"
   },
   "dependencies": {
