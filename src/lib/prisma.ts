@@ -15,6 +15,42 @@ const globalForPrisma = globalThis as typeof globalThis & {
 // `instructions`) with a PrismaClientValidationError.
 const prismaSchemaRevision = "20261013130000";
 
+// The MariaDB driver reports connection failures to the pool, which surfaces
+// them to Prisma only as a generic "pool timeout" (45028). That hides the
+// actionable cause (e.g. 1045 access denied, 1049 unknown database, unreachable
+// host). Route the driver's error logger through here so the real reason is
+// always logged instead of being mistaken for pool exhaustion.
+const DATABASE_ERROR_LOG_INTERVAL_MS = 5000;
+
+let lastDatabaseError: { signature: string; loggedAt: number } | null = null;
+
+function summarizeDatabaseError(error: unknown) {
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "Unknown database error";
+
+  // Drop the per-connection id so repeated retries collapse into one line.
+  return raw.replace(/\(conn:\d+,\s*/, "(").trim();
+}
+
+function reportDatabaseError(error: unknown) {
+  const signature = summarizeDatabaseError(error);
+  const now = Date.now();
+
+  if (
+    lastDatabaseError?.signature === signature &&
+    now - lastDatabaseError.loggedAt < DATABASE_ERROR_LOG_INTERVAL_MS
+  ) {
+    return;
+  }
+
+  lastDatabaseError = { signature, loggedAt: now };
+  console.error(`[prisma] database connection error: ${signature}`);
+}
+
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
 
@@ -45,6 +81,10 @@ function createPrismaClient() {
     connectTimeout: timeoutMs,
     acquireTimeout: timeoutMs,
     queryTimeout: timeoutMs,
+    logger: {
+      error: reportDatabaseError,
+      warning: () => {},
+    },
   });
 
   return new PrismaClient({ adapter });
