@@ -107,7 +107,7 @@ export default function PlacementCell() {
           <div className="placement-reveal">
             <div className="flex items-center gap-4">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-800/50">
-                02 — Placement Cell
+                Placement Cell
               </span>
 
               <span className="h-px w-10 bg-primary-800/15" />
@@ -143,7 +143,9 @@ export default function PlacementCell() {
                 key={index}
                 className="focus-item group border-b border-primary-800/10 py-8 sm:px-7 sm:py-10 lg:border-b-0 lg:border-r lg:px-8 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0"
               >
-                <SectionHeading as="h3">{area.title}</SectionHeading>
+                <SectionHeading as="h3" customSize={true} className="text-2xl">
+                  {area.title}
+                </SectionHeading>
 
                 <p className="mt-4 leading-6 text-gray-600">
                   {area.description}

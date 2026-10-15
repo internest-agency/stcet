@@ -6,19 +6,20 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 export interface OverviewParagraph {
-  content: React.ReactNode;
+  content: string;
 }
 
 interface CourseOverviewProps {
   label?: string;
   heading: string;
   paragraphs: OverviewParagraph[];
-  keyStatement?: React.ReactNode;
+  keyStatement?: string;
 }
 
 export default function CourseOverview({
@@ -161,7 +162,7 @@ export default function CourseOverview({
 
             <div className="overview-content">
               {paragraphs.map((paragraph, index) => (
-                <p
+                <RichText
                   key={index}
                   className="
                     text-[14px]
@@ -173,16 +174,15 @@ export default function CourseOverview({
                     lg:leading-8
                     mb-5
                   "
-                >
-                  {paragraph.content}
-                </p>
+                  html={paragraph.content}
+                />
               ))}
 
               {/* ==========================================
                   KEY STATEMENT
                   ========================================== */}
 
-              {keyStatement && (
+              {keyStatement ? (
                 <div
                   className="
                     mt-7
@@ -193,7 +193,7 @@ export default function CourseOverview({
                     sm:pt-7
                   "
                 >
-                  <p
+                  <RichText
                     className="
                       max-w-2xl
                       text-[15px]
@@ -206,11 +206,10 @@ export default function CourseOverview({
                       lg:text-[18px]
                       lg:leading-8
                     "
-                  >
-                    {keyStatement}
-                  </p>
+                    html={keyStatement}
+                  />
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useLayoutEffect, useRef } from "react";
+import { FormEvent, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { FiArrowUpRight, FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import { FiMail, FiMapPin, FiPhone } from "react-icons/fi";
 
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
@@ -20,6 +20,12 @@ const contactDetails = {
 
 export default function ContactMain() {
   const sectionRef = useRef<HTMLElement>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -53,10 +59,53 @@ export default function ContactMain() {
     return () => context.revert();
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Connect your form submission here.
+    if (isSubmitting) return;
+
+    const form = event.currentTarget;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    setSubmitStatus("idle");
+    setFeedbackMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData(form);
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message || "Failed to send message. Please try again.",
+        );
+      }
+
+      setSubmitStatus("success");
+      setFeedbackMessage(
+        data?.message ||
+          "Thank you for contacting us! We will get back to you shortly.",
+      );
+      form.reset();
+    } catch (err: unknown) {
+      console.error("Contact form submission failed:", err);
+      setSubmitStatus("error");
+      setFeedbackMessage(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while sending your message. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -346,6 +395,40 @@ export default function ContactMain() {
                 </div>
               </div>
 
+              {/* Status Notifications */}
+              {submitStatus === "success" && (
+                <div
+                  role="status"
+                  className="mt-8 rounded-xl border border-green-200 bg-green-50 p-5"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
+                      ✓
+                    </span>
+                    <div>
+                      <p className="font-bold text-green-800">
+                        Message Sent Successfully
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-green-700">
+                        {feedbackMessage}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {submitStatus === "error" && feedbackMessage && (
+                <div
+                  role="alert"
+                  className="mt-8 rounded-xl border border-red-200 bg-red-50 p-5"
+                >
+                  <p className="font-bold text-red-800">Unable to Send Message</p>
+                  <p className="mt-1 text-sm leading-6 text-red-700">
+                    {feedbackMessage}
+                  </p>
+                </div>
+              )}
+
               {/* Submit */}
               <div className="mt-10">
                 <Button
@@ -353,9 +436,16 @@ export default function ContactMain() {
                   type="submit"
                   variant="primary"
                   size="md"
-                  rightIcon={<FaArrowCircleRight />}
+                  disabled={isSubmitting}
+                  rightIcon={
+                    isSubmitting ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    ) : (
+                      <FaArrowCircleRight />
+                    )
+                  }
                 >
-                  Send Message
+                  {isSubmitting ? "Sending Message..." : "Send Message"}
                 </Button>
               </div>
             </form>

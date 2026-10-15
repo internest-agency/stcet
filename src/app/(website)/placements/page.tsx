@@ -5,8 +5,11 @@ import CareerReadiness from "@/src/components/sections/placement/CareerReadiness
 import IndustryEngagement from "@/src/components/sections/placement/IndustryEngagement";
 import PlacementFuture from "@/src/components/sections/placement/PlacementFuture";
 import PlacementCell from "@/src/components/sections/placement/PlacementCell";
+import ManagedPlacementContent from "@/src/components/sections/placement/ManagedPlacementContent";
+import { getPublishedPlacementContent } from "@/src/lib/queries/placements";
 
-export default function PlacementPage() {
+export default async function PlacementPage() {
+  const content = await getPublishedPlacementContent();
   return (
     <>
       <PlacementHero />
@@ -15,6 +18,7 @@ export default function PlacementPage() {
       <IndustryConnect />
       <CareerReadiness />
       <IndustryEngagement />
+      {/* <ManagedPlacementContent {...content} /> */}
       <PlacementFuture />
     </>
   );

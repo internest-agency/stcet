@@ -143,11 +143,7 @@ export default function AcademicFacilities() {
               </div>
 
               <div className="pt-4">
-                <span className="font-mono text-[9px] font-bold tracking-[0.15em] text-accent-500">
-                  {facility.number}
-                </span>
-
-                <h3 className="mt-2 text-[13px] font-bold leading-5 text-primary-800">
+                <h3 className="mt-2 text-md font-semibold uppercase text-gray-600">
                   {facility.title}
                 </h3>
               </div>

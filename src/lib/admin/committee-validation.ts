@@ -1,0 +1,4 @@
+import { z } from "zod";
+const slug = z.string().trim().min(2).max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+export const committeeSchema = z.object({ slug, name: z.string().trim().min(2).max(191), pageTitle: z.string().trim().min(2).max(191), introduction: z.string().trim().max(20_000).optional().nullable(), heroImage: z.string().trim().max(2048).optional().nullable(), sortOrder: z.coerce.number().int().min(0).max(99_999).default(0), isPublished: z.boolean().default(false) });
+export const committeeMemberSchema = z.object({ committeeSlug: slug, committeeName: z.string().trim().min(2).max(191), memberName: z.string().trim().min(2).max(191), designation: z.string().trim().max(191).optional().nullable(), role: z.string().trim().max(100).optional().nullable(), sortOrder: z.coerce.number().int().min(0).max(99_999).default(0), isActive: z.boolean().default(true), isPublished: z.boolean().default(false) });

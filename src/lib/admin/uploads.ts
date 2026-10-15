@@ -57,11 +57,18 @@ export async function cleanupUnreferencedUploads(references: string[]) {
         },
         select: { id: true },
       });
-      const galleryReference = await prisma.galleryImage.findFirst({
-        where: { imagePath: asset.path },
-        select: { id: true },
-      });
-      if (reference || galleryReference) continue;
+      const [galleryReference, admissionsReference, placementReference, infrastructureReference, committeeReference, pagesReference, seoReference, settingsReference, facultyReference] = await Promise.all([
+        prisma.galleryImage.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
+        prisma.admissionRoute.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
+        prisma.placementCompany.findFirst({ where: { logoPath: asset.path }, select: { id: true } }),
+        prisma.infrastructureFacility.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
+        prisma.committee.findFirst({ where: { heroImage: asset.path }, select: { id: true } }),
+        prisma.generalPage.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
+        prisma.pageSeo.findFirst({ where: { ogImage: asset.path }, select: { id: true } }),
+        prisma.siteSettings.findFirst({ where: { OR: [{ logoPath: asset.path }, { faviconPath: asset.path }] }, select: { id: true } }),
+        prisma.faculty.findFirst({ where: { photo: asset.path }, select: { id: true } }),
+      ]);
+      if (reference || galleryReference || admissionsReference || placementReference || infrastructureReference || committeeReference || pagesReference || seoReference || settingsReference || facultyReference) continue;
 
       if (await removeManagedUpload(asset.path)) {
         await prisma.mediaAsset.delete({ where: { id: asset.id } });

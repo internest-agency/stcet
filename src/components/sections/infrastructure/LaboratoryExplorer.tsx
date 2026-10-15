@@ -11,28 +11,28 @@ const laboratories = [
     title: "Computer Science & IT Labs",
     description:
       "Programming, computing and technology-based practical learning.",
-    image: "/images/infrastructure/labs/computer-science.webp",
+    image: "/images/infrastructure/labs/computer-science-lab.webp",
   },
   {
     number: "02",
     title: "AI & ML Labs",
     description:
       "Practical exposure to artificial intelligence, machine learning and emerging technologies.",
-    image: "/images/infrastructure/labs/ai-ml.webp",
+    image: "/images/infrastructure/labs/computer-science-ai-lab-1.webp",
   },
   {
     number: "03",
     title: "Electronics & Communication Labs",
     description:
       "Hands-on learning in electronics, communication systems and embedded technologies.",
-    image: "/images/infrastructure/labs/ece.webp",
+    image: "/images/infrastructure/labs/electrical-electronics-lab.webp",
   },
   {
     number: "04",
     title: "Electrical & Electronics Labs",
     description:
       "Practical learning in electrical systems, circuits and engineering applications.",
-    image: "/images/infrastructure/labs/eee.webp",
+    image: "/images/infrastructure/labs/electrical-communication-lab.webp",
   },
 ];
 
@@ -64,18 +64,15 @@ export default function LaboratoryExplorer() {
                 src={lab.image}
                 alt={lab.title}
                 fill
-                sizes="(max-width: 768px) 50vw, 25vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                quality={90}
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
               <div className="absolute inset-0 bg-linear-to-t from-primary-800 via-primary-800/35 to-transparent" />
 
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <span className="font-mono text-[10px] font-bold text-accent-400">
-                  {lab.number}
-                </span>
-
-                <h3 className="mt-2 text-[15px] font-bold leading-5 text-white">
+                <h3 className="mt-2 text-base uppercase font-bold leading-snug! text-white">
                   {lab.title}
                 </h3>
 

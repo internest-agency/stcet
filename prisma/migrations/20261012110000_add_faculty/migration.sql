@@ -1,0 +1,23 @@
+CREATE TABLE `Faculty` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `designation` VARCHAR(191) NOT NULL,
+    `department` VARCHAR(191) NULL,
+    `auFin` VARCHAR(64) NULL,
+    `aicteId` VARCHAR(128) NULL,
+    `qualification` VARCHAR(255) NULL,
+    `specialization` VARCHAR(255) NULL,
+    `experience` DOUBLE NULL,
+    `email` VARCHAR(191) NULL,
+    `phone` VARCHAR(50) NULL,
+    `photo` VARCHAR(2048) NULL,
+    `bio` TEXT NULL,
+    `sortOrder` INTEGER NOT NULL DEFAULT 0,
+    `isPublished` BOOLEAN NOT NULL DEFAULT false,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    INDEX `Faculty_isPublished_sortOrder_idx`(`isPublished`, `sortOrder`),
+    INDEX `Faculty_designation_idx`(`designation`),
+    INDEX `Faculty_auFin_idx`(`auFin`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

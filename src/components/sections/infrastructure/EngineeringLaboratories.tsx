@@ -75,7 +75,7 @@ export default function EngineeringLaboratories() {
 
           <div className="lab-reveal relative aspect-[1.25/0.8] overflow-hidden">
             <Image
-              src="/images/infrastructure/engineering-labs.webp"
+              src="/images/infrastructure/chemistry-laboratory.webp"
               alt="Engineering laboratory"
               fill
               sizes="(max-width: 1024px) 100vw, 60vw"

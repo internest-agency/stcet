@@ -56,6 +56,16 @@ model Course {
   tagline           String?            @db.VarChar(255)
   description       String?            @db.Text
   heroImage         String?            @db.VarChar(2048)
+  overviewHeading   String?            @db.VarChar(255)
+  overviewKeyStatement String?         @db.Text
+  curriculumTitle   String?            @db.VarChar(255)
+  curriculumIntro   String?            @db.Text
+  opportunityTitle  String?            @db.VarChar(255)
+  whyStudyLabel     String?            @db.VarChar(191)
+  whyStudyHeading   String?            @db.VarChar(255)
+  whyStudyIntro     String?            @db.Text
+  careerTitle       String?            @db.VarChar(255)
+  careerIntro       String?            @db.Text
   seoTitle          String?            @db.VarChar(191)
   metaDescription   String?            @db.VarChar(320)
   canonicalUrl      String?            @db.VarChar(2048)
@@ -69,6 +79,9 @@ model Course {
   reasons           CourseReason[]
   careerPathways    CareerPathway[]
   futurePaths       FuturePath[]
+  admissionRoutes   AdmissionRoute[]
+  trainingProgrammes TrainingProgramme[]
+  industryInteractions IndustryInteraction[]
 
   @@index([isPublished, name])
 }
@@ -152,6 +165,7 @@ model MediaAsset {
   path         String    @unique @db.VarChar(2048)
   contentType  String    @db.VarChar(80)
   size         Int
+  title        String?   @db.VarChar(191)
   altText      String?   @db.VarChar(255)
   createdAt    DateTime  @default(now()) @db.DateTime(3)
   uploadedById Int
@@ -186,4 +200,416 @@ model GalleryImage {
   category    GalleryCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([isPublished, categoryId, sortOrder])
+}
+
+model AdmissionsIntro {
+  id          Int            @id @default(autoincrement())
+  title       String         @db.VarChar(191)
+  subtitle    String?        @db.VarChar(255)
+  description String?        @db.Text
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+}
+
+model AdmissionRoute {
+  id          Int            @id @default(autoincrement())
+  courseId    Int?
+  number      String?        @db.VarChar(10)
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  imagePath   String?        @db.VarChar(2048)
+  linkHref    String?        @db.VarChar(2048)
+  linkText    String?        @db.VarChar(100)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+  course      Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([isPublished, sortOrder])
+}
+
+model TNEACounselling {
+  id           Int      @id @default(autoincrement())
+  stepNumber   Int
+  title        String   @db.VarChar(191)
+  description  String?  @db.Text
+  instructions Json?
+  imagePath    String?  @db.VarChar(2048)
+  imageLabel   String?  @db.VarChar(191)
+  sortOrder    Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.DateTime(3)
+  updatedAt    DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model ManagementQuotaInfo {
+  id          Int            @id @default(autoincrement())
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  eligibility String?        @db.Text
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+}
+
+model AdmissionDocuments {
+  id          Int            @id @default(autoincrement())
+  category    String?        @db.VarChar(100)
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model ImportantNotices {
+  id          Int            @id @default(autoincrement())
+  title       String         @db.VarChar(191)
+  content     String         @db.Text
+  linkUrl     String?        @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model ApplicationLink {
+  id          Int            @id @default(autoincrement())
+  name        String         @db.VarChar(191)
+  url         String         @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model AdmissionContact {
+  id          Int            @id @default(autoincrement())
+  title       String         @db.VarChar(191)
+  value       String         @db.VarChar(255)
+  contactType String?        @db.VarChar(50)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model Scholarship {
+  id                      Int            @id @default(autoincrement())
+  name                    String         @db.VarChar(191)
+  description             String?        @db.Text
+  eligibility             String?        @db.Text
+  financialBenefit        String?        @db.Text
+  incomeLimit             String?        @db.Text
+  applicationInstructions String?        @db.Text
+  applicationUrl          String?        @db.VarChar(2048)
+  sortOrder               Int            @default(0)
+  isPublished             Boolean        @default(true)
+  createdAt               DateTime       @default(now()) @db.DateTime(3)
+  updatedAt               DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model PlacementCompany {
+  id          Int            @id @default(autoincrement())
+  name        String         @db.VarChar(191)
+  slug        String         @unique @db.VarChar(191)
+  websiteUrl  String?        @db.VarChar(2048)
+  logoPath    String?        @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isActive    Boolean        @default(true)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model TrainingProgramme {
+  id          Int            @id @default(autoincrement())
+  courseId    Int?
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  imagePath   String?        @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+  course      Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([isPublished, sortOrder])
+}
+
+model IndustryInteraction {
+  id          Int            @id @default(autoincrement())
+  courseId    Int?
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  imagePath   String?        @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+  course      Course?        @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([isPublished, sortOrder])
+}
+
+model InfrastructureFacility {
+  id          Int            @id @default(autoincrement())
+  category    String         @db.VarChar(100)
+  sectionId   String?        @db.VarChar(50)
+  layout      String?        @db.VarChar(100)
+  title       String         @db.VarChar(191)
+  description String?        @db.Text
+  imagePath   String?        @db.VarChar(2048)
+  sortOrder   Int            @default(0)
+  isActive    Boolean        @default(true)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([category, isPublished, sortOrder])
+}
+
+model Committee {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique @db.VarChar(100)
+  name        String   @db.VarChar(191)
+  pageTitle   String   @db.VarChar(191)
+  introduction String? @db.Text
+  heroImage   String?  @db.VarChar(2048)
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model CommitteeMember {
+  id            Int            @id @default(autoincrement())
+  committeeSlug String         @db.VarChar(100)
+  committeeName String         @db.VarChar(191)
+  memberName    String         @db.VarChar(191)
+  designation   String?        @db.VarChar(191)
+  role          String?        @db.VarChar(100)
+  sortOrder     Int            @default(0)
+  isActive      Boolean        @default(true)
+  isPublished   Boolean        @default(true)
+  createdAt     DateTime       @default(now()) @db.DateTime(3)
+  updatedAt     DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([committeeSlug, isPublished, sortOrder])
+}
+
+model InstitutionalPage {
+  id              Int            @id @default(autoincrement())
+  title           String         @db.VarChar(191)
+  slug            String         @unique @db.VarChar(191)
+  introduction    String?        @db.Text
+  seoTitle        String?        @db.VarChar(191)
+  metaDescription String?        @db.VarChar(320)
+  sortOrder       Int            @default(0)
+  isPublished     Boolean        @default(true)
+  createdAt       DateTime       @default(now()) @db.DateTime(3)
+  updatedAt       DateTime       @updatedAt @db.DateTime(3)
+  sections        PageSection[]
+
+  @@index([isPublished, sortOrder])
+}
+
+model PageSection {
+  id          Int               @id @default(autoincrement())
+  pageId      Int
+  title       String            @db.VarChar(191)
+  content     String?           @db.Text
+  imagePath   String?           @db.VarChar(2048)
+  layout      String            @default("standard") @db.VarChar(32)
+  sortOrder   Int               @default(0)
+  createdAt   DateTime          @default(now()) @db.DateTime(3)
+  updatedAt   DateTime          @updatedAt @db.DateTime(3)
+  page        InstitutionalPage @relation(fields: [pageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([pageId, sortOrder])
+}
+
+model GeneralPage {
+  id              Int            @id @default(autoincrement())
+  title           String         @db.VarChar(191)
+  slug            String         @unique @db.VarChar(191)
+  introduction    String?        @db.Text
+  content         String?        @db.Text
+  imagePath       String?        @db.VarChar(2048)
+  ctaLabel        String?        @db.VarChar(100)
+  ctaUrl          String?        @db.VarChar(2048)
+  seoTitle        String?        @db.VarChar(191)
+  metaDescription String?        @db.VarChar(320)
+  sortOrder       Int            @default(0)
+  isPublished     Boolean        @default(true)
+  createdAt       DateTime       @default(now()) @db.DateTime(3)
+  updatedAt       DateTime       @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model MenuItem {
+  id          Int            @id @default(autoincrement())
+  parentId    Int?
+  title       String         @db.VarChar(191)
+  url         String         @db.VarChar(2048)
+  type        String         @default("link") @db.VarChar(50)
+  sortOrder   Int            @default(0)
+  isActive    Boolean        @default(true)
+  openInNewTab Boolean       @default(false)
+  isPublished Boolean        @default(true)
+  createdAt   DateTime       @default(now()) @db.DateTime(3)
+  updatedAt   DateTime       @updatedAt @db.DateTime(3)
+  parent      MenuItem?      @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    MenuItem[]     @relation("MenuHierarchy")
+
+  @@index([isActive, sortOrder])
+}
+
+model PageSeo {
+  id              Int      @id @default(autoincrement())
+  pagePath        String   @unique @db.VarChar(191)
+  pageTitle       String   @db.VarChar(191)
+  seoTitle        String?  @db.VarChar(191)
+  metaDescription String?  @db.VarChar(320)
+  canonicalUrl    String?  @db.VarChar(2048)
+  ogImage         String?  @db.VarChar(2048)
+  noIndex         Boolean  @default(false)
+  createdAt       DateTime @default(now()) @db.DateTime(3)
+  updatedAt       DateTime @updatedAt @db.DateTime(3)
+}
+
+model SiteSettings {
+  id                     Int            @id @default(autoincrement())
+  collegeName            String         @db.VarChar(191)
+  logoPath               String?        @db.VarChar(2048)
+  faviconPath            String?        @db.VarChar(2048)
+  contactEmail           String?        @db.VarChar(255)
+  phoneNumber            String?        @db.VarChar(50)
+  alternativePhone       String?        @db.VarChar(50)
+  address                String?        @db.Text
+  socialLinks            Json?
+  footerLinks            Json?
+  footerText             String?        @db.Text
+  defaultSeoTitle        String?        @db.VarChar(191)
+  defaultMetaDescription String?        @db.VarChar(320)
+  createdAt              DateTime       @default(now()) @db.DateTime(3)
+  updatedAt              DateTime       @updatedAt @db.DateTime(3)
+}
+
+model Faculty {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(191)
+  designation    String    @db.VarChar(191)
+  department     String?   @db.VarChar(191)
+  auFin          String?   @db.VarChar(64)
+  aicteId        String?   @db.VarChar(128)
+  qualification  String?   @db.VarChar(255)
+  specialization String?   @db.VarChar(255)
+  experience     Float?
+  email          String?   @db.VarChar(191)
+  phone          String?   @db.VarChar(50)
+  photo          String?   @db.VarChar(2048)
+  bio            String?   @db.Text
+  sortOrder      Int       @default(0)
+  isPublished    Boolean   @default(false)
+  createdAt      DateTime  @default(now()) @db.DateTime(3)
+  updatedAt      DateTime  @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+  @@index([designation])
+  @@index([auFin])
+}
+
+model Enquiry {
+  id                 Int      @id @default(autoincrement())
+  enquiryNumber      String   @unique
+
+  studentName        String
+  dateOfBirth        String
+  studentMobile      String
+  studentEmail       String
+  category           String   @default("")
+  hostelRequired     String   @default("")
+  transportRequired  String   @default("")
+
+  parentName         String
+  occupation         String   @default("")
+  parentMobile       String
+  parentEmail        String   @default("")
+  annualIncome       String   @default("")
+  address            String   @db.Text
+
+  tenthSchool        String   @default("")
+  tenthBoard         String   @default("")
+  tenthMarks         String   @default("")
+
+  twelfthSchool      String   @default("")
+  twelfthBoard       String   @default("")
+  mathsMarks         String   @default("")
+  physicsMarks       String   @default("")
+  chemistryMarks     String   @default("")
+  mpcPercentage      String   @default("")
+  tneaCounselling    String   @default("")
+
+  coursePreference1  String   @default("")
+  coursePreference2  String   @default("")
+  coursePreference3  String   @default("")
+  coursePreference4  String   @default("")
+  coursePreference5  String   @default("")
+
+  howDidYouKnow      String   @default("")
+  clientIp           String   @default("unknown")
+
+  status             String   @default("New") @db.VarChar(50)
+  adminNotes         String?  @db.Text
+
+  submittedAt        DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([status])
+  @@index([studentName])
+  @@index([studentMobile])
+  @@index([studentEmail])
+  @@index([submittedAt])
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(191)
+  email     String   @db.VarChar(191)
+  phone     String   @db.VarChar(50)
+  subject   String   @db.VarChar(255)
+  message   String   @db.Text
+  clientIp  String   @default("unknown") @db.VarChar(100)
+
+  status    String   @default("New") @db.VarChar(50)
+  adminNotes String?  @db.Text
+
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
 }

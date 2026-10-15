@@ -103,7 +103,7 @@ export default function GovernmentSchemes() {
           <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
             <div className="government-label">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-gray-400">
-                02 — Government of Tamil Nadu Support
+                Government of Tamil Nadu Support
               </p>
             </div>
 
@@ -135,7 +135,13 @@ export default function GovernmentSchemes() {
 
                 {/* Content */}
                 <div className="pt-16">
-                  <SectionHeading as="h3">{scheme.title}</SectionHeading>
+                  <SectionHeading
+                    as="h3"
+                    customSize={true}
+                    className="text-2xl "
+                  >
+                    {scheme.title}
+                  </SectionHeading>
                   <p className="mt-5 max-w-[270px] text-gray-600">
                     {scheme.description}
                   </p>

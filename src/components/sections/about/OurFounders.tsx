@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -127,11 +128,11 @@ export default function OurFounders() {
               </span>
             </div>
 
-            <h2 className="founders-heading max-w-md text-2xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl lg:text-5xl uppercase">
+            <SectionHeading as="h2">
               People behind
               <br />
-              the vision.
-            </h2>
+              <span className="text-accent-400">the vision.</span>
+            </SectionHeading>
           </div>
 
           {/* Intro */}
@@ -147,7 +148,7 @@ export default function OurFounders() {
         {/* -------------------------------------------------
             FOUNDERS
         ------------------------------------------------- */}
-        <div className="mt-16 border-t border-gray-200 sm:mt-20 lg:mt-24">
+        <div className="mt-12 border-t border-gray-200">
           {/* =================================================
               FOUNDER 01
           ================================================= */}
@@ -192,9 +193,9 @@ export default function OurFounders() {
                 </div>
 
                 {/* Name */}
-                <h3 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                <SectionHeading as="h3" className="text-gray-800!">
                   Thiru. S. Thangapazham
-                </h3>
+                </SectionHeading>
 
                 {/* Role */}
                 <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-accent-400">
@@ -243,9 +244,9 @@ export default function OurFounders() {
                 </div>
 
                 {/* Name */}
-                <h3 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                <SectionHeading as="h3" className="text-gray-800!">
                   Thiru. S.T. Murugesan
-                </h3>
+                </SectionHeading>
 
                 {/* Role */}
                 <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-accent-400">

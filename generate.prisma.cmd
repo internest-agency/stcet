@@ -1,0 +1,2 @@
+cd D:\Next JS\STCET\stcet
+node_modules\.bin\prisma.exe generate

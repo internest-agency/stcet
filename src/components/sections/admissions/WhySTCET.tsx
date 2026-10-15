@@ -124,7 +124,7 @@ export default function WhySTCET() {
 
           <div className="why-stcet-image relative h-full overflow-hidden">
             <Image
-              src="/images/admissions/why-stcet.webp"
+              src="/images/admissions/stcet-laboratory-physics.webp"
               alt="STCET campus"
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"

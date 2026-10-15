@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import SectionHeading from "../../ui/SectionHeading";
 import Container from "../../ui/Container";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -149,9 +150,13 @@ export default function ScholarshipSchemes() {
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-xl font-extrabold leading-tight tracking-[-0.02em] text-primary-700 transition-colors duration-300 group-hover:text-white sm:text-2xl">
+                  <SectionHeading
+                    as="h3"
+                    customSize={true}
+                    className="text-2xl"
+                  >
                     {scheme.title}
-                  </h3>
+                  </SectionHeading>
 
                   <p className="mt-5 text-base leading-7 text-gray-600 transition-colors duration-300 group-hover:text-white/70">
                     {scheme.description}

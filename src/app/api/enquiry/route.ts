@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -46,7 +47,7 @@ type EnquiryData = {
 
 /* =========================================================
    GET
-   Used only to confirm that the API route is available.
+   Used to confirm that the API route is available and healthy.
 ========================================================= */
 
 export async function GET() {
@@ -69,27 +70,57 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     /* =====================================================
-       READ FORM DATA
+       PARSE INCOMING REQUEST (FormData or JSON)
     ===================================================== */
 
-    const formData = await request.formData();
+    const contentType = request.headers.get("content-type") || "";
+    const rawData: Record<string, string> = {};
 
-    /* =====================================================
-       HELPER
-    ===================================================== */
-
-    const getString = (key: string): string => {
-      const value = formData.get(key);
-
-      if (typeof value !== "string") {
-        return "";
+    if (contentType.includes("application/json")) {
+      try {
+        const json = await request.json();
+        if (json && typeof json === "object") {
+          for (const [key, value] of Object.entries(json)) {
+            rawData[key] =
+              typeof value === "string" ? value.trim() : String(value ?? "").trim();
+          }
+        }
+      } catch {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid JSON payload provided.",
+          },
+          {
+            status: 400,
+          },
+        );
       }
+    } else {
+      try {
+        const formData = await request.formData();
+        for (const [key, value] of formData.entries()) {
+          if (typeof value === "string") {
+            rawData[key] = value.trim();
+          }
+        }
+      } catch {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid form data payload provided.",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+    }
 
-      return value.trim();
-    };
+    const getString = (key: string): string => rawData[key] ?? "";
 
     /* =====================================================
-       COLLECT FORM DATA
+       COLLECT DATA
     ===================================================== */
 
     const data: EnquiryData = {
@@ -202,7 +233,6 @@ export async function POST(request: Request) {
     ===================================================== */
 
     const cleanStudentMobile = data.studentMobile.replace(/\D/g, "");
-
     const cleanParentMobile = data.parentMobile.replace(/\D/g, "");
 
     if (cleanStudentMobile.length < 10 || cleanStudentMobile.length > 15) {
@@ -243,10 +273,6 @@ export async function POST(request: Request) {
 
     const selectedRanks = coursePreferences.filter(Boolean);
 
-    /*
-     * Only 1, 2 and 3 are allowed.
-     */
-
     const invalidRank = selectedRanks.find(
       (rank) => !["1", "2", "3"].includes(rank),
     );
@@ -263,17 +289,6 @@ export async function POST(request: Request) {
       );
     }
 
-    /*
-     * Prevent duplicate ranks.
-     *
-     * Example:
-     *
-     * CSE     = 1
-     * ECE     = 1
-     *
-     * This is invalid.
-     */
-
     const uniqueRanks = new Set(selectedRanks);
 
     if (uniqueRanks.size !== selectedRanks.length) {
@@ -289,126 +304,141 @@ export async function POST(request: Request) {
     }
 
     /* =====================================================
+       DATABASE CONFIGURATION CHECK
+    ===================================================== */
+
+    if (!isDatabaseConfigured()) {
+      console.error(
+        "STCET enquiry API error: DATABASE_URL is not configured in environment.",
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Database service is currently unavailable. Please try again later.",
+        },
+        {
+          status: 503,
+        },
+      );
+    }
+
+    const prisma = getPrismaClient();
+
+    /* =====================================================
+       PREVENT DUPLICATE REPEATED SUBMISSIONS
+    ===================================================== */
+
+    const recentWindow = new Date(Date.now() - 2 * 60 * 1000); // 2 minutes window
+    const existingRecent = await prisma.enquiry.findFirst({
+      where: {
+        studentMobile: cleanStudentMobile,
+        studentEmail: data.studentEmail,
+        submittedAt: {
+          gte: recentWindow,
+        },
+      },
+      select: {
+        enquiryNumber: true,
+        submittedAt: true,
+      },
+    });
+
+    if (existingRecent) {
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Your enquiry has already been submitted recently.",
+          enquiryNumber: existingRecent.enquiryNumber,
+          submittedAt: existingRecent.submittedAt.toISOString(),
+          isDuplicate: true,
+        },
+        {
+          status: 200,
+        },
+      );
+    }
+
+    /* =====================================================
        GET CLIENT IP
     ===================================================== */
 
     const forwardedFor = request.headers.get("x-forwarded-for");
-
     const realIp = request.headers.get("x-real-ip");
-
     const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
 
     /* =====================================================
-       GENERATE ENQUIRY NUMBER
+       SAVE TO DATABASE (WITH UNIQUE ENQUIRY NUMBER RETRY)
     ===================================================== */
 
-    const now = new Date();
+    const currentYear = new Date().getFullYear();
+    let savedEnquiry = null;
+    let attempts = 0;
 
-    const year = now.getFullYear();
+    while (!savedEnquiry && attempts < 3) {
+      attempts++;
+      const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      const enquiryNumber = `STCET-${currentYear}-${randomNumber}`;
 
-    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      try {
+        savedEnquiry = await prisma.enquiry.create({
+          data: {
+            enquiryNumber,
 
-    const enquiryNumber = `STCET-${year}-${randomNumber}`;
+            studentName: data.studentName,
+            dateOfBirth: data.dateOfBirth,
+            studentMobile: cleanStudentMobile,
+            studentEmail: data.studentEmail,
+            category: data.category,
+            hostelRequired: data.hostelRequired,
+            transportRequired: data.transportRequired,
 
-    /* =====================================================
-       SUBMISSION TIME
-    ===================================================== */
+            parentName: data.parentName,
+            occupation: data.occupation,
+            parentMobile: cleanParentMobile,
+            parentEmail: data.parentEmail,
+            annualIncome: data.annualIncome,
+            address: data.address,
 
-    const submittedAt = now.toISOString();
+            tenthSchool: data.tenthSchool,
+            tenthBoard: data.tenthBoard,
+            tenthMarks: data.tenthMarks,
 
-    /* =====================================================
-       PREPARE APPLICATION
-    ===================================================== */
+            twelfthSchool: data.twelfthSchool,
+            twelfthBoard: data.twelfthBoard,
+            mathsMarks: data.mathsMarks,
+            physicsMarks: data.physicsMarks,
+            chemistryMarks: data.chemistryMarks,
+            mpcPercentage: data.mpcPercentage,
+            tneaCounselling: data.tneaCounselling,
 
-    const enquiry = {
-      enquiryNumber,
-      submittedAt,
-      clientIp,
+            coursePreference1: data.coursePreference1,
+            coursePreference2: data.coursePreference2,
+            coursePreference3: data.coursePreference3,
+            coursePreference4: data.coursePreference4,
+            coursePreference5: data.coursePreference5,
 
-      student: {
-        name: data.studentName,
-        dateOfBirth: data.dateOfBirth,
-        mobile: cleanStudentMobile,
-        email: data.studentEmail,
-        category: data.category,
-        hostelRequired: data.hostelRequired,
-        transportRequired: data.transportRequired,
-      },
+            howDidYouKnow: data.howDidYouKnow,
+            clientIp,
+          },
+        });
+      } catch (insertError: unknown) {
+        if (
+          typeof insertError === "object" &&
+          insertError !== null &&
+          "code" in insertError &&
+          (insertError as { code: string }).code === "P2002" &&
+          attempts < 3
+        ) {
+          continue;
+        }
+        throw insertError;
+      }
+    }
 
-      parent: {
-        name: data.parentName,
-        occupation: data.occupation,
-        mobile: cleanParentMobile,
-        email: data.parentEmail,
-        annualIncome: data.annualIncome,
-        address: data.address,
-      },
-
-      academic: {
-        tenth: {
-          school: data.tenthSchool,
-          board: data.tenthBoard,
-          marks: data.tenthMarks,
-        },
-
-        twelfth: {
-          school: data.twelfthSchool,
-          board: data.twelfthBoard,
-          mathsMarks: data.mathsMarks,
-          physicsMarks: data.physicsMarks,
-          chemistryMarks: data.chemistryMarks,
-          mpcPercentage: data.mpcPercentage,
-          tneaCounselling: data.tneaCounselling,
-        },
-      },
-
-      coursePreferences: {
-        "B.E. CSE": data.coursePreference1,
-        "B.E. CSE (AI+ML)": data.coursePreference2,
-        "B.E. ECE": data.coursePreference3,
-        "B.E. EEE": data.coursePreference4,
-        "B.Tech. IT": data.coursePreference5,
-      },
-
-      source: data.howDidYouKnow,
-    };
-
-    /* =====================================================
-       PROCESS ENQUIRY
-    ===================================================== */
-
-    /*
-     * IMPORTANT
-     *
-     * This is the point where the enquiry should be
-     * permanently stored or sent to another service.
-     *
-     * Examples:
-     *
-     * 1. Database
-     * 2. Google Sheets
-     * 3. Email
-     * 4. CRM
-     * 5. WhatsApp / SMS
-     *
-     * Example:
-     *
-     * await db.enquiry.create({
-     *   data: enquiry
-     * });
-     *
-     * Do NOT expose sensitive information to the browser.
-     */
-
-    console.log("==========================================");
-
-    console.log("NEW STCET ENQUIRY");
-
-    console.log("==========================================");
-
-    console.log(JSON.stringify(enquiry, null, 2));
-
-    console.log("==========================================");
+    if (!savedEnquiry) {
+      throw new Error("Failed to generate unique enquiry number after retries.");
+    }
 
     /* =====================================================
        SUCCESS RESPONSE
@@ -417,20 +447,17 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-
         message: "Your enquiry has been submitted successfully.",
-
-        enquiryNumber,
-
-        submittedAt,
+        enquiryNumber: savedEnquiry.enquiryNumber,
+        submittedAt: savedEnquiry.submittedAt.toISOString(),
       },
       {
-        status: 200,
+        status: 201,
       },
     );
   } catch (error) {
     /* =====================================================
-       SERVER ERROR
+       SERVER ERROR LOGGING & RESPONSE
     ===================================================== */
 
     console.error("STCET enquiry API error:", error);
@@ -438,7 +465,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
-
         message:
           "Something went wrong while processing your enquiry. Please try again later.",
       },

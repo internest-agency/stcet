@@ -144,7 +144,11 @@ export default function CommunitySupport() {
                   </div>
 
                   {/* Title */}
-                  <SectionHeading as="h3" className="mt-4">
+                  <SectionHeading
+                    as="h3"
+                    customSize={true}
+                    className="mt-4 text-2xl leading-snug"
+                  >
                     {scheme.title}
                   </SectionHeading>
 

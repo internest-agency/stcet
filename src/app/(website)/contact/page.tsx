@@ -10,7 +10,7 @@ export default function ContactPage() {
   return (
     <>
       <EditorialHero
-        image="/images/contact/contact-hero.webp"
+        image="/images/contact/contact-hero-image.webp"
         imageAlt="STCET students"
       >
         <Breadcrumb

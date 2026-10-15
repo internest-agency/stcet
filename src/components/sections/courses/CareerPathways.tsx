@@ -10,12 +10,12 @@ import {
 } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
 /* =========================================================
    TYPES
@@ -847,43 +847,6 @@ export default function CareerPathways({
 
       /*
        * ===============================================
-       * CAREER HEADING
-       * ===============================================
-       */
-
-      const careerHeading = section.querySelector<HTMLElement>(
-        "[data-career-heading]",
-      );
-
-      if (careerHeading) {
-        const split = SplitText.create(careerHeading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        gsap.set(split.lines, {
-          yPercent: 110,
-          rotateX: -65,
-          transformOrigin: "50% 100%",
-        });
-
-        gsap.to(split.lines, {
-          yPercent: 0,
-          rotateX: 0,
-          duration: 1,
-          stagger: 0.1,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: careerHeading,
-            start: "top 84%",
-            once: true,
-          },
-        });
-      }
-
-      /*
-       * ===============================================
        * INTRO
        * ===============================================
        */
@@ -1107,7 +1070,7 @@ export default function CareerPathways({
 
               {/* RIGHT */}
 
-              <p
+              <div
                 data-career-intro
                 className="
                   max-w-xl
@@ -1120,8 +1083,8 @@ export default function CareerPathways({
                   lg:leading-7
                 "
               >
-                {careerIntro}
-              </p>
+                <RichText html={careerIntro} />
+              </div>
             </div>
           </div>
         </Container>

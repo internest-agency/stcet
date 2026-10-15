@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText);
 
@@ -161,13 +162,13 @@ export default function ChairmansMessage() {
               </span>
             </div>
 
-            <h2 className="chairman-heading max-w-md mb-6 text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-5xl">
+            <SectionHeading as="h2" className="text-white! mb-8">
               Education is
               <br />
               more than
               <br />
               knowledge.
-            </h2>
+            </SectionHeading>
 
             {/* Chairman Image Placeholder */}
             <div className="chairman-image relative mb-8 aspect-[4/5] max-w-sm overflow-hidden bg-primary-700/40">
@@ -212,7 +213,7 @@ export default function ChairmansMessage() {
           <div className="relative">
             {/* Large quote */}
             <div className="chairman-quote">
-              <p className="max-w-3xl text-lg font-medium leading-8 tracking-[-0.01em] text-white sm:text-2xl sm:leading-9 lg:text-2xl lg:leading-10">
+              <p className="max-w-3xl text-lg leading-relaxed text-white sm:text-2xl lg:text-xl">
                 At S. Thangapazham College of Engineering and Technology, we
                 believe that education is not merely about acquiring knowledge;
                 it is about developing the ability to think, question, create

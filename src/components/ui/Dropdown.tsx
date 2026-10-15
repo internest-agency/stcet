@@ -4,6 +4,7 @@ import { IoIosArrowDown } from "react-icons/io";
 export type DropdownItem = {
   href: string;
   label: string;
+  openInNewTab?: boolean;
 };
 
 type DropdownProps = {
@@ -74,8 +75,10 @@ export default function Dropdown({
         >
           {items.map((item) => (
             <Link
-              key={item.href}
+              key={`${item.href}-${item.label}`}
               href={item.href}
+              target={item.openInNewTab ? "_blank" : undefined}
+              rel={item.openInNewTab ? "noopener noreferrer" : undefined}
               className="
                 group/item
                 relative
@@ -92,6 +95,7 @@ export default function Dropdown({
                 focus:bg-primary-700
                 focus:text-white
                 focus:outline-none
+                uppercase
               "
             >
               <span className="relative z-10">{item.label}</span>

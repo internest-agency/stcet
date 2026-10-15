@@ -1,0 +1,1 @@
+ALTER TABLE `MenuItem` ADD COLUMN `openInNewTab` BOOLEAN NOT NULL DEFAULT false;

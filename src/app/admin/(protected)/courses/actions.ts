@@ -8,30 +8,107 @@ import {
   requireAdmin,
   requireAdministrator,
 } from "@/src/lib/admin/authorization";
-import { courseEditorSchema } from "@/src/lib/admin/course-validation";
+import { courseEditorSchema, collectFieldErrors } from "@/src/lib/admin/course-validation";
+import type {
+  CourseEditorInput,
+  CourseFormState,
+} from "@/src/lib/admin/course-validation";
 import {
   cleanupUnreferencedUploads,
   validateImageReferences,
 } from "@/src/lib/admin/uploads";
+import { sanitizeHtml } from "@/src/lib/content/html";
 import { getPrismaClient } from "@/src/lib/prisma";
 
-async function readCourse(formData: FormData) {
-  const raw = formData.get("content");
-  if (typeof raw !== "string" || raw.length > 900_000) return null;
+const COURSE_HTML_FIELDS = [
+  "description",
+  "overviewKeyStatement",
+  "curriculumIntro",
+  "whyStudyIntro",
+  "careerIntro",
+] as const;
 
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    const result = courseEditorSchema.safeParse(parsed);
-    return result.success ? result.data : null;
-  } catch {
-    return null;
+function sanitizeHtmlValue(value: unknown): unknown {
+  return typeof value === "string" ? sanitizeHtml(value) : value;
+}
+
+function sanitizeRecordArray(value: unknown, field: string): unknown {
+  if (!Array.isArray(value)) return value;
+  return value.map((row) => {
+    if (typeof row !== "object" || row === null) return row;
+    const record = row as Record<string, unknown>;
+    return { ...record, [field]: sanitizeHtmlValue(record[field]) };
+  });
+}
+
+/**
+ * Strip dangerous markup from every rich-text field before validation and
+ * storage. Sanitizing first means the length/required checks below evaluate the
+ * content that will actually be persisted.
+ */
+function sanitizeCoursePayload(value: unknown): unknown {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return value;
   }
+  const record = value as Record<string, unknown>;
+  const next: Record<string, unknown> = { ...record };
+  for (const field of COURSE_HTML_FIELDS) {
+    next[field] = sanitizeHtmlValue(record[field]);
+  }
+  next.modules = sanitizeRecordArray(record.modules, "description");
+  next.reasons = sanitizeRecordArray(record.reasons, "description");
+  next.futurePaths = sanitizeRecordArray(record.futurePaths, "description");
+  return next;
+}
+
+type CourseParseResult =
+  | { ok: true; data: CourseEditorInput }
+  | { ok: false; formError: string; fieldErrors: Record<string, string> };
+
+async function readCourse(formData: FormData): Promise<CourseParseResult> {
+  const raw = formData.get("content");
+  if (typeof raw !== "string") {
+    return {
+      ok: false,
+      formError: "The submitted course details were invalid.",
+      fieldErrors: {},
+    };
+  }
+  if (raw.length > 900_000) {
+    return {
+      ok: false,
+      formError: "The course details are too large to save.",
+      fieldErrors: {},
+    };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return {
+      ok: false,
+      formError: "The submitted course details were invalid.",
+      fieldErrors: {},
+    };
+  }
+
+  const result = courseEditorSchema.safeParse(sanitizeCoursePayload(parsed));
+  if (!result.success) {
+    return {
+      ok: false,
+      formError: "Review the highlighted fields and try again.",
+      fieldErrors: collectFieldErrors(result.error),
+    };
+  }
+
+  return { ok: true, data: result.data };
 }
 
 async function replaceChildren(
   transaction: Prisma.TransactionClient,
   courseId: number,
-  content: NonNullable<Awaited<ReturnType<typeof readCourse>>>,
+  content: CourseEditorInput,
 ) {
   await transaction.courseModule.deleteMany({ where: { courseId } });
   await transaction.courseOpportunity.deleteMany({ where: { courseId } });
@@ -106,7 +183,7 @@ async function replaceChildren(
 }
 
 function courseImageReferences(
-  content: NonNullable<Awaited<ReturnType<typeof readCourse>>>,
+  content: CourseEditorInput,
 ) {
   return [
     content.heroImage,
@@ -131,7 +208,7 @@ function existingCourseImageReferences(course: {
 }
 
 function courseData(
-  content: NonNullable<Awaited<ReturnType<typeof readCourse>>>,
+  content: CourseEditorInput,
   isPublished: boolean,
 ) {
   return {
@@ -141,6 +218,16 @@ function courseData(
     tagline: content.tagline || null,
     description: content.description || null,
     heroImage: content.heroImage || null,
+    overviewHeading: content.overviewHeading || null,
+    overviewKeyStatement: content.overviewKeyStatement || null,
+    curriculumTitle: content.curriculumTitle || null,
+    curriculumIntro: content.curriculumIntro || null,
+    opportunityTitle: content.opportunityTitle || null,
+    whyStudyLabel: content.whyStudyLabel || null,
+    whyStudyHeading: content.whyStudyHeading || null,
+    whyStudyIntro: content.whyStudyIntro || null,
+    careerTitle: content.careerTitle || null,
+    careerIntro: content.careerIntro || null,
     seoTitle: content.seoTitle || null,
     metaDescription: content.metaDescription || null,
     canonicalUrl: content.canonicalUrl || null,
@@ -157,18 +244,96 @@ function isDuplicateError(error: unknown) {
   );
 }
 
+function isDuplicateSlugError(error: unknown) {
+  if (!isDuplicateError(error)) return false;
+  const target = (error as Prisma.PrismaClientKnownRequestError).meta?.target;
+  const fields = Array.isArray(target)
+    ? target.map(String)
+    : typeof target === "string"
+      ? [target]
+      : [];
+  return fields.includes("slug");
+}
+
+function courseSaveFailure(error: unknown): CourseFormState {
+  if (isDuplicateSlugError(error)) {
+    return {
+      fieldErrors: {
+        slug: "That slug is already in use. Choose a unique slug.",
+      },
+    };
+  }
+  if (isDuplicateError(error)) {
+    return {
+      formError:
+        "Some entries conflict with records that already exist. Review the ordered item numbers and try saving again.",
+      fieldErrors: {},
+    };
+  }
+  return {
+    formError:
+      "The course could not be saved. Check the database and try again.",
+    fieldErrors: {},
+  };
+}
+
+function redactSensitiveText(value: string) {
+  return value.replace(/\b[a-z][a-z0-9+.-]*:\/\/[^\s"']+/gi, "<redacted>");
+}
+
+function logCourseSaveError(
+  context: { operation: "create" | "update"; courseId?: number },
+  content: CourseEditorInput,
+  error: unknown,
+) {
+  let kind = "unknown";
+  let detail: string | null = null;
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    kind = `prisma-known:${error.code}`;
+    detail = error.message;
+  } else if (error instanceof Prisma.PrismaClientValidationError) {
+    kind = "prisma-validation";
+    detail = error.message;
+  } else if (error instanceof Prisma.PrismaClientInitializationError) {
+    kind = "prisma-init";
+    detail = error.message;
+  } else if (error instanceof Error) {
+    kind = error.name;
+    detail = error.message;
+  }
+  console.error(`[courses] ${context.operation} failed`, {
+    courseId: context.courseId,
+    slug: content.slug,
+    name: content.name,
+    kind,
+    detail: detail ? redactSensitiveText(detail) : null,
+  });
+}
+
 function revalidateCoursePaths(slug: string) {
   revalidatePath("/admin/courses");
   revalidatePath("/courses");
   revalidatePath(`/courses/${slug}`);
+  revalidatePath("/");
 }
 
-export async function createCourse(formData: FormData): Promise<never> {
+export async function createCourse(
+  _previousState: CourseFormState,
+  formData: FormData,
+): Promise<CourseFormState> {
   const admin = await requireAdmin();
-  const content = await readCourse(formData);
-  if (!content) redirect("/admin/courses/new?error=invalid");
+  const parsed = await readCourse(formData);
+  if (!parsed.ok) {
+    return { formError: parsed.formError, fieldErrors: parsed.fieldErrors };
+  }
+  const content = parsed.data;
+
   if (!(await validateImageReferences(courseImageReferences(content)))) {
-    redirect("/admin/courses/new?error=image");
+    return {
+      formError:
+        "Choose an existing STCET image or upload an image before saving.",
+      fieldErrors: {},
+    };
   }
 
   let createdId: number;
@@ -194,21 +359,28 @@ export async function createCourse(formData: FormData): Promise<never> {
     createdId = course.id;
     revalidateCoursePaths(course.slug);
   } catch (error) {
+    logCourseSaveError({ operation: "create" }, content, error);
     await cleanupUnreferencedUploads(courseImageReferences(content));
-    if (isDuplicateError(error)) redirect("/admin/courses/new?error=duplicate");
-    redirect("/admin/courses/new?error=save");
+    return courseSaveFailure(error);
   }
 
   redirect(`/admin/courses/${createdId}/edit?saved=1`);
 }
 
-export async function updateCourse(formData: FormData): Promise<never> {
+export async function updateCourse(
+  _previousState: CourseFormState,
+  formData: FormData,
+): Promise<CourseFormState> {
   const admin = await requireAdmin();
   const id = Number(formData.get("courseId"));
-  const content = await readCourse(formData);
-  if (!Number.isSafeInteger(id) || id <= 0 || !content) {
+  const parsed = await readCourse(formData);
+  if (!Number.isSafeInteger(id) || id <= 0) {
     redirect("/admin/courses?error=invalid");
   }
+  if (!parsed.ok) {
+    return { formError: parsed.formError, fieldErrors: parsed.fieldErrors };
+  }
+  const content = parsed.data;
 
   const prisma = getPrismaClient();
   const previous = await prisma.course.findUnique({
@@ -239,7 +411,11 @@ export async function updateCourse(formData: FormData): Promise<never> {
       previousImages,
     ))
   ) {
-    redirect(`/admin/courses/${id}/edit?error=image`);
+    return {
+      formError:
+        "Choose an existing STCET image or upload an image before saving.",
+      fieldErrors: {},
+    };
   }
 
   const isPublished = isAdministrator(admin) ? content.isPublished : false;
@@ -267,10 +443,9 @@ export async function updateCourse(formData: FormData): Promise<never> {
       });
     });
   } catch (error) {
+    logCourseSaveError({ operation: "update", courseId: id }, content, error);
     await cleanupUnreferencedUploads(newImages);
-    if (isDuplicateError(error))
-      redirect(`/admin/courses/${id}/edit?error=duplicate`);
-    redirect(`/admin/courses/${id}/edit?error=save`);
+    return courseSaveFailure(error);
   }
 
   revalidateCoursePaths(previous.slug);

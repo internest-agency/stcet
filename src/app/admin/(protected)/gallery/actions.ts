@@ -28,6 +28,7 @@ function duplicateError(error: unknown) {
 function refreshGallery() {
   revalidatePath("/admin/gallery");
   revalidatePath("/gallery");
+  revalidatePath("/");
 }
 
 function categoryInput(formData: FormData) {

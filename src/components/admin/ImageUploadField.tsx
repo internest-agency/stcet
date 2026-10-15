@@ -16,18 +16,23 @@ export default function ImageUploadField({
   category,
   value,
   onChange,
+  error,
+  compact = false,
 }: {
   label: string;
   category: string;
   value: string;
   onChange: (path: string) => void;
+  error?: string;
+  /** Renders a smaller control for dense admin forms. */
+  compact?: boolean;
 }) {
   const inputId = useId();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [error, setError] = useState("");
+  const [uploadError, setUploadError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
@@ -38,14 +43,14 @@ export default function ImageUploadField({
   function upload(file: File | undefined) {
     if (!file || uploading) return;
 
-    setError("");
+    setUploadError("");
     setSuccess("");
     if (file.size > DEFAULT_MAX_BYTES) {
-      setError("Choose an image no larger than 5 MB.");
+      setUploadError("Choose an image no larger than 5 MB.");
       return;
     }
     if (file.type && !ACCEPTED_TYPES.has(file.type)) {
-      setError("Choose a JPEG, PNG, or WebP image.");
+      setUploadError("Choose a JPEG, PNG, or WebP image.");
       return;
     }
 
@@ -75,9 +80,9 @@ export default function ImageUploadField({
           const response = JSON.parse(request.responseText) as {
             error?: string;
           };
-          setError(response.error ?? "Image upload failed. Try again.");
+          setUploadError(response.error ?? "Image upload failed. Try again.");
         } catch {
-          setError("Image upload failed. Try again.");
+          setUploadError("Image upload failed. Try again.");
         }
         return;
       }
@@ -89,23 +94,23 @@ export default function ImageUploadField({
         }
         onChange(response.path);
         setPreviewUrl(null);
-        setSuccess("Image uploaded. Save the course to apply it.");
+        setSuccess("Image uploaded. Save to apply it.");
       } catch {
         setPreviewUrl(null);
-        setError("The upload completed but could not be selected. Try again.");
+        setUploadError("The upload completed but could not be selected. Try again.");
       }
     };
     request.onerror = () => {
       setUploading(false);
       setPreviewUrl(null);
-      setError(
+      setUploadError(
         "Network error while uploading. Your current image is unchanged.",
       );
     };
     request.onabort = () => {
       setUploading(false);
       setPreviewUrl(null);
-      setError("Upload cancelled. Your current image is unchanged.");
+      setUploadError("Upload cancelled. Your current image is unchanged.");
     };
     request.send(file);
   }
@@ -131,7 +136,7 @@ export default function ImageUploadField({
       />
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
         <label
-          className={`flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed px-4 py-5 text-center transition focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary-700 ${dragging ? "border-primary-600 bg-primary-50" : "border-gray-300 bg-gray-50 hover:border-primary-500 hover:bg-primary-50/50"} ${uploading ? "cursor-wait opacity-75" : ""}`}
+          className={`flex ${compact ? "min-h-24 px-3 py-3" : "min-h-36 px-4 py-5"} cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed text-center transition focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary-700 ${dragging ? "border-primary-600 bg-primary-50" : "border-gray-300 bg-gray-50 hover:border-primary-500 hover:bg-primary-50/50"} ${uploading ? "cursor-wait opacity-75" : ""}`}
           htmlFor={inputId}
           onDragEnter={(event) => {
             event.preventDefault();
@@ -173,12 +178,12 @@ export default function ImageUploadField({
             </span>
           ) : null}
         </label>
-        <div className="flex min-h-36 flex-col items-center justify-center rounded-md border border-gray-200 bg-white p-3">
+        <div className={`flex ${compact ? "min-h-24 p-2" : "min-h-36 p-3"} flex-col items-center justify-center rounded-md border border-gray-200 bg-white`}>
           {imageSource ? (
             <>
               <Image
                 alt={`${label} preview`}
-                className="h-24 w-full rounded object-contain"
+                className={`${compact ? "h-16" : "h-24"} w-full rounded object-contain`}
                 height={96}
                 src={imageSource}
                 unoptimized
@@ -190,7 +195,7 @@ export default function ImageUploadField({
                   onClick={() => {
                     onChange("");
                     setSuccess("");
-                    setError("");
+                    setUploadError("");
                   }}
                   type="button"
                 >
@@ -205,12 +210,12 @@ export default function ImageUploadField({
           )}
         </div>
       </div>
-      {error ? (
+      {uploadError || error ? (
         <p
           aria-live="polite"
           className="mt-2 text-xs font-semibold text-red-700"
         >
-          {error}
+          {uploadError || error}
         </p>
       ) : null}
       {success ? (

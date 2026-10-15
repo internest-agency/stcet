@@ -25,7 +25,12 @@ export async function getPublicGalleryData(): Promise<PublicGalleryData> {
 
   try {
     const prisma = getPrismaClient();
-    const totalImages = await prisma.galleryImage.count();
+    const totalImages = await prisma.galleryImage.count({
+      where: {
+        isPublished: true,
+        category: { isActive: true },
+      },
+    });
     if (totalImages === 0) return fallback;
 
     const images = await prisma.galleryImage.findMany({

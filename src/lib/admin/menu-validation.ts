@@ -1,0 +1,2 @@
+import { z } from "zod";
+export const menuSchema = z.object({ parentId: z.coerce.number().int().positive().optional().nullable(), title: z.string().trim().min(1).max(191), url: z.string().trim().max(2048).refine((value) => value.startsWith("/") || /^https?:\/\//.test(value), "Use an internal path or http(s) URL."), sortOrder: z.coerce.number().int().min(0).max(99_999).default(0), isActive: z.boolean().default(true), openInNewTab: z.boolean().default(false), isPublished: z.boolean().default(false) });

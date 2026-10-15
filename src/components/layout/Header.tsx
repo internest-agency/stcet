@@ -17,6 +17,8 @@ import Button from "@/src/components/ui/Button";
 import Container from "../ui/Container";
 
 interface HeaderProps {
+  collegeName?: string | null;
+  logoPath?: string | null;
   /**
    * Set overlay=true on the homepage.
    *
@@ -83,7 +85,11 @@ const navLinks = [
   },
 ];
 
-export default function Header({ overlay = false }: HeaderProps) {
+export default function Header({
+  overlay = false,
+  collegeName,
+  logoPath,
+}: HeaderProps) {
   const pathname = usePathname();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -202,8 +208,11 @@ export default function Header({ overlay = false }: HeaderProps) {
             "
           >
             <Image
-              src="/images/logo-transparent.png"
-              alt="S. Thangapazham College of Engineering and Technology"
+              src={logoPath ?? "/images/logo-transparent.png"}
+              alt={
+                collegeName ??
+                "S. Thangapazham College of Engineering and Technology"
+              }
               width={80}
               height={40}
               priority
@@ -263,7 +272,7 @@ export default function Header({ overlay = false }: HeaderProps) {
           <div className="hidden lg:block">
             <Button
               href="/enquire-now"
-              variant="secondary"
+              variant="accent"
               size="md"
               rightIcon={<FaCircleArrowRight />}
             >

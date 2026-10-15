@@ -38,6 +38,7 @@ export default function EnquiryForm() {
   >("idle");
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [enquiryRefNumber, setEnquiryRefNumber] = useState("");
 
   const [coursePreferences, setCoursePreferences] = useState<
     Record<string, string>
@@ -107,8 +108,13 @@ export default function EnquiryForm() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     setSubmitStatus("idle");
     setErrorMessage("");
+    setEnquiryRefNumber("");
 
     const form = event.currentTarget;
 
@@ -168,8 +174,10 @@ export default function EnquiryForm() {
       }
 
       setSubmitStatus("success");
-
       setErrorMessage("");
+      if (result?.enquiryNumber) {
+        setEnquiryRefNumber(result.enquiryNumber);
+      }
 
       /*
        * Reset form after successful submission.
@@ -658,6 +666,12 @@ export default function EnquiryForm() {
                           Thank you for your enquiry. Our admission team will
                           contact you soon.
                         </p>
+                        {enquiryRefNumber ? (
+                          <p className="mt-2 text-xs font-bold text-green-900">
+                            Enquiry Reference:{" "}
+                            <span className="font-mono">{enquiryRefNumber}</span>
+                          </p>
+                        ) : null}
                       </div>
                     </div>
                   </div>

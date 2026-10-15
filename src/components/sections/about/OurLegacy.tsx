@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -119,11 +120,11 @@ export default function OurLegacy() {
               </span>
             </div>
 
-            <h2 className="legacy-heading max-w-lg text-2xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl lg:text-5xl uppercase">
+            <SectionHeading as="h2">
               A vision rooted
               <br />
-              in education.
-            </h2>
+              <span className="text-accent-400">in education.</span>
+            </SectionHeading>
 
             <p className="legacy-intro mt-7 max-w-md text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
               Our journey is built on a commitment to education,
@@ -158,19 +159,13 @@ export default function OurLegacy() {
                   className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-[3px] border-white bg-accent-400 ring-1 ring-accent-400 sm:h-[19px] sm:w-[19px]"
                 />
 
-                <div className="mb-4 flex items-center gap-4">
-                  <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
-                    01
-                  </span>
-                  -
-                  <span className="text-sm font-extrabold tracking-tight text-primary-700">
-                    2010
-                  </span>
+                <div className="mb-4 uppercase text-gray-400 text-sm">
+                  01 - Begin
                 </div>
 
-                <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+                <SectionHeading as="h3" customSize={true} className="text-2xl">
                   The Beginning of a Vision
-                </h3>
+                </SectionHeading>
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                   S. Thangapazham College of Engineering and Technology is part
@@ -188,19 +183,13 @@ export default function OurLegacy() {
                   className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-[3px] border-white bg-primary-700 ring-1 ring-primary-700 sm:h-[19px] sm:w-[19px]"
                 />
 
-                <div className="mb-4 flex items-center gap-4">
-                  <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
-                    02
-                  </span>
-                  -
-                  <span className="text-sm font-extrabold tracking-tight text-primary-700">
-                    The Trust
-                  </span>
+                <div className="mb-4 uppercase text-gray-400 text-sm">
+                  02 - The Trust
                 </div>
 
-                <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+                <SectionHeading as="h3" customSize={true} className="text-2xl">
                   Honouring a Family Legacy
-                </h3>
+                </SectionHeading>
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                   The Trust was founded in honour of Thiru. S.
@@ -217,19 +206,13 @@ export default function OurLegacy() {
                   className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-[3px] border-white bg-accent-400 ring-1 ring-accent-400 sm:h-[19px] sm:w-[19px]"
                 />
 
-                <div className="mb-4 flex items-center gap-4">
-                  <span className="text-xs font-bold tracking-[0.2em] text-gray-400">
-                    03
-                  </span>
-                  -
-                  <span className="text-sm font-extrabold tracking-tight text-primary-700">
-                    Today
-                  </span>
+                <div className="mb-4 uppercase text-gray-400 text-sm">
+                  03 - Today
                 </div>
 
-                <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+                <SectionHeading as="h3" customSize={true} className="text-2xl">
                   Building the Next Chapter
-                </h3>
+                </SectionHeading>
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                   This vision continues through S. Thangapazham College of

@@ -66,7 +66,8 @@ export default async function CoursePreviewPage({
           tagline={course.tagline ?? ""}
         />
         <CourseOverview
-          heading={course.name}
+          heading={course.overviewHeading || course.name}
+          keyStatement={course.overviewKeyStatement || undefined}
           paragraphs={[
             {
               content:
@@ -75,24 +76,28 @@ export default async function CoursePreviewPage({
           ]}
         />
         <CurriculumExplorer
-          intro="Preview of the saved learning modules."
+          intro={course.curriculumIntro || "Preview of the saved learning modules."}
           slides={slides}
-          title="Learning modules"
+          title={course.curriculumTitle || "Learning modules"}
         />
         <OpportunityAreas
           data={course.opportunities.map((opportunity) => opportunity.title)}
-          title="Opportunities"
+          title={course.opportunityTitle || "Opportunities"}
         />
         <WhyStudy
-          heading={`Why study ${course.name}`}
+          heading={course.whyStudyHeading || `Why study ${course.name}`}
+          intro={
+            course.whyStudyIntro || "Preview of saved course reasons."
+          }
+          label={course.whyStudyLabel || "Why study"}
           reasons={reasons}
-          label="Why study"
-          intro="Preview of saved course reasons."
         />
         <CareerPathways
           careerGroups={careerGroups}
-          careerIntro="Preview of saved career pathways."
-          careerTitle="Career pathways"
+          careerIntro={
+            course.careerIntro || "Preview of saved career pathways."
+          }
+          careerTitle={course.careerTitle || "Career pathways"}
         />
       </div>
     </div>

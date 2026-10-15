@@ -1,0 +1,1 @@
+ALTER TABLE `MediaAsset` ADD COLUMN `title` VARCHAR(191) NULL;

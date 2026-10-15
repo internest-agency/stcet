@@ -24,10 +24,12 @@ export const UPLOAD_CATEGORIES = [
   "courses/modules",
   "courses/careers",
   "gallery",
+  "admissions",
   "placements",
   "infrastructure",
   "committees",
   "pages",
+  "faculty",
 ] as const;
 
 export type UploadCategory = (typeof UPLOAD_CATEGORIES)[number];

@@ -8,10 +8,23 @@ import { SplitText } from "gsap/SplitText";
 import Container from "../../ui/Container";
 import Button from "../../ui/Button";
 import { FaCircleArrowRight } from "react-icons/fa6";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-export default function AdmissionsSection() {
+export type HomeAdmissionsIntro = {
+  title?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+};
+
+interface AdmissionsSectionProps {
+  intro?: HomeAdmissionsIntro | null;
+}
+
+export default function AdmissionsSection({
+  intro,
+}: AdmissionsSectionProps = {}) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -107,6 +120,12 @@ export default function AdmissionsSection() {
     };
   }, []);
 
+  const card1Title = intro?.title || "Begin Your Engineering Journey";
+  const card1Description =
+    intro?.description ||
+    "At S. Thangapazham College of Engineering & Technology, discover an environment that encourages curiosity, builds confidence and opens pathways to a wide range of engineering careers.";
+  const card2Title = intro?.subtitle || "Admissions for 2026-27";
+
   return (
     <section
       ref={sectionRef}
@@ -118,12 +137,10 @@ export default function AdmissionsSection() {
       -------------------------------- */}
       <Container className="mb-12">
         <div>
-          <h2
-            id="admissions-heading"
-            className="split-heading mb-4 text-2xl md:text-3xl lg:text-4xl font-bold uppercase text-gray-900"
-          >
-            Your Gateway to What&apos;s Next
-          </h2>
+          <SectionHeading id="admission-heading">
+            Your Gateway to{" "}
+            <span className="text-accent-400">What&apos;s Next</span>
+          </SectionHeading>
         </div>
       </Container>
 
@@ -135,20 +152,16 @@ export default function AdmissionsSection() {
           {/* First Card */}
           <div className="border-t border-t-gray-300 py-16 pr-0 md:pr-20">
             <h3 className="split-heading mb-4 text-2xl font-bold uppercase">
-              Begin Your Engineering Journey
+              {card1Title}
             </h3>
 
-            <p className="fade-up text-gray-700">
-              At S. Thangapazham College of Engineering & Technology, discover
-              an environment that encourages curiosity, builds confidence and
-              opens pathways to a wide range of engineering careers.
-            </p>
+            <p className="fade-up text-gray-700">{card1Description}</p>
           </div>
 
           {/* Second Card */}
           <div className="border-t border-t-gray-300 py-16 pr-0 md:pr-20">
             <h3 className="split-heading mb-4 text-2xl font-bold uppercase">
-              Admissions for 2026-27
+              {card2Title}
             </h3>
 
             <p className="fade-up text-gray-700">
@@ -167,11 +180,11 @@ export default function AdmissionsSection() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* Heading */}
           <div>
-            <h3 className="split-heading lg:mt-4 lg:mb-12 text-4xl font-bold uppercase">
+            <SectionHeading as="h3" className="mb-4 lg:mb-8">
               Who can Apply?
-            </h3>
+            </SectionHeading>
             <Button
-              href="/admissions"
+              href="/enquire-now#application"
               variant="primary"
               size="md"
               rightIcon={<FaCircleArrowRight />}

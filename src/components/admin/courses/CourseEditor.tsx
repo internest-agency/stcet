@@ -1,8 +1,17 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
-import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from "lucide-react";
+import { useActionState, useId, useState, type ReactNode } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  LoaderCircle,
+  Plus,
+  Save,
+  Trash2,
+} from "lucide-react";
 import ImageUploadField from "@/src/components/admin/ImageUploadField";
+import RichTextEditor from "@/src/components/admin/RichTextEditor";
+import type { CourseFormState } from "@/src/lib/admin/course-validation";
 
 type ModuleRow = {
   number: string;
@@ -27,6 +36,16 @@ export type CourseEditorValues = {
   tagline: string;
   description: string;
   heroImage: string;
+  overviewHeading: string;
+  overviewKeyStatement: string;
+  curriculumTitle: string;
+  curriculumIntro: string;
+  opportunityTitle: string;
+  whyStudyLabel: string;
+  whyStudyHeading: string;
+  whyStudyIntro: string;
+  careerTitle: string;
+  careerIntro: string;
   seoTitle: string;
   metaDescription: string;
   canonicalUrl: string;
@@ -40,7 +59,10 @@ export type CourseEditorValues = {
   futurePaths: FuturePathRow[];
 };
 
-type CourseAction = (formData: FormData) => Promise<void>;
+type CourseAction = (
+  state: CourseFormState,
+  formData: FormData,
+) => Promise<CourseFormState>;
 
 const blankValues: CourseEditorValues = {
   name: "",
@@ -49,6 +71,16 @@ const blankValues: CourseEditorValues = {
   tagline: "",
   description: "",
   heroImage: "",
+  overviewHeading: "",
+  overviewKeyStatement: "",
+  curriculumTitle: "",
+  curriculumIntro: "",
+  opportunityTitle: "",
+  whyStudyLabel: "",
+  whyStudyHeading: "",
+  whyStudyIntro: "",
+  careerTitle: "",
+  careerIntro: "",
   seoTitle: "",
   metaDescription: "",
   canonicalUrl: "",
@@ -72,18 +104,21 @@ function TextField({
   onChange,
   required = false,
   placeholder,
+  error,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
   placeholder?: string;
+  error?: string;
 }) {
   const id = useId();
   return (
     <label className="block text-sm font-semibold text-gray-700" htmlFor={id}>
       {label}
       <input
+        aria-invalid={error ? true : undefined}
         className={fieldClass()}
         id={id}
         onChange={(event) => onChange(event.target.value)}
@@ -91,6 +126,11 @@ function TextField({
         required={required}
         value={value}
       />
+      {error ? (
+        <span className="mt-1 block text-xs font-semibold text-red-700">
+          {error}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -102,6 +142,7 @@ function TextAreaField({
   required = false,
   rows = 3,
   hint,
+  error,
 }: {
   label: string;
   value: string;
@@ -109,12 +150,14 @@ function TextAreaField({
   required?: boolean;
   rows?: number;
   hint?: string;
+  error?: string;
 }) {
   const id = useId();
   return (
     <label className="block text-sm font-semibold text-gray-700" htmlFor={id}>
       {label}
       <textarea
+        aria-invalid={error ? true : undefined}
         className={`${fieldClass()} resize-y`}
         id={id}
         onChange={(event) => onChange(event.target.value)}
@@ -125,6 +168,11 @@ function TextAreaField({
       {hint ? (
         <span className="mt-1 block text-xs font-normal text-gray-500">
           {hint}
+        </span>
+      ) : null}
+      {error ? (
+        <span className="mt-1 block text-xs font-semibold text-red-700">
+          {error}
         </span>
       ) : null}
     </label>
@@ -262,6 +310,24 @@ export default function CourseEditor({
   ) => {
     setValues((current) => ({ ...current, [key]: value }));
   };
+
+  // The action returns a state object on failure (instead of redirecting), so
+  // the component never unmounts and every entered value is preserved. It only
+  // navigates away on a confirmed successful save.
+  const [state, formAction, isPending] = useActionState(action, {
+    fieldErrors: {},
+  });
+  const fieldErrors = state.fieldErrors ?? {};
+  const fieldError = (key: string) => fieldErrors[key];
+  const firstError = (prefix: string) => {
+    if (fieldErrors[prefix]) return fieldErrors[prefix];
+    const match = Object.keys(fieldErrors).find((key) =>
+      key.startsWith(`${prefix}.`),
+    );
+    return match ? fieldErrors[match] : undefined;
+  };
+  const bannerError = state.formError ?? error;
+
   const payload = {
     ...values,
     careerPathways: values.careerPathways.map(({ rolesText, ...pathway }) => ({
@@ -274,17 +340,17 @@ export default function CourseEditor({
   };
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={formAction} className="space-y-5">
       {courseId ? (
         <input name="courseId" type="hidden" value={courseId} />
       ) : null}
       <input name="content" type="hidden" value={JSON.stringify(payload)} />
-      {error ? (
+      {bannerError ? (
         <p
           aria-live="polite"
           className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
         >
-          {error}
+          {bannerError}
         </p>
       ) : null}
       {saved ? (
@@ -306,18 +372,21 @@ export default function CourseEditor({
         <div className="grid gap-4 md:grid-cols-2">
           <TextField
             label="Course name"
+            error={fieldError("name")}
             onChange={(value) => set("name", value)}
             required
             value={values.name}
           />
           <TextField
             label="Slug"
+            error={fieldError("slug")}
             onChange={(value) => set("slug", value)}
             required
             value={values.slug}
           />
           <TextField
             label="Degree"
+            error={fieldError("degree")}
             onChange={(value) => set("degree", value)}
             placeholder="e.g. B.E."
             required
@@ -325,20 +394,24 @@ export default function CourseEditor({
           />
           <TextField
             label="Tagline"
+            error={fieldError("tagline")}
             onChange={(value) => set("tagline", value)}
             value={values.tagline}
           />
           <ImageUploadField
             category="courses/heroes"
+            error={fieldError("heroImage")}
             label="Hero image"
             onChange={(value) => set("heroImage", value)}
             value={values.heroImage}
           />
           <div className="md:col-span-2">
-            <TextAreaField
+            <RichTextEditor
               label="Description"
+              error={fieldError("description")}
+              hint="Formatting is supported. This copy becomes the public overview paragraphs."
+              minHeight={180}
               onChange={(value) => set("description", value)}
-              rows={5}
               value={values.description}
             />
           </div>
@@ -360,6 +433,92 @@ export default function CourseEditor({
         )}
       </section>
 
+      <section className="rounded-md border border-gray-200 bg-white p-4 sm:p-5">
+        <div className="mb-5 border-b border-gray-100 pb-4">
+          <h3 className="font-bold text-gray-900">
+            Section headings &amp; intros
+          </h3>
+          <p className="mt-1 text-xs text-gray-500">
+            Headings and intro copy for each section of the public course page.
+            Leave a field empty to fall back to the bundled course content.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <TextField
+            label="Overview heading"
+            error={fieldError("overviewHeading")}
+            onChange={(value) => set("overviewHeading", value)}
+            value={values.overviewHeading}
+          />
+          <TextField
+            label="Curriculum section title"
+            error={fieldError("curriculumTitle")}
+            onChange={(value) => set("curriculumTitle", value)}
+            value={values.curriculumTitle}
+          />
+          <div className="md:col-span-2">
+            <RichTextEditor
+              label="Overview key statement"
+              error={fieldError("overviewKeyStatement")}
+              minHeight={90}
+              onChange={(value) => set("overviewKeyStatement", value)}
+              value={values.overviewKeyStatement}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <RichTextEditor
+              label="Curriculum intro"
+              error={fieldError("curriculumIntro")}
+              minHeight={90}
+              onChange={(value) => set("curriculumIntro", value)}
+              value={values.curriculumIntro}
+            />
+          </div>
+          <TextField
+            label="Opportunity areas title"
+            error={fieldError("opportunityTitle")}
+            onChange={(value) => set("opportunityTitle", value)}
+            value={values.opportunityTitle}
+          />
+          <TextField
+            label="Why study label"
+            error={fieldError("whyStudyLabel")}
+            onChange={(value) => set("whyStudyLabel", value)}
+            value={values.whyStudyLabel}
+          />
+          <TextField
+            label="Why study heading"
+            error={fieldError("whyStudyHeading")}
+            onChange={(value) => set("whyStudyHeading", value)}
+            value={values.whyStudyHeading}
+          />
+          <div className="md:col-span-2">
+            <RichTextEditor
+              label="Why study intro"
+              error={fieldError("whyStudyIntro")}
+              minHeight={90}
+              onChange={(value) => set("whyStudyIntro", value)}
+              value={values.whyStudyIntro}
+            />
+          </div>
+          <TextField
+            label="Career pathways title"
+            error={fieldError("careerTitle")}
+            onChange={(value) => set("careerTitle", value)}
+            value={values.careerTitle}
+          />
+          <div className="md:col-span-2">
+            <RichTextEditor
+              label="Career pathways intro"
+              error={fieldError("careerIntro")}
+              minHeight={90}
+              onChange={(value) => set("careerIntro", value)}
+              value={values.careerIntro}
+            />
+          </div>
+        </div>
+      </section>
+
       <Repeater
         description="Curriculum slides shown in their saved order."
         makeRow={() => ({
@@ -369,28 +528,32 @@ export default function CourseEditor({
           image: "",
         })}
         onChange={(rows) => set("modules", rows)}
-        renderRow={(row, update) => (
+        renderRow={(row, update, index) => (
           <div className="grid gap-3 md:grid-cols-2">
             <TextField
               label="Number"
+              error={fieldError(`modules.${index}.number`)}
               onChange={(number) => update({ number })}
               required
               value={row.number}
             />
             <TextField
               label="Title"
+              error={fieldError(`modules.${index}.title`)}
               onChange={(title) => update({ title })}
               required
               value={row.title}
             />
             <TextAreaField
               label="Description"
+              error={fieldError(`modules.${index}.description`)}
               onChange={(description) => update({ description })}
               required
               value={row.description}
             />
             <ImageUploadField
               category="courses/modules"
+              error={fieldError(`modules.${index}.image`)}
               label="Module image"
               onChange={(image) => update({ image })}
               value={row.image}
@@ -405,9 +568,10 @@ export default function CourseEditor({
         description="Opportunity areas displayed on the course page."
         makeRow={() => ({ title: "" })}
         onChange={(rows) => set("opportunities", rows)}
-        renderRow={(row, update) => (
+        renderRow={(row, update, index) => (
           <TextField
             label="Opportunity"
+            error={fieldError(`opportunities.${index}.title`)}
             onChange={(title) => update({ title })}
             required
             value={row.title}
@@ -425,16 +589,18 @@ export default function CourseEditor({
           description: "",
         })}
         onChange={(rows) => set("reasons", rows)}
-        renderRow={(row, update) => (
+        renderRow={(row, update, index) => (
           <div className="grid gap-3 md:grid-cols-2">
             <TextField
               label="Number"
+              error={fieldError(`reasons.${index}.number`)}
               onChange={(number) => update({ number })}
               required
               value={row.number}
             />
             <TextField
               label="Title"
+              error={fieldError(`reasons.${index}.title`)}
               onChange={(title) => update({ title })}
               required
               value={row.title}
@@ -442,6 +608,7 @@ export default function CourseEditor({
             <div className="md:col-span-2">
               <TextAreaField
                 label="Description"
+                error={fieldError(`reasons.${index}.description`)}
                 onChange={(description) => update({ description })}
                 required
                 value={row.description}
@@ -462,22 +629,25 @@ export default function CourseEditor({
           rolesText: "",
         })}
         onChange={(rows) => set("careerPathways", rows)}
-        renderRow={(row, update) => (
+        renderRow={(row, update, index) => (
           <div className="grid gap-3 md:grid-cols-2">
             <TextField
               label="Number"
+              error={fieldError(`careerPathways.${index}.number`)}
               onChange={(number) => update({ number })}
               required
               value={row.number}
             />
             <TextField
               label="Pathway title"
+              error={fieldError(`careerPathways.${index}.title`)}
               onChange={(title) => update({ title })}
               required
               value={row.title}
             />
             <ImageUploadField
               category="courses/careers"
+              error={fieldError(`careerPathways.${index}.image`)}
               label="Career pathway image"
               onChange={(image) => update({ image })}
               value={row.image}
@@ -485,6 +655,7 @@ export default function CourseEditor({
             <TextAreaField
               hint="Each non-empty line becomes an ordered career role."
               label="Career roles"
+              error={firstError(`careerPathways.${index}.roles`)}
               onChange={(rolesText) => update({ rolesText })}
               rows={4}
               value={row.rolesText}
@@ -503,16 +674,18 @@ export default function CourseEditor({
           description: "",
         })}
         onChange={(rows) => set("futurePaths", rows)}
-        renderRow={(row, update) => (
+        renderRow={(row, update, index) => (
           <div className="grid gap-3 md:grid-cols-2">
             <TextField
               label="Number"
+              error={fieldError(`futurePaths.${index}.number`)}
               onChange={(number) => update({ number })}
               required
               value={row.number}
             />
             <TextField
               label="Title"
+              error={fieldError(`futurePaths.${index}.title`)}
               onChange={(title) => update({ title })}
               required
               value={row.title}
@@ -520,6 +693,7 @@ export default function CourseEditor({
             <div className="md:col-span-2">
               <TextAreaField
                 label="Description"
+                error={fieldError(`futurePaths.${index}.description`)}
                 onChange={(description) => update({ description })}
                 required
                 value={row.description}
@@ -542,11 +716,13 @@ export default function CourseEditor({
         <div className="grid gap-4 md:grid-cols-2">
           <TextField
             label="SEO title"
+            error={fieldError("seoTitle")}
             onChange={(value) => set("seoTitle", value)}
             value={values.seoTitle}
           />
           <ImageUploadField
             category="courses/heroes"
+            error={fieldError("ogImage")}
             label="Open Graph image"
             onChange={(value) => set("ogImage", value)}
             value={values.ogImage}
@@ -554,6 +730,7 @@ export default function CourseEditor({
           <div className="md:col-span-2">
             <TextAreaField
               label="Meta description"
+              error={fieldError("metaDescription")}
               onChange={(value) => set("metaDescription", value)}
               rows={3}
               value={values.metaDescription}
@@ -562,6 +739,7 @@ export default function CourseEditor({
           <div className="md:col-span-2">
             <TextField
               label="Canonical URL"
+              error={fieldError("canonicalUrl")}
               onChange={(value) => set("canonicalUrl", value)}
               value={values.canonicalUrl}
             />
@@ -583,10 +761,20 @@ export default function CourseEditor({
           Repeating content is saved together in one database transaction.
         </p>
         <button
-          className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary-700 px-5 py-2 text-sm font-bold text-white hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
+          className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary-700 px-5 py-2 text-sm font-bold text-white hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isPending}
           type="submit"
         >
-          <Save aria-hidden className="size-4" /> Save course
+          {isPending ? (
+            <>
+              <LoaderCircle aria-hidden className="size-4 animate-spin" />
+              Saving…
+            </>
+          ) : (
+            <>
+              <Save aria-hidden className="size-4" /> Save course
+            </>
+          )}
         </button>
       </div>
     </form>

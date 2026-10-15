@@ -5,8 +5,10 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { FaUser } from "react-icons/fa";
 
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -233,11 +235,11 @@ export default function GoverningCouncil() {
               </span>
             </div>
 
-            <h2 className="council-heading max-w-md text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-4xl lg:text-5xl">
+            <SectionHeading as="h2">
               Leadership
               <br />
               with purpose.
-            </h2>
+            </SectionHeading>
           </div>
 
           {/* Intro */}
@@ -250,75 +252,47 @@ export default function GoverningCouncil() {
             </p>
           </div>
         </div>
-
         {/* =================================================
-            COUNCIL GRID
+            FUTURISTIC GOVERNING COUNCIL GRID
         ================================================= */}
-        <div className="mt-16 grid grid-cols-1 gap-x-6 gap-y-12 sm:mt-20 sm:grid-cols-2 sm:gap-y-14 lg:mt-24 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-16">
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-5 xl:gap-7">
           {councilMembers.map((member) => (
-            <article key={member.number} className="council-card group">
-              {/* Image */}
-              <div className="council-card-image relative aspect-[4/5] overflow-hidden bg-primary-800">
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-                />
+            <article
+              key={member.number}
+              className="council-card group relative"
+            >
+              {/* Profile card */}
+              <div className="relative isolate overflow-hidden rounded-lg border border-primary-900/10 bg-primary-900 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent-400/60 hover:shadow-xl hover:shadow-primary-900/15">
+                {/* Portrait */}
+                <div className="council-card-image flex flex-col items-center relative aspect-[4/5] overflow-hidden bg-primary-800">
+                  <FaUser className="text-gray-200/20 text-9xl mt-10" />
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-primary-900/80 via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+                  {/* Cinematic image overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/25 to-primary-900/10 opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
 
-                {/* Number */}
-                <span
-                  aria-hidden="true"
-                  className="absolute left-5 top-5 text-xs font-black tracking-[0.2em] text-white/60 transition-colors duration-300 group-hover:text-white sm:left-6 sm:top-6"
-                >
-                  {member.number}
-                </span>
+                  {/* Subtle futuristic grid */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-20"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)",
+                      backgroundSize: "32px 32px",
+                    }}
+                  />
 
-                {/* Role */}
-                <div className="absolute bottom-5 left-5 right-5 sm:bottom-6 sm:left-6 sm:right-6">
-                  <div className="flex items-start gap-2">
-                    <span
-                      aria-hidden="true"
-                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-400"
-                    />
-
-                    <span className="text-[10px] font-bold uppercase leading-4 tracking-[0.14em] text-white/75">
-                      {member.role}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Bottom Accent */}
-                <span
-                  aria-hidden="true"
-                  className="absolute bottom-0 left-0 h-1 w-0 bg-accent-400 transition-all duration-500 ease-out group-hover:w-full"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="council-card-content relative border-b border-gray-200 py-5 sm:py-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-extrabold leading-tight tracking-[-0.02em] text-gray-900 transition-transform duration-300 ease-out group-hover:translate-x-1 sm:text-xl">
+                  {/* Member identity */}
+                  <div className="council-card-content absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                    <h3 className="text-lg uppercase font-semibold leading-tight tracking-tight text-white">
                       {member.name}
                     </h3>
 
-                    <p className="mt-2 text-[10px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
-                      {member.role}
-                    </p>
+                    <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-3">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                        {member.role}
+                      </span>
+                    </div>
                   </div>
-
-                  {/* Indicator */}
-                  <span
-                    aria-hidden="true"
-                    className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 transition-all duration-500 group-hover:border-primary-700 group-hover:bg-primary-700"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary-700 transition-all duration-300 group-hover:scale-150 group-hover:bg-white" />
-                  </span>
                 </div>
               </div>
             </article>

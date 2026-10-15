@@ -13,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "@/src/components/ui/Container";
+import RichText from "@/src/components/ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
@@ -86,7 +87,13 @@ export default function CurriculumExplorer({
 
   const selectSlide = useCallback(
     (index: number) => {
-      if (slides.length === 0 || index === safeActiveIndex || isChanging) {
+      if (
+        slides.length === 0 ||
+        index < 0 ||
+        index >= slides.length ||
+        index === safeActiveIndex ||
+        isChanging
+      ) {
         return;
       }
 
@@ -745,7 +752,7 @@ export default function CurriculumExplorer({
             ================================================= */}
 
             <div>
-              <p
+              <div
                 ref={introRef}
                 className="
                   curriculum-intro
@@ -759,8 +766,8 @@ export default function CurriculumExplorer({
                   lg:leading-8
                 "
               >
-                {intro}
-              </p>
+                <RichText html={intro} />
+              </div>
             </div>
           </div>
         </div>
@@ -1014,14 +1021,18 @@ export default function CurriculumExplorer({
                 {/* TITLE */}
 
                 <div className="curriculum-module-title">
-                  <SectionHeading className="mt-4" as="h3">
+                  <SectionHeading
+                    key={`${activeSlide.number}-${activeSlide.title}`}
+                    className="mt-4"
+                    as="h3"
+                  >
                     {activeSlide.title}
                   </SectionHeading>
                 </div>
 
                 {/* DESCRIPTION */}
 
-                <p
+                <RichText
                   className="
                     curriculum-module-description
                     mt-5
@@ -1035,9 +1046,8 @@ export default function CurriculumExplorer({
                     lg:text-[16px]
                     lg:leading-8
                   "
-                >
-                  {activeSlide.description}
-                </p>
+                  html={activeSlide.description}
+                />
               </div>
             </div>
           </div>

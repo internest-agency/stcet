@@ -1,0 +1,10 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { requireAdministrator } from "@/src/lib/admin/authorization";
+import { cleanupUnreferencedUploads } from "@/src/lib/admin/uploads";
+import { getPrismaClient } from "@/src/lib/prisma";
+import { z } from "zod";
+const schema = z.object({ id: z.coerce.number().int().positive(), title: z.string().trim().max(191).optional().nullable(), altText: z.string().trim().max(255).optional().nullable() });
+export async function saveMediaMetadata(formData: FormData): Promise<never> { const admin = await requireAdministrator(); const parsed = schema.safeParse({ id: formData.get("id"), title: formData.get("title") || null, altText: formData.get("altText") || null }); if (!parsed.success) redirect("/admin/media?error=invalid"); const prisma = getPrismaClient(); try { const asset = await prisma.mediaAsset.update({ where: { id: parsed.data.id }, data: { title: parsed.data.title, altText: parsed.data.altText } }); await prisma.adminAuditLog.create({ data: { actorId: admin.id, action: "update", entityType: "MediaAsset", entityId: String(asset.id), details: { path: asset.path } } }); } catch { redirect("/admin/media?error=save"); } revalidatePath("/admin/media"); redirect("/admin/media?saved=1"); }
+export async function deleteMediaAsset(formData: FormData): Promise<never> { const admin = await requireAdministrator(); const id = Number(formData.get("id")); if (!Number.isSafeInteger(id) || id <= 0) redirect("/admin/media?error=invalid"); const prisma = getPrismaClient(); const asset = await prisma.mediaAsset.findUnique({ where: { id } }); if (!asset) redirect("/admin/media?error=missing"); await cleanupUnreferencedUploads([asset.path]); const remaining = await prisma.mediaAsset.findUnique({ where: { id } }); if (remaining) redirect("/admin/media?error=in-use"); await prisma.adminAuditLog.create({ data: { actorId: admin.id, action: "delete", entityType: "MediaAsset", entityId: String(id), details: { path: asset.path } } }); revalidatePath("/admin/media"); redirect("/admin/media?deleted=1"); }

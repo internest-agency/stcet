@@ -10,14 +10,16 @@ import {
   ChevronRight,
   ClipboardList,
   FileText,
-  FolderOpen,
   GraduationCap,
   Image,
+  Inbox,
   LayoutDashboard,
   LogOut,
+  Mail,
   Menu,
   Settings2,
   ShieldCheck,
+  UserRound,
   X,
 } from "lucide-react";
 import { logoutAdmin } from "@/src/app/admin/actions";
@@ -25,25 +27,41 @@ import type { CurrentAdmin } from "@/src/lib/admin/authorization";
 
 const availableLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/enquiries", label: "Enquiries", icon: Inbox },
+  { href: "/admin/contact-messages", label: "Contact Messages", icon: Mail },
   { href: "/admin/courses", label: "Courses", icon: GraduationCap },
+  { href: "/admin/faculty", label: "Faculty", icon: UserRound },
   { href: "/admin/gallery", label: "Gallery", icon: Image },
-];
-
-const plannedLinks = [
-  { label: "Admissions", icon: ClipboardList },
-  { label: "Scholarships", icon: BookOpen },
-  { label: "Placements", icon: ChartNoAxesCombined },
-  { label: "Infrastructure", icon: Building2 },
-  { label: "Committees", icon: ShieldCheck },
-  { label: "Institutional pages", icon: FileText },
-  { label: "Pages and menus", icon: FolderOpen },
-  { label: "Media and SEO", icon: Image },
-  { label: "Users and settings", icon: Settings2 },
+  { href: "/admin/admissions", label: "Admissions", icon: ClipboardList },
+  { href: "/admin/scholarships", label: "Scholarships", icon: BookOpen },
+  { href: "/admin/placements", label: "Placements", icon: ChartNoAxesCombined },
+  { href: "/admin/infrastructure", label: "Infrastructure", icon: Building2 },
+  { href: "/admin/committees", label: "Committees", icon: ShieldCheck },
+  { href: "/admin/media", label: "Media", icon: Image },
+  { href: "/admin/seo", label: "SEO", icon: FileText },
+  { href: "/admin/users", label: "Users", icon: ShieldCheck },
+  { href: "/admin/settings", label: "Settings", icon: Settings2 },
+  { href: "/admin/menus", label: "Menus", icon: Menu },
+  { href: "/admin/institutional-pages", label: "Institutional Pages", icon: FileText },
 ];
 
 function titleForPath(pathname: string) {
+  if (pathname.startsWith("/admin/enquiries")) return "Enquiries";
+  if (pathname.startsWith("/admin/contact-messages")) return "Contact Messages";
   if (pathname.startsWith("/admin/courses")) return "Courses";
+  if (pathname.startsWith("/admin/faculty")) return "Faculty";
   if (pathname.startsWith("/admin/gallery")) return "Gallery";
+  if (pathname.startsWith("/admin/admissions")) return "Admissions";
+  if (pathname.startsWith("/admin/scholarships")) return "Scholarships";
+  if (pathname.startsWith("/admin/placements")) return "Placements";
+  if (pathname.startsWith("/admin/infrastructure")) return "Infrastructure";
+  if (pathname.startsWith("/admin/committees")) return "Committees";
+  if (pathname.startsWith("/admin/media")) return "Media";
+  if (pathname.startsWith("/admin/seo")) return "SEO";
+  if (pathname.startsWith("/admin/users")) return "Users";
+  if (pathname.startsWith("/admin/settings")) return "Settings";
+  if (pathname.startsWith("/admin/menus")) return "Menus";
+  if (pathname.startsWith("/admin/institutional-pages")) return "Institutional Pages";
   return "Dashboard";
 }
 
@@ -121,23 +139,6 @@ export default function AdminShell({
                 </li>
               );
             })}
-          </ul>
-          <p className="px-3 pb-2 pt-7 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            More modules
-          </p>
-          <ul className="space-y-1">
-            {plannedLinks.map(({ label, icon: Icon }) => (
-              <li key={label}>
-                <span
-                  aria-disabled="true"
-                  className="flex min-h-10 cursor-not-allowed items-center gap-3 rounded-md px-3 text-sm font-medium text-gray-400"
-                  title="Not available yet"
-                >
-                  <Icon aria-hidden className="size-4.5" />
-                  {label}
-                </span>
-              </li>
-            ))}
           </ul>
         </nav>
         <div className="border-t border-gray-100 p-3">

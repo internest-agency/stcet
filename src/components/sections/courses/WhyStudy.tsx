@@ -10,6 +10,7 @@ import {
 import { gsap } from "gsap";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
 
 export interface WhyStudyReason {
@@ -581,7 +582,7 @@ export default function WhyStudyHorizontal({
 
             {/* Description */}
 
-            <p
+            <div
               data-intro-item
               className="
                 mt-5
@@ -596,8 +597,8 @@ export default function WhyStudyHorizontal({
                 lg:leading-7
               "
             >
-              {intro}
-            </p>
+              <RichText html={intro} />
+            </div>
           </div>
 
           {/* =================================================
@@ -852,7 +853,7 @@ export default function WhyStudyHorizontal({
                       {reason.title}
                     </h3>
 
-                    <p
+                    <RichText
                       className="
                           mt-3
                           max-w-[370px]
@@ -866,9 +867,8 @@ export default function WhyStudyHorizontal({
                           sm:text-[14px]
                           sm:leading-6
                         "
-                    >
-                      {reason.description}
-                    </p>
+                      html={reason.description}
+                    />
                   </div>
                 </article>
               ))}

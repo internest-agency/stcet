@@ -7,28 +7,24 @@ import Button from "../../ui/Button";
 import { FaCircleArrowRight } from "react-icons/fa6";
 import SectionHeading from "../../ui/SectionHeading";
 
-const routes = [
-  {
-    number: "01",
-    title: "TNEA Counselling",
-    description:
-      "Government Quota through TNEA (Tamil Nadu Engineering Admissions) as per official norms.",
-    image: "/images/admissions/admission-via-tnea-couselling.webp",
-    href: "#tnea-journey",
-    button: "Explore TNEA Process",
-  },
-  {
-    number: "02",
-    title: "Management Quota",
-    description:
-      "Eligible candidates may also apply under the Management Quota as per Government and AICTE regulations.",
-    image: "/images/admissions/management-quota-admission.webp",
-    href: "#management-quota",
-    button: "Enquire Now",
-  },
-];
+export type AdmissionRouteItem = {
+  number: string;
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  button: string;
+};
 
-export default function AdmissionRoutes() {
+interface AdmissionRoutesProps {
+  initialRoutes?: AdmissionRouteItem[];
+}
+
+export default function AdmissionRoutes({
+  initialRoutes,
+}: AdmissionRoutesProps = {}) {
+  const routeList = initialRoutes;
+
   return (
     <section className="bg-primary-800 py-14 sm:py-18 lg:py-20">
       <Container>
@@ -48,43 +44,45 @@ export default function AdmissionRoutes() {
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
-          {routes.map((route) => (
-            <article
-              key={route.number}
-              className="group relative min-h-[280px] rounded-xl overflow-hidden bg-white"
-            >
-              <Image
-                src={route.image}
-                alt={route.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-
-              <div className="absolute inset-0 bg-linear-to-r from-white via-white/90 to-transparent" />
-
-              <div className="relative z-10 flex min-h-[360px] max-w-[65%] flex-col items-start justify-between p-7 sm:p-9">
-                <div>
-                  <span className="text-[11px] font-bold text-accent-400">
-                    {route.number}
-                  </span>
-                  <SectionHeading as="h3" className="mt-2">
-                    {route.title}
-                  </SectionHeading>
-                  <p className="mt-5 text-gray-800">{route.description}</p>
-                </div>
-
-                <Button
-                  href={route.href}
-                  variant="accent"
-                  size="md"
-                  rightIcon={<FaCircleArrowRight />}
+          {routeList && routeList.length > 0
+            ? routeList.map((route, index) => (
+                <article
+                  key={`${route.number}-${index}`}
+                  className="group relative min-h-[280px] rounded-xl overflow-hidden bg-white"
                 >
-                  {route.button}
-                </Button>
-              </div>
-            </article>
-          ))}
+                  <Image
+                    src={route.image}
+                    alt={route.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 bg-linear-to-r from-white via-white/90 to-transparent" />
+
+                  <div className="relative z-10 flex min-h-[360px] max-w-[65%] flex-col items-start justify-between p-7 sm:p-9">
+                    <div>
+                      <span className="text-[11px] font-bold text-accent-400">
+                        {route.number}
+                      </span>
+                      <SectionHeading as="h3" className="mt-2">
+                        {route.title}
+                      </SectionHeading>
+                      <p className="mt-5 text-gray-800">{route.description}</p>
+                    </div>
+
+                    <Button
+                      href={route.href}
+                      variant="accent"
+                      size="md"
+                      rightIcon={<FaCircleArrowRight />}
+                    >
+                      {route.button}
+                    </Button>
+                  </div>
+                </article>
+              ))
+            : null}
         </div>
       </Container>
     </section>

@@ -35,7 +35,7 @@ export default function ContactMap() {
               Visit Our Campus
             </p>
 
-            <SectionHeading as="h3">
+            <SectionHeading as="h3" customSize={true} className="text-lg">
               S. Thangapazham College of Engineering & Technology
             </SectionHeading>
 

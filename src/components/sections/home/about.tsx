@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -120,12 +121,16 @@ export default function AboutSection() {
       <Container className="mb-16 grid grid-cols-1 items-center gap-8 md:grid-cols-2">
         {/* Heading */}
         <div>
-          <h2
-            id="about-heading"
-            className="about-heading lg:mb-4 uppercase lg:pr-12 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900"
+          <SectionHeading
+            as="h2"
+            customSize={true}
+            className="text-3xl lg:text-4xl leading-tight"
           >
-            Enabling Aspirations Through Quality Engineering Education.
-          </h2>
+            Enabling Aspirations Through{" "}
+            <span className="text-accent-400">
+              Quality Engineering Education.
+            </span>
+          </SectionHeading>
         </div>
 
         {/* Description */}
@@ -151,31 +156,39 @@ export default function AboutSection() {
       -------------------------------- */}
       <Container className="grid grid-cols-1 items-center gap-0 md:grid-cols-2 lg:grid-cols-4">
         {/* Stat 01 */}
-        <div className="about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
-          <h3 className="about-stat-number text-4xl font-semibold">05</h3>
+        <div className="group about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
+          <h3 className="about-stat-number text-4xl font-semibold text-primary-700 group-hover:text-white">
+            05
+          </h3>
 
           <p>Engineering Programmes</p>
         </div>
 
         {/* Stat 02 */}
-        <div className="about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
-          <h3 className="about-stat-number text-4xl font-semibold">AICTE</h3>
+        <div className="group about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
+          <h3 className="about-stat-number text-4xl font-semibold text-primary-700 group-hover:text-white">
+            AICTE
+          </h3>
 
           <p>Approved Institution</p>
         </div>
 
         {/* Stat 03 */}
-        <div className="about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
-          <h3 className="about-stat-number text-4xl font-semibold">AU</h3>
+        <div className="group about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
+          <h3 className="about-stat-number text-4xl font-semibold text-primary-700 group-hover:text-white">
+            AU
+          </h3>
 
           <p>Anna University Affiliated</p>
         </div>
 
         {/* Stat 04 */}
-        <div className="about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
-          <h3 className="about-stat-number text-4xl font-semibold">2010</h3>
+        <div className="group about-stat border border-gray-300 px-6 py-8 text-gray-900 transition-colors duration-300 hover:bg-accent-400 hover:text-white">
+          <h3 className="about-stat-number text-4xl font-semibold text-primary-700 group-hover:text-white">
+            2010
+          </h3>
 
-          <p>Educational Trust Founded</p>
+          <p>Educational Trust Established</p>
         </div>
       </Container>
     </section>

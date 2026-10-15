@@ -1,6 +1,7 @@
 import Container from "@/src/components/ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
 import Button from "../../ui/Button";
+import { FaCircleArrowRight } from "react-icons/fa6";
 
 export default function ExperienceSTCET() {
   return (
@@ -12,7 +13,7 @@ export default function ExperienceSTCET() {
               <span className="h-2 w-2 rounded-full bg-accent-400" />
 
               <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-gray-800/45">
-                10 — Experience STCET
+                Experience STCET
               </span>
             </div>
 
@@ -26,8 +27,12 @@ export default function ExperienceSTCET() {
               A campus designed to give students the spaces and resources they
               need to learn, explore and grow.
             </p>
-            <Button href="/enquire-now" variant="accent" size="md">
-              Take a Campus Tour
+            <Button
+              href="/enquire-now"
+              variant="accent"
+              rightIcon={<FaCircleArrowRight />}
+            >
+              Enquire Now
             </Button>
           </div>
 

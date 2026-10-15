@@ -5,7 +5,15 @@ import { PrismaClient } from "@/src/generated/prisma/client";
 
 const globalForPrisma = globalThis as typeof globalThis & {
   prisma?: PrismaClient;
+  prismaSchemaRevision?: string;
 };
+
+// Bump with an additive Prisma migration. This forces a fresh client when a
+// newly added field/model exists. Note: a *running* Next dev server still has
+// to be restarted after `prisma generate`, because Turbopack can retain the
+// previously compiled generated client, which then rejects new fields (e.g.
+// `instructions`) with a PrismaClientValidationError.
+const prismaSchemaRevision = "20261013130000";
 
 function createPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
@@ -47,15 +55,17 @@ export function isDatabaseConfigured() {
 }
 
 export function getPrismaClient() {
-  if (globalForPrisma.prisma) {
+  if (
+    globalForPrisma.prisma &&
+    globalForPrisma.prismaSchemaRevision === prismaSchemaRevision
+  ) {
     return globalForPrisma.prisma;
   }
 
   const client = createPrismaClient();
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = client;
-  }
+  globalForPrisma.prisma = client;
+  globalForPrisma.prismaSchemaRevision = prismaSchemaRevision;
 
   return client;
 }

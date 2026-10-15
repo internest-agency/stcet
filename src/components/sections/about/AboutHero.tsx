@@ -8,6 +8,7 @@ import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
 import Breadcrumb from "../../ui/Breadcrumb";
+import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -140,11 +141,11 @@ export default function AboutHero() {
             </div>
 
             {/* Heading */}
-            <h1 className="about-hero-heading max-w-3xl text-2xl font-extrabold uppercase leading-[1.05] tracking-[-0.035em] text-gray-900 sm:text-2xl md:text-4xl lg:text-5xl">
+            <SectionHeading as="h1">
               Building Foundations
               <br />
-              for a Better Future.
-            </h1>
+              for <span className="text-accent-400">a Better Future.</span>
+            </SectionHeading>
 
             {/* Description */}
             <p className="about-hero-description mt-7 max-w-2xl text-base leading-7 text-gray-600 sm:mt-8 sm:text-lg sm:leading-8">

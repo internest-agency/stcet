@@ -12,12 +12,16 @@ import { FaCircleArrowRight } from "react-icons/fa6";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import Button from "@/src/components/ui/Button";
+import ManagedFacilities from "@/src/components/sections/infrastructure/ManagedFacilities";
+import { getPublishedInfrastructureFacilities } from "@/src/lib/queries/infrastructure";
 
-export default function InfrastructurePage() {
+export default async function InfrastructurePage() {
+  const facilities = await getPublishedInfrastructureFacilities();
+
   return (
     <>
       <EditorialHero
-        image="/images/infrastructure/hero.webp"
+        image="/images/infrastructure/stcet-laboratory-hero.webp"
         imageAlt="STCET infrastructure"
       >
         <Breadcrumb
@@ -35,26 +39,17 @@ export default function InfrastructurePage() {
           student facilities that support learning, exploration and a
           well-rounded college experience.
         </p>
-
-        <div className="mt-8">
-          <Button
-            href="#campus-future"
-            variant="accent"
-            rightIcon={<FaCircleArrowRight />}
-          >
-            Explore Our Campus
-          </Button>
-        </div>
       </EditorialHero>
       <CampusFutureSection />
       <AcademicFacilities />
       <EngineeringLaboratories />
       <LaboratoryExplorer />
-      <Container className="grid lg:grid-cols-[1.5fr_1fr]">
+      <Container className="grid lg:grid-cols-[1.5fr_1fr] gap-8">
         <LibrarySection />
         <SeminarSection />
       </Container>
       <StudentFacilities />
+      <ManagedFacilities facilities={facilities} />
       <ExperienceSTCET />
     </>
   );

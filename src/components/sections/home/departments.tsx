@@ -4,73 +4,51 @@ import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Container from "../../ui/Container";
 import Button from "../../ui/Button";
+import SectionHeading from "../../ui/SectionHeading";
 import { FaCircleArrowRight } from "react-icons/fa6";
-
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
-import ComputerScienceImage from "@/public/images/computer-science-engineering.jpg";
-import ElectronicsImage from "@/public/images/electronics-and-communication-engineering.jpg";
-import ElectricalImage from "@/public/images/electrical-engineering.jpg";
-import InformationTechnologyImage from "@/public/images/information-technology.jpg";
-import ComputerScienceAIImage from "@/public/images/artificial-intelligence.jpg";
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+export interface DepartmentItem {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  href: string;
+}
 
-const departments = [
-  {
-    id: "01",
-    name: "Computer Science and Engineering",
-    image: ComputerScienceImage,
-    description:
-      "Build expertise in software development, computing systems, artificial intelligence, and emerging technologies.",
-    href: "/courses/computer-science-engineering",
-  },
-  {
-    id: "02",
-    name: "Computer Science and Engineering (AI/ML)",
-    image: ComputerScienceAIImage,
-    description:
-      "Explore artificial intelligence and machine learning through practical learning, innovation, and advanced computing.",
-    href: "/courses/computer-science-ai-ml",
-  },
-  {
-    id: "03",
-    name: "Information Technology",
-    image: InformationTechnologyImage,
-    description:
-      "Develop strong foundations in information systems, software technologies, networking, and digital transformation.",
-    href: "/courses/information-technology",
-  },
-  {
-    id: "04",
-    name: "Electronics and Communication Engineering",
-    image: ElectronicsImage,
-    description:
-      "Learn electronics, communication systems, embedded technologies, signal processing, and modern digital systems.",
-    href: "/courses/electronics-communication-engineering",
-  },
-  {
-    id: "05",
-    name: "Electrical and Electronics Engineering",
-    image: ElectricalImage,
-    description:
-      "Gain practical knowledge in electrical systems, power engineering, automation, control systems, and electronics.",
-    href: "/courses/electrical-electronics-engineering",
-  },
-];
+interface DepartmentsSectionProps {
+  departmentList: DepartmentItem[];
+}
 
-export default function DepartmentsSection() {
+export default function DepartmentsSection({
+  departmentList,
+}: DepartmentsSectionProps) {
   const [activeDepartment, setActiveDepartment] = useState(0);
 
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const department = departments[activeDepartment];
+  // Reset the selected index if the supplied data changes.
+  useLayoutEffect(() => {
+    setActiveDepartment((current) =>
+      departmentList.length === 0
+        ? 0
+        : Math.min(current, departmentList.length - 1),
+    );
+  }, [departmentList.length]);
+
+  const department = departmentList[activeDepartment];
 
   useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section || departmentList.length === 0) return;
+
     const context = gsap.context(() => {
       const reducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -78,18 +56,15 @@ export default function DepartmentsSection() {
 
       if (reducedMotion) return;
 
-      /*
-       * ==========================================
-       * HEADING
-       * ==========================================
-       */
-
-      const heading = sectionRef.current?.querySelector(
+      // Heading animation
+      const heading = section.querySelector(
         ".departments-heading",
       ) as HTMLElement | null;
 
+      let split: SplitText | null = null;
+
       if (heading) {
-        const split = SplitText.create(heading, {
+        split = SplitText.create(heading, {
           type: "lines",
           mask: "lines",
           autoSplit: true,
@@ -99,13 +74,12 @@ export default function DepartmentsSection() {
           trigger: heading,
           start: "top 85%",
           once: true,
-
           onEnter: () => {
+            if (!split) return;
+
             gsap.fromTo(
               split.lines,
-              {
-                yPercent: 100,
-              },
+              { yPercent: 100 },
               {
                 yPercent: 0,
                 duration: 0.9,
@@ -117,123 +91,87 @@ export default function DepartmentsSection() {
         });
       }
 
-      /*
-       * ==========================================
-       * INTRO TEXT
-       * ==========================================
-       */
-
-      const intro = sectionRef.current?.querySelector(
+      // Intro text animation
+      const intro = section.querySelector(
         ".departments-intro",
       ) as HTMLElement | null;
 
       if (intro) {
-        ScrollTrigger.create({
-          trigger: intro,
-          start: "top 90%",
-          once: true,
-
-          onEnter: () => {
-            gsap.fromTo(
-              intro,
-              {
-                opacity: 0,
-                y: 25,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-              },
-            );
+        gsap.fromTo(
+          intro,
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: intro,
+              start: "top 90%",
+              once: true,
+            },
           },
-        });
+        );
       }
 
-      /*
-       * ==========================================
-       * DEPARTMENT LIST
-       * ==========================================
-       *
-       * IMPORTANT:
-       * We do NOT animate opacity here.
-       *
-       * The titles remain visible even if
-       * ScrollTrigger doesn't fire.
-       */
-
+      // Department list animation
       const departmentItems =
-        gsap.utils.toArray<HTMLElement>(".department-item");
+        section.querySelectorAll<HTMLElement>(".department-item");
 
-      ScrollTrigger.create({
-        trigger: ".department-list",
-        start: "top 90%",
-        once: true,
-
-        onEnter: () => {
-          gsap.fromTo(
-            departmentItems,
-            {
-              x: -20,
+      if (departmentItems.length > 0) {
+        gsap.fromTo(
+          departmentItems,
+          { x: -20 },
+          {
+            x: 0,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section.querySelector(".department-list"),
+              start: "top 90%",
+              once: true,
             },
-            {
-              x: 0,
-              duration: 0.6,
-              stagger: 0.08,
-              ease: "power3.out",
-            },
-          );
-        },
-      });
+          },
+        );
+      }
 
-      /*
-       * ==========================================
-       * IMAGE CONTAINER
-       * ==========================================
-       */
-
-      const imageWrapper = sectionRef.current?.querySelector(
+      // Department image wrapper animation
+      const imageWrapper = section.querySelector(
         ".department-image-wrapper",
       ) as HTMLElement | null;
 
       if (imageWrapper) {
-        ScrollTrigger.create({
-          trigger: imageWrapper,
-          start: "top 90%",
-          once: true,
-
-          onEnter: () => {
-            gsap.fromTo(
-              imageWrapper,
-              {
-                y: 30,
-              },
-              {
-                y: 0,
-                duration: 0.9,
-                ease: "power3.out",
-              },
-            );
+        gsap.fromTo(
+          imageWrapper,
+          { y: 30 },
+          {
+            y: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: imageWrapper,
+              start: "top 90%",
+              once: true,
+            },
           },
-        });
+        );
       }
-    }, sectionRef);
+
+      return () => {
+        split?.revert();
+      };
+    }, section);
 
     return () => context.revert();
-  }, []);
+  }, [departmentList.length]);
 
-  /*
-   * ==========================================
-   * DEPARTMENT CHANGE
-   * ==========================================
-   */
-
+  // Animate the image and content when the selected department changes.
   useLayoutEffect(() => {
     const image = imageRef.current;
     const content = contentRef.current;
 
-    if (!image || !content) return;
+    if (!image || !content || !department) return;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -249,47 +187,40 @@ export default function DepartmentsSection() {
       return;
     }
 
-    const timeline = gsap.timeline();
+    const context = gsap.context(() => {
+      const timeline = gsap.timeline();
 
-    /*
-     * Image transition
-     */
-    timeline.fromTo(
-      image,
-      {
-        opacity: 0.7,
-        scale: 1.04,
-      },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 0.7,
-        ease: "power2.out",
-      },
-    );
+      timeline.fromTo(
+        image,
+        { opacity: 0.7, scale: 1.04 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.7,
+          ease: "power2.out",
+        },
+      );
 
-    /*
-     * Content transition
-     */
-    timeline.fromTo(
-      content,
-      {
-        opacity: 0,
-        y: 20,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.55,
-        ease: "power3.out",
-      },
-      "-=0.35",
-    );
+      timeline.fromTo(
+        content,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          ease: "power3.out",
+        },
+        "-=0.35",
+      );
+    }, sectionRef);
 
-    return () => {
-      timeline.kill();
-    };
-  }, [activeDepartment]);
+    return () => context.revert();
+  }, [activeDepartment, department]);
+
+  // No fallback or hardcoded department data.
+  if (departmentList.length === 0 || !department) {
+    return null;
+  }
 
   return (
     <section
@@ -297,47 +228,32 @@ export default function DepartmentsSection() {
       className="py-20"
       aria-labelledby="departments-heading"
     >
-      {/* ==========================================
-          INTRO
-      ========================================== */}
-
+      {/* Introduction */}
       <Container className="mb-16 grid grid-cols-1 items-center gap-8 md:grid-cols-2">
         <div>
-          <h2
+          <SectionHeading
             id="departments-heading"
-            className="departments-heading mb-4 lg:pr-6 text-2xl md:text-4xl lg:text-5xl font-bold uppercase text-gray-900"
+            className="departments-heading"
           >
-            Five Disciplines One{" "}
-            <span className="text-primary-700">Foundation</span>
-          </h2>
+            Five Disciplines
+            <br />
+            <span className="text-accent-400">One Foundation</span>
+          </SectionHeading>
         </div>
 
         <div>
-          <p className="departments-intro lg:text-left text-primary-800">
-            STCET offers undergraduate programmes in{" "}
-            <strong>
-              Computer Science and Engineering, CSE with Artificial Intelligence
-              & Machine Learning, Electronics and Communication Engineering,
-              Electrical and Electronics Engineering, and Information
-              Technology,
-            </strong>{" "}
-            designed to help students build strong fundamentals, explore
-            emerging technologies and prepare for meaningful careers.
+          <p className="departments-intro text-primary-800 lg:text-left">
+            STCET offers undergraduate programmes designed to help students
+            build strong fundamentals, explore emerging technologies, and
+            prepare for meaningful careers.
           </p>
         </div>
       </Container>
 
-      {/* ==========================================
-          DEPARTMENTS
-      ========================================== */}
-
+      {/* Departments */}
       <Container className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
-        {/* ----------------------------------------
-            Department List
-        ---------------------------------------- */}
-
         <div className="department-list">
-          {departments.map((item, index) => {
+          {departmentList.map((item, index) => {
             const isActive = activeDepartment === index;
 
             return (
@@ -346,24 +262,10 @@ export default function DepartmentsSection() {
                 type="button"
                 onClick={() => setActiveDepartment(index)}
                 className={`
-                  department-item
-                  group
-                  flex
-                  w-full
-                  cursor-pointer
-                  items-center
-                  border-b
-                  border-gray-200
-                  px-6
-                  py-5
-                  text-left
-                  text-lg
-                  font-bold
-                  uppercase
-                  transition-all
-                  duration-300
-                  first:border-t
-
+                  department-item group flex w-full cursor-pointer
+                  items-center border-b border-gray-200 px-6 py-4
+                  text-left text-lg font-bold uppercase
+                  transition-all duration-300 rounded first:border-t
                   ${
                     isActive
                       ? "bg-primary-700 text-white"
@@ -374,10 +276,7 @@ export default function DepartmentsSection() {
               >
                 <span
                   className={`
-                    mr-4
-                    font-extrabold
-                    transition-transform
-                    duration-300
+                    mr-4 font-extrabold transition-transform duration-300
                     ${isActive ? "translate-x-1" : "group-hover:translate-x-1"}
                   `}
                 >
@@ -389,9 +288,9 @@ export default function DepartmentsSection() {
             );
           })}
 
-          <div className="hero-cta mt-4">
+          <div className="hero-cta mt-8">
             <Button
-              href="/admissions"
+              href="/enquire-now#application"
               variant="primary"
               size="md"
               rightIcon={<FaCircleArrowRight />}
@@ -401,12 +300,10 @@ export default function DepartmentsSection() {
           </div>
         </div>
 
-        {/* ----------------------------------------
-            Department Image
-        ---------------------------------------- */}
-
-        <div className="department-image-wrapper relative h-100 xl:h-130 overflow-hidden rounded-lg">
+        {/* Active department */}
+        <div className="department-image-wrapper relative h-100 overflow-hidden rounded-lg xl:h-130">
           <Image
+            key={`${department.id}-${department.image}`}
             ref={imageRef}
             src={department.image}
             alt={department.name}
@@ -416,13 +313,11 @@ export default function DepartmentsSection() {
             className="h-full w-full object-cover"
           />
 
-          {/* Overlay */}
           <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
 
-          {/* Content */}
           <div
-            ref={contentRef}
             key={department.id}
+            ref={contentRef}
             className="absolute inset-x-0 bottom-0 z-10 p-8 text-white"
           >
             <span className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-accent-400">
@@ -438,7 +333,7 @@ export default function DepartmentsSection() {
             </p>
 
             <Button
-              href="/admissions"
+              href={department.href || "/courses"}
               variant="accent"
               size="md"
               rightIcon={<FaCircleArrowRight />}
