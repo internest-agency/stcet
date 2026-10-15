@@ -25,9 +25,9 @@ NEXTAUTH_SECRET="a-unique-random-secret"
 NEXTAUTH_URL="http://localhost:3000"
 DATABASE_CONNECTION_LIMIT="5"
 DATABASE_CONNECT_TIMEOUT_MS="5000"
-UPLOADS_DIR="./uploads"
 UPLOAD_MAX_BYTES="5242880"
 ```
+
 
 Percent-encode reserved characters in the database username and password. Generate an Auth.js secret with `openssl rand -base64 32` or PowerShell:
 
@@ -128,25 +128,51 @@ Auth.js provides the HTTP-only session cookie. Sessions expire after eight hours
 
 Use a private, TLS-protected MySQL endpoint and inject `DATABASE_URL`, `NEXTAUTH_SECRET`, and `NEXTAUTH_URL` from the deployment secret manager. Commit reviewed migrations; deploy them with `npx prisma migrate deploy`, generate the client with `npm run prisma:generate`, then build and start the Next.js application. Bootstrap the initial administrator through a controlled one-time deployment job or trusted terminal, then remove bootstrap access from routine deployment procedures. Never run a database reset in production.
 
-### Hostinger VPS Upload Storage
+### Hostinger Node.js Upload Storage
 
-The selected target is a Hostinger VPS running the Node.js application. Uploaded files use the Node filesystem and are served only through the Next.js `/uploads/[...path]` route; they are not written into `public/` and are not directly exposed by arbitrary filesystem paths. The running VPS filesystem is expected to persist across process restarts, but persistence across your particular deployment/release workflow must be verified on the VPS.
+Uploaded files are stored at `<os.homedir()>/uploads` — the home directory of
+the OS user running the Node.js process, with an `uploads` subdirectory appended.
+On Hostinger this resolves to `/home/<account-user>/uploads` (e.g.
+`/home/u251286829/uploads`). **No environment variable is required.**
 
-Configure `UPLOADS_DIR` to a persistent location outside the directory replaced by deployments. For example, if the Node service runs as the `stcet` user and group:
+The path is computed at runtime by `getUploadRoot()` in
+`src/lib/admin/upload-storage.ts` using Node's built-in `os.homedir()`, which:
+
+- Is always an absolute path — no risk of resolving against the read-only
+  deploy directory (`/368e0f76285bc013/files/hbuilds/`).
+- Points to a directory outside the deploy tree, so uploads persist across
+  redeployments without any extra configuration.
+- Works on every OS (Linux on the VPS, Windows locally) without environment
+  differences.
+
+The directory is created automatically the first time an image is uploaded.
+No manual `mkdir` step is required, but you can pre-create it via SSH if you
+wish to confirm write access before the first upload:
 
 ```bash
-sudo install -d -o stcet -g stcet -m 0750 /var/lib/stcet/uploads
+mkdir -p "$(eval echo ~)/uploads"
 ```
 
-Set the production environment values:
+The startup log confirms the resolved path and write access on every cold start:
 
-```dotenv
-UPLOADS_DIR="/var/lib/stcet/uploads"
-UPLOAD_MAX_BYTES="5242880"
+```
+[startup] upload storage ready at /home/u251286829/uploads
 ```
 
-Ensure the Node process runs as that unprivileged service account and can write this directory. If Nginx is the reverse proxy, allow enough request-body overhead for a 5 MiB image, for example `client_max_body_size 6m;`. Keep the application limit configured independently; the server checks streamed bytes and image signatures. Do not grant uploads execute permission.
+If it instead prints `upload storage is NOT writable`, the Node process user
+does not have write access to its own home directory — an unusual Hostinger
+configuration. Contact Hostinger support to confirm the home directory path for
+your account user.
 
-Back up `/var/lib/stcet/uploads` together with the MySQL database, and test restoring both. Before the first production deploy, verify the service user can create a file, upload and retrieve an image, restart/redeploy the application, and confirm the same image remains available. This repository cannot verify the VPS filesystem or proxy configuration without access to the deployed Hostinger instance.
+Uploads are served only through the Next.js `/uploads/[...path]` route and are
+not directly exposed by the filesystem or an HTTP file server. If Nginx is the
+reverse proxy, allow enough request-body overhead for a 5 MiB image:
+
+```nginx
+client_max_body_size 6m;
+```
+
+Back up `<home>/uploads` together with the MySQL database and test restoring
+both before going live.
 
 Password-reset email is not configured, so the forgot-password route directs staff to the system administrator. Course image uploads are implemented for hero, module, career-pathway, and Open Graph images. Gallery/media-library UI, uploads in placement/infrastructure/committee modules, administrator and editor management, editor assignments, and the Admissions, Scholarships, Placements, Gallery, Infrastructure, Committees, Pages, Menus, and general SEO modules remain future work.

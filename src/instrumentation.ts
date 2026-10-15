@@ -8,29 +8,7 @@ export async function register() {
     );
   }
 
-  const { checkStorageReadiness, isUploadDirAbsolute } = await import(
-    "./lib/admin/upload-storage"
-  );
-
-  // Warn immediately if UPLOADS_DIR is missing or relative — before we even
-  // try the filesystem so the operator sees a targeted message, not just EACCES.
-  const uploadsDir = process.env.UPLOADS_DIR;
-  if (!uploadsDir) {
-    console.warn(
-      "[startup] UPLOADS_DIR is not set. " +
-        "Uploads will fall back to <cwd>/uploads, which is the read-only deploy " +
-        "directory on Hostinger. Set UPLOADS_DIR to an absolute path such as " +
-        "/home/<user>/uploads in hPanel > Node.js > Environment Variables.",
-    );
-  } else if (!isUploadDirAbsolute()) {
-    console.error(
-      `[startup] UPLOADS_DIR is set to a relative path ("${uploadsDir}"). ` +
-        `This resolves inside the read-only deploy directory on managed hosts ` +
-        `and will cause EACCES on every upload. ` +
-        `Change it to an absolute path such as /home/<user>/uploads in hPanel.`,
-    );
-  }
-
+  const { checkStorageReadiness } = await import("./lib/admin/upload-storage");
   const storage = await checkStorageReadiness();
 
   if (storage.ok) {
@@ -45,6 +23,6 @@ export async function register() {
   console.error(
     `[startup] upload storage is NOT writable at ${storage.root}${
       code ? ` (${code})` : ""
-    }. Set UPLOADS_DIR to a writable, persistent absolute path outside the deploy folder.`,
+    }. Verify the process user has write access to that path.`,
   );
 }

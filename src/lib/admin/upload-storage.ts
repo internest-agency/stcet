@@ -11,6 +11,7 @@ import {
   stat,
   unlink,
 } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import {
   Readable,
@@ -48,10 +49,9 @@ export class UploadTooLargeError extends Error {}
 export class UnsupportedImageError extends Error {}
 export class InvalidUploadError extends Error {}
 
-// Thrown when the upload directory itself cannot be created or written to
-// (read-only deploy directory, missing permissions, wrong UPLOADS_DIR). Kept
-// separate from the validation errors so the API can log the real filesystem
-// cause instead of a generic "upload failed".
+// Thrown when the upload directory cannot be created or written to.
+// Kept separate from the validation errors so the API can log the real
+// filesystem cause instead of a generic "upload failed".
 export class UploadStorageError extends Error {}
 
 export function getUploadLimit() {
@@ -62,38 +62,23 @@ export function getUploadLimit() {
 }
 
 /**
- * Returns true when UPLOADS_DIR is set to an absolute path.
- * Used by startup diagnostics to distinguish a missing variable from a
- * misconfigured relative path (e.g. "./uploads" copied from .env.example).
+ * Returns the absolute path of the upload root directory.
+ *
+ * Uses os.homedir() as the writable base so that:
+ * - The path is always absolute (no accidental resolution against process.cwd()).
+ * - On Hostinger the running user's home directory (/home/<user>) is writable
+ *   and persists across redeployments because it is outside the deploy tree.
+ * - Locally the developer's home directory is always writable.
+ *
+ * No environment variable is read. The directory is created on first use by
+ * ensureUploadRoot().
  */
-export function isUploadDirAbsolute() {
-  const dir = process.env.UPLOADS_DIR;
-  return Boolean(dir && path.isAbsolute(dir));
-}
-
 export function getUploadRoot() {
-  const configured =
+  return path.join(
     /*turbopackIgnore: true*/
-    process.env.UPLOADS_DIR;
-
-  if (configured) {
-    if (!path.isAbsolute(configured)) {
-      // A relative UPLOADS_DIR is almost certainly a misconfiguration in
-      // production (e.g. "./uploads" copied from .env.example). path.resolve
-      // would silently anchor it to process.cwd(), which on Hostinger is the
-      // read-only internal build directory (/368e0f76285bc013/files/hbuilds).
-      // Log clearly so the operator knows exactly what to fix.
-      console.error(
-        `[uploads] UPLOADS_DIR is set to a relative path ("${configured}"). ` +
-          `On managed hosts this resolves inside the read-only deploy directory. ` +
-          `Set UPLOADS_DIR to an absolute path such as /home/<user>/uploads.`,
-      );
-    }
-    return path.resolve(configured);
-  }
-
-  // No UPLOADS_DIR configured — fall back to <cwd>/uploads for local dev only.
-  return path.join(process.cwd(), "uploads");
+    os.homedir(),
+    "uploads",
+  );
 }
 
 /**
@@ -108,7 +93,8 @@ export async function ensureUploadRoot() {
     await access(root, constants.W_OK);
   } catch (error) {
     throw new UploadStorageError(
-      `Upload directory "${root}" is not writable. Check UPLOADS_DIR and its filesystem permissions.`,
+      `Upload directory "${root}" is not writable. ` +
+        `Verify that the process user owns or has write permission on that path.`,
       { cause: error },
     );
   }
@@ -185,7 +171,8 @@ export async function storeImageStream(
     await mkdir(directory, { recursive: true, mode: 0o750 });
   } catch (error) {
     throw new UploadStorageError(
-      `Upload directory "${directory}" is not writable. Check UPLOADS_DIR and its filesystem permissions.`,
+      `Upload directory "${directory}" is not writable. ` +
+        `Verify that the process user owns or has write permission on that path.`,
       { cause: error },
     );
   }
