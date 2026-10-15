@@ -15,7 +15,8 @@
     "prisma:studio": "prisma studio",
     "admin:bootstrap": "tsx scripts/bootstrap-admin.ts",
     "faculty:import": "tsx scripts/import-faculty.ts",
-    "media:cleanup": "tsx scripts/cleanup-uploads.ts"
+    "media:cleanup": "tsx scripts/cleanup-uploads.ts",
+    "db:connectivity": "tsx scripts/prisma-connectivity.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
