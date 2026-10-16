@@ -70,38 +70,69 @@ export default function VisionMission() {
     const section = sectionRef.current;
     if (!section) return;
 
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduceMotion) return;
+
     const ctx = gsap.context(() => {
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+      const visionElements = gsap.utils.toArray<HTMLElement>(
+        "[data-vision-element]",
+        section,
+      );
+      const missionItems = gsap.utils.toArray<HTMLElement>(
+        "[data-mission-item]",
+        section,
+      );
+      const visionTrigger = section.querySelector<HTMLElement>(
+        "[data-vision-section]",
+      );
+      const missionTrigger = section.querySelector<HTMLElement>(
+        "[data-mission-list]",
+      );
 
-      if (reduceMotion) return;
-
-      gsap.from("[data-vision-element]", {
-        y: 30,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: "[data-vision-section]",
+      if (visionElements.length && visionTrigger) {
+        ScrollTrigger.create({
+          trigger: visionTrigger,
           start: "top 75%",
           once: true,
-        },
-      });
+          onEnter: () => {
+            gsap.fromTo(
+              visionElements,
+              { y: 30, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.9,
+                stagger: 0.12,
+                ease: "power3.out",
+              },
+            );
+          },
+        });
+      }
 
-      gsap.from("[data-mission-item]", {
-        y: 20,
-        opacity: 0,
-        duration: 0.65,
-        stagger: 0.12,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: "[data-mission-list]",
+      if (missionItems.length && missionTrigger) {
+        ScrollTrigger.create({
+          trigger: missionTrigger,
           start: "top 82%",
           once: true,
-        },
-      });
+          onEnter: () => {
+            gsap.fromTo(
+              missionItems,
+              { y: 20, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.65,
+                stagger: 0.12,
+                ease: "power2.out",
+              },
+            );
+          },
+        });
+      }
     }, section);
 
     return () => ctx.revert();

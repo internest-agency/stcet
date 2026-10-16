@@ -55,7 +55,7 @@ const PlacementFutureIntro = memo(function PlacementFutureIntro() {
     <div className="grid gap-10 lg:grid-cols-[0.5fr_1.8fr] lg:gap-20">
       <div>
         <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-          07 — Placement Future
+          Placement Future
         </span>
       </div>
 

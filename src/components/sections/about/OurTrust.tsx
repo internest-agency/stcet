@@ -3,7 +3,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { FaQuoteRight } from "react-icons/fa";
 import {
   FaGraduationCap,
@@ -16,7 +15,7 @@ import {
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
 
-gsap.registerPlugin(SplitText, ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger);
 
 const trustPillars = [
   {
@@ -60,92 +59,82 @@ export default function OurTrust() {
     const section = sectionRef.current;
     if (!section) return;
 
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reducedMotion) return;
+
     const ctx = gsap.context(() => {
-      const eyebrow = section.querySelector(".trust-eyebrow");
-      const heading = section.querySelector(".trust-heading");
-      const intro = section.querySelector(".trust-intro");
-      const cards = gsap.utils.toArray<HTMLElement>(".trust-pillar");
-      const statement = section.querySelector(".institution-statement");
-
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (reducedMotion) return;
+      const eyebrow = section.querySelector<HTMLElement>(".trust-eyebrow");
+      const intro = section.querySelector<HTMLElement>(".trust-intro");
+      const cards = gsap.utils.toArray<HTMLElement>(".trust-pillar", section);
+      const statement = section.querySelector<HTMLElement>(
+        ".institution-statement",
+      );
 
       if (eyebrow) {
-        gsap.from(eyebrow, {
-          y: 15,
-          opacity: 0,
-          duration: 0.6,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: eyebrow,
-            start: "top 90%",
-            once: true,
-          },
-        });
-      }
-
-      let split: ReturnType<typeof SplitText.create> | undefined;
-
-      if (heading) {
-        split = SplitText.create(heading, {
-          type: "lines",
-          mask: "lines",
-          autoSplit: true,
-        });
-
-        gsap.from(split.lines, {
-          yPercent: 100,
-          duration: 0.85,
-          stagger: 0.08,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: heading,
-            start: "top 85%",
-            once: true,
+        ScrollTrigger.create({
+          trigger: eyebrow,
+          start: "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              eyebrow,
+              { y: 15, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+            );
           },
         });
       }
 
       if (intro) {
-        gsap.from(intro, {
-          y: 20,
-          opacity: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: intro,
-            start: "top 90%",
-            once: true,
+        ScrollTrigger.create({
+          trigger: intro,
+          start: "top 90%",
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              intro,
+              { y: 20, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+            );
           },
         });
       }
 
-      gsap.from(cards, {
-        y: 30,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: {
+      if (cards.length) {
+        ScrollTrigger.create({
           trigger: cards[0],
           start: "top 85%",
           once: true,
-        },
-      });
+          onEnter: () => {
+            gsap.fromTo(
+              cards,
+              { y: 30, opacity: 0 },
+              {
+                y: 0,
+                opacity: 1,
+                duration: 0.7,
+                stagger: 0.12,
+                ease: "power3.out",
+              },
+            );
+          },
+        });
+      }
 
       if (statement) {
-        gsap.from(statement, {
-          y: 25,
-          opacity: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: statement,
-            start: "top 88%",
-            once: true,
+        ScrollTrigger.create({
+          trigger: statement,
+          start: "top 88%",
+          once: true,
+          onEnter: () => {
+            gsap.fromTo(
+              statement,
+              { y: 25, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+            );
           },
         });
       }
