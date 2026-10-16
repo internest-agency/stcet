@@ -15,10 +15,19 @@ import {
 import Dropdown from "@/src/components/ui/Dropdown";
 import Button from "@/src/components/ui/Button";
 import Container from "../ui/Container";
+import type { MenuItemNode } from "@/src/lib/menu-types";
 
 interface HeaderProps {
   collegeName?: string | null;
   logoPath?: string | null;
+  /**
+   * Navigation items managed in the admin Menu Management screen.
+   *
+   * Fetched on the server (see `getMenuItems`) and passed down so the Header
+   * stays a Client Component without importing Prisma. When empty or
+   * unavailable, a documented fallback navigation is rendered.
+   */
+  menuItems?: MenuItemNode[];
   /**
    * Set overlay=true on the homepage.
    *
@@ -31,70 +40,262 @@ interface HeaderProps {
   overlay?: boolean;
 }
 
-const courseLinks = [
-  {
-    href: "/courses/computer-science-engineering",
-    label: "Computer Science Engineering",
-  },
-  {
-    href: "/courses/computer-science-ai-ml",
-    label: "Computer Science Engineering (AI & ML)",
-  },
-  {
-    href: "/courses/electronics-communication-engineering",
-    label: "Electronics & Communication Engineering",
-  },
-  {
-    href: "/courses/electrical-electronics-engineering",
-    label: "Electrical & Electronics Engineering",
-  },
-  {
-    href: "/courses/information-technology",
-    label: "Information Technology",
-  },
-];
+/*
+ * Deliberate, documented fallback used ONLY when the menu table has no
+ * published/active items or the query is temporarily unavailable. It is not a
+ * second source of truth: as soon as an administrator publishes menu items,
+ * those records fully replace this list. It exists so the public site never
+ * renders an empty/broken header.
+ */
+const FALLBACK_NAV: MenuItemNode[] = [
+  ["Home", "/"],
+  ["About Us", "/about"],
+  ["Admissions", "/admissions"],
+  ["Infrastructure", "/infrastructure"],
+  ["Placements", "/placements"],
+  ["Careers", "/careers"],
+  ["Contact Us", "/contact"],
+].map(([title, url], index) => ({
+  id: -(index + 1),
+  parentId: null,
+  title,
+  url,
+  type: "link",
+  sortOrder: index,
+  isActive: true,
+  openInNewTab: false,
+  isPublished: true,
+  children: [],
+  depth: 0,
+}));
 
-const navLinks = [
-  {
-    href: "/",
-    label: "Home",
-  },
-  {
-    href: "/about",
-    label: "About Us",
-  },
-  {
-    href: "/admissions",
-    label: "Admissions",
-  },
-  {
-    href: "/infrastructure",
-    label: "Infrastructure",
-  },
-  {
-    href: "/placements",
-    label: "Placement",
-  },
-  {
-    href: "/careers",
-    label: "Careers",
-  },
-  {
-    href: "/contact",
-    label: "Contact Us",
-  },
-];
+/** External destinations render as plain anchors; internal ones use `Link`. */
+function isExternalUrl(url: string) {
+  return /^https?:\/\//i.test(url);
+}
+
+/**
+ * A destination of `#` is an explicit placeholder (typically a dropdown
+ * parent such as "Courses"). It must never trigger navigation or scroll the
+ * page to the top, so it renders as a non-navigating control instead of a link.
+ */
+function isPlaceholderDestination(url: string) {
+  return url.trim() === "#";
+}
+
+/**
+ * Flattens a branch into a single dropdown list. Menu nesting is arbitrary, so
+ * deeper levels are surfaced in the same panel rather than being dropped.
+ */
+function flattenForDropdown(
+  nodes: MenuItemNode[],
+): { href: string; label: string; openInNewTab: boolean }[] {
+  return nodes.flatMap((node) => [
+    { href: node.url, label: node.title, openInNewTab: node.openInNewTab },
+    ...flattenForDropdown(node.children),
+  ]);
+}
+
+/** A single top-level desktop item: dropdown when it has children, else link. */
+function DesktopNavItem({
+  item,
+  pathname,
+}: {
+  item: MenuItemNode;
+  pathname: string;
+}) {
+  const target = item.openInNewTab ? "_blank" : undefined;
+  const rel = item.openInNewTab ? "noopener noreferrer" : undefined;
+
+  if (item.children.length > 0) {
+    return (
+      <Dropdown
+        key={`${item.id}-${pathname}`}
+        href={item.url}
+        label={item.title}
+        items={flattenForDropdown(item.children)}
+      />
+    );
+  }
+
+  if (isExternalUrl(item.url)) {
+    return (
+      <a
+        key={item.id}
+        href={item.url}
+        className="header-nav-item"
+        target={target}
+        rel={rel}
+      >
+        {item.title}
+      </a>
+    );
+  }
+
+  if (isPlaceholderDestination(item.url)) {
+    return (
+      <button
+        key={item.id}
+        type="button"
+        className="header-nav-item cursor-pointer"
+      >
+        {item.title}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      key={item.id}
+      href={item.url}
+      className="header-nav-item"
+      target={target}
+      rel={rel}
+    >
+      {item.title}
+    </Link>
+  );
+}
+
+/**
+ * Recursive mobile navigation node. Items with children render as expandable
+ * sections (multiple can be open at once) at any depth; leaves render as links.
+ */
+function MobileNavNode({
+  item,
+  depth,
+  openMenus,
+  onToggle,
+  onNavigate,
+}: {
+  item: MenuItemNode;
+  depth: number;
+  openMenus: Set<number>;
+  onToggle: (id: number) => void;
+  onNavigate: () => void;
+}) {
+  const target = item.openInNewTab ? "_blank" : undefined;
+  const rel = item.openInNewTab ? "noopener noreferrer" : undefined;
+  const titleClass =
+    depth === 0
+      ? "block py-5 text-lg font-bold uppercase tracking-tight text-gray-900 transition-colors hover:text-primary-700"
+      : "block py-3 text-sm font-medium leading-5 text-gray-600 transition-colors hover:text-primary-700";
+
+  const hasChildren = item.children.length > 0;
+  const open = openMenus.has(item.id);
+
+  const link = isPlaceholderDestination(item.url) ? (
+    <button
+      type="button"
+      aria-expanded={hasChildren ? open : undefined}
+      onClick={hasChildren ? () => onToggle(item.id) : undefined}
+      className={`${titleClass} w-full cursor-pointer text-left`}
+    >
+      {item.title}
+    </button>
+  ) : isExternalUrl(item.url) ? (
+    <a
+      href={item.url}
+      onClick={onNavigate}
+      target={target}
+      rel={rel}
+      className={titleClass}
+    >
+      {item.title}
+    </a>
+  ) : (
+    <Link
+      href={item.url}
+      onClick={onNavigate}
+      target={target}
+      rel={rel}
+      className={titleClass}
+    >
+      {item.title}
+    </Link>
+  );
+
+  if (!hasChildren) {
+    return depth === 0 ? (
+      <div className="border-b border-gray-200">{link}</div>
+    ) : (
+      link
+    );
+  }
+
+  return (
+    <div className={depth === 0 ? "border-b border-gray-200" : ""}>
+      <div className="flex items-center justify-between">
+        {link}
+        <button
+          type="button"
+          aria-label={`${open ? "Collapse" : "Expand"} ${item.title}`}
+          aria-expanded={open}
+          onClick={() => onToggle(item.id)}
+          className="
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            text-gray-600
+            transition-colors
+            hover:text-primary-700
+          "
+        >
+          {open ? <FaChevronUp /> : <FaChevronDown />}
+        </button>
+      </div>
+
+      <div
+        className={`
+          grid
+          transition-[grid-template-rows]
+          duration-300
+          ease-out
+
+          ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}
+        `}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={
+              depth === 0
+                ? "mb-5 border-l-2 border-primary-700 pl-4"
+                : "mb-3 border-l-2 border-primary-700 pl-4"
+            }
+          >
+            {item.children.map((child) => (
+              <MobileNavNode
+                key={child.id}
+                item={child}
+                depth={depth + 1}
+                openMenus={openMenus}
+                onToggle={onToggle}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Header({
   overlay = false,
   collegeName,
   logoPath,
+  menuItems,
 }: HeaderProps) {
   const pathname = usePathname();
 
+  const items =
+    menuItems && menuItems.length > 0 ? menuItems : FALLBACK_NAV;
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [coursesOpen, setCoursesOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState<Set<number>>(new Set());
 
   /*
    * ============================================================
@@ -110,10 +311,7 @@ export default function Header({
    *   Glass navbar + dark text
    */
   useEffect(() => {
-    if (!overlay) {
-      setIsScrolled(false);
-      return;
-    }
+    if (!overlay) return;
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 80);
@@ -165,12 +363,24 @@ export default function Header({
 
   /*
    * ============================================================
-   * CLOSE MOBILE MENU
+   * MOBILE MENU HELPERS
    * ============================================================
    */
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-    setCoursesOpen(false);
+    setOpenMenus(new Set());
+  };
+
+  const toggleMobileSection = (id: number) => {
+    setOpenMenus((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   return (
@@ -234,35 +444,8 @@ export default function Header({
               ${navMode}
             `}
           >
-            {/* HOME */}
-            <Link href="/" className="header-nav-item">
-              Home
-            </Link>
-
-            {/* ABOUT */}
-            <Link href="/about" className="header-nav-item">
-              About Us
-            </Link>
-
-            {/* COURSES */}
-            <div className="header-dropdown">
-              <Dropdown
-                key={pathname}
-                href="/courses"
-                label="Courses"
-                items={courseLinks}
-              />
-            </div>
-
-            {/* REMAINING LINKS */}
-            {navLinks.slice(2).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="header-nav-item"
-              >
-                {link.label}
-              </Link>
+            {items.map((item) => (
+              <DesktopNavItem key={item.id} item={item} pathname={pathname} />
             ))}
           </nav>
 
@@ -417,155 +600,15 @@ export default function Header({
               Mobile Navigation
           ----------------------------------------------------- */}
           <nav className="flex-1 overflow-y-auto px-6 pb-8">
-            {/* HOME */}
-            <Link
-              href="/"
-              onClick={closeMobileMenu}
-              className="
-                block
-                border-b
-                border-gray-200
-                py-5
-                text-lg
-                font-bold
-                uppercase
-                tracking-tight
-                text-gray-900
-                transition-colors
-                hover:text-primary-700
-              "
-            >
-              Home
-            </Link>
-
-            {/* ABOUT */}
-            <Link
-              href="/about"
-              onClick={closeMobileMenu}
-              className="
-                block
-                border-b
-                border-gray-200
-                py-5
-                text-lg
-                font-bold
-                uppercase
-                tracking-tight
-                text-gray-900
-                transition-colors
-                hover:text-primary-700
-              "
-            >
-              About Us
-            </Link>
-
-            {/* ==================================================
-                COURSES
-            =================================================== */}
-            <div className="border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                {/* Courses Link */}
-                <Link
-                  href="/courses"
-                  onClick={closeMobileMenu}
-                  className="
-                    py-5
-                    text-lg
-                    font-bold
-                    uppercase
-                    tracking-tight
-                    text-gray-900
-                    transition-colors
-                    hover:text-primary-700
-                  "
-                >
-                  Courses
-                </Link>
-
-                {/* Expand Button */}
-                <button
-                  type="button"
-                  aria-label={
-                    coursesOpen ? "Collapse courses" : "Expand courses"
-                  }
-                  aria-expanded={coursesOpen}
-                  onClick={() => setCoursesOpen((prev) => !prev)}
-                  className="
-                    flex
-                    h-10
-                    w-10
-                    items-center
-                    justify-center
-                    text-gray-600
-                    transition-colors
-                    hover:text-primary-700
-                  "
-                >
-                  {coursesOpen ? <FaChevronUp /> : <FaChevronDown />}
-                </button>
-              </div>
-
-              {/* Course List */}
-              <div
-                className={`
-                  grid
-                  transition-[grid-template-rows]
-                  duration-300
-                  ease-out
-
-                  ${coursesOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}
-                `}
-              >
-                <div className="overflow-hidden">
-                  <div className="mb-5 border-l-2 border-primary-700 pl-4">
-                    {courseLinks.map((course) => (
-                      <Link
-                        key={course.href}
-                        href={course.href}
-                        onClick={closeMobileMenu}
-                        className="
-                          block
-                          py-3
-                          text-sm
-                          font-medium
-                          leading-5
-                          text-gray-600
-                          transition-colors
-                          hover:text-primary-700
-                        "
-                      >
-                        {course.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ==================================================
-                REMAINING LINKS
-            =================================================== */}
-            {navLinks.slice(2).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMobileMenu}
-                className="
-                  block
-                  border-b
-                  border-gray-200
-                  py-5
-                  text-lg
-                  font-bold
-                  uppercase
-                  tracking-tight
-                  text-gray-900
-                  transition-colors
-                  hover:text-primary-700
-                "
-              >
-                {link.label}
-              </Link>
+            {items.map((item) => (
+              <MobileNavNode
+                key={item.id}
+                item={item}
+                depth={0}
+                openMenus={openMenus}
+                onToggle={toggleMobileSection}
+                onNavigate={closeMobileMenu}
+              />
             ))}
           </nav>
 

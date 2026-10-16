@@ -42,7 +42,8 @@ export async function saveMenuItem(formData: FormData): Promise<MenuActionResult
   if (!parsed.success) {
     return {
       success: false,
-      error: "Check the label and destination. Use an internal path or an http(s) URL.",
+      error:
+        "Check the label and destination. Use an internal path, a # placeholder, or an http(s) URL.",
     };
   }
 

@@ -333,7 +333,7 @@ export default function DepartmentsSection({
             </p>
 
             <Button
-              href={department.href || "/courses"}
+              href={department.href || "/"}
               variant="accent"
               size="md"
               rightIcon={<FaCircleArrowRight />}

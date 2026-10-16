@@ -22,30 +22,52 @@ export default function Dropdown({
   menuClassName = "w-72",
   triggerClassName = "",
 }: DropdownProps) {
+  const isPlaceholder = href.trim() === "#";
+
+  const triggerContent = (
+    <>
+      <span>{label}</span>
+
+      <IoIosArrowDown
+        className="
+          text-sm
+          transition-transform
+          duration-300
+          group-hover:rotate-180
+          group-focus-within:rotate-180
+        "
+        aria-hidden="true"
+      />
+    </>
+  );
+
   return (
     <div className="header-dropdown group relative">
       {/* Trigger */}
-      <Link
-        href={href}
-        className={`
-          header-nav-item
-          flex items-center gap-1.5
-          ${triggerClassName}
-        `}
-      >
-        <span>{label}</span>
-
-        <IoIosArrowDown
-          className="
-            text-sm
-            transition-transform
-            duration-300
-            group-hover:rotate-180
-            group-focus-within:rotate-180
-          "
-          aria-hidden="true"
-        />
-      </Link>
+      {isPlaceholder ? (
+        <button
+          type="button"
+          aria-haspopup="true"
+          className={`
+            header-nav-item
+            flex cursor-pointer items-center gap-1.5
+            ${triggerClassName}
+          `}
+        >
+          {triggerContent}
+        </button>
+      ) : (
+        <Link
+          href={href}
+          className={`
+            header-nav-item
+            flex items-center gap-1.5
+            ${triggerClassName}
+          `}
+        >
+          {triggerContent}
+        </Link>
+      )}
 
       {/* Dropdown */}
       <div
@@ -73,34 +95,64 @@ export default function Dropdown({
             backdrop-blur-xl
           "
         >
-          {items.map((item) => (
-            <Link
-              key={`${item.href}-${item.label}`}
-              href={item.href}
-              target={item.openInNewTab ? "_blank" : undefined}
-              rel={item.openInNewTab ? "noopener noreferrer" : undefined}
-              className="
-                group/item
-                relative
-                block
-                px-5 py-3
-                text-sm
-                font-semibold
-                leading-5
-                text-gray-700
-                transition-all
-                duration-200
-                hover:bg-primary-700
-                hover:text-white
-                focus:bg-primary-700
-                focus:text-white
-                focus:outline-none
-                uppercase
-              "
-            >
-              <span className="relative z-10">{item.label}</span>
-            </Link>
-          ))}
+          {items.map((item) =>
+            item.href.trim() === "#" ? (
+              <button
+                key={`${item.href}-${item.label}`}
+                type="button"
+                className="
+                  group/item
+                  relative
+                  block
+                  w-full
+                  cursor-pointer
+                  px-5 py-3
+                  text-left
+                  text-sm
+                  font-semibold
+                  leading-5
+                  text-gray-700
+                  transition-all
+                  duration-200
+                  hover:bg-primary-700
+                  hover:text-white
+                  focus:bg-primary-700
+                  focus:text-white
+                  focus:outline-none
+                  uppercase
+                "
+              >
+                <span className="relative z-10">{item.label}</span>
+              </button>
+            ) : (
+              <Link
+                key={`${item.href}-${item.label}`}
+                href={item.href}
+                target={item.openInNewTab ? "_blank" : undefined}
+                rel={item.openInNewTab ? "noopener noreferrer" : undefined}
+                className="
+                  group/item
+                  relative
+                  block
+                  px-5 py-3
+                  text-sm
+                  font-semibold
+                  leading-5
+                  text-gray-700
+                  transition-all
+                  duration-200
+                  hover:bg-primary-700
+                  hover:text-white
+                  focus:bg-primary-700
+                  focus:text-white
+                  focus:outline-none
+                  uppercase
+                "
+              >
+                <span className="relative z-10">{item.label}</span>
+              </Link>
+            ),
+          )}
         </div>
       </div>
     </div>

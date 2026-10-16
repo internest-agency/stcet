@@ -6,6 +6,7 @@ import GoToTop from "@/src/components/ui/GoToTop";
 import WhatsAppChat from "@/src/components/ui/WhatsAppChat";
 import NotFoundContent from "@/src/components/sections/not-found/NotFoundContent";
 import { getSiteSettings } from "@/src/lib/admin/settings";
+import { getMenuItems } from "@/src/lib/queries/menus";
 
 /*
  * The root not-found boundary handles unmatched URLs for the whole
@@ -25,11 +26,18 @@ export const metadata: Metadata = {
 };
 
 export default async function NotFound() {
-  const settings = await getSiteSettings();
+  const [settings, menuItems] = await Promise.all([
+    getSiteSettings(),
+    getMenuItems(),
+  ]);
 
   return (
     <>
-      <Header collegeName={settings.collegeName} logoPath={settings.logoPath} />
+      <Header
+        collegeName={settings.collegeName}
+        logoPath={settings.logoPath}
+        menuItems={menuItems}
+      />
 
       <main>
         <NotFoundContent />

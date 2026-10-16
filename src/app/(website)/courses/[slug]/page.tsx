@@ -78,7 +78,6 @@ export default async function DynamicCoursePage({
         breadcrumbItems={[
           {
             label: "Courses",
-            href: "/courses",
           },
           {
             label: page.name,

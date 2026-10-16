@@ -1,5 +1,60 @@
-import SeoManager from "@/src/components/admin/seo/SeoManager";
+import SeoManager, {
+  type SeoRecord,
+} from "@/src/components/admin/seo/SeoManager";
 import { requireAdministrator } from "@/src/lib/admin/authorization";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
+
 export const metadata = { title: "SEO | STCET Admin" };
-export default async function SeoPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) { await requireAdministrator(); const [records, params] = await Promise.all([isDatabaseConfigured() ? getPrismaClient().pageSeo.findMany({ orderBy: { pagePath: "asc" } }) : [], searchParams]); const error = Array.isArray(params.error) ? params.error[0] : params.error; return <div className="space-y-6"><section><p className="text-sm font-semibold text-primary-700">Search</p><h2 className="mt-1 text-2xl font-bold">SEO Management</h2><p className="mt-2 text-sm text-gray-600">Manage metadata for public pages. Draft content stays excluded from the public routes.</p></section>{error ? <p className="rounded border border-amber-200 bg-amber-50 p-3 text-sm">The SEO record could not be saved. Review its path and URLs.</p> : null}<SeoManager records={records} /></div>; }
+
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function SeoPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  await requireAdministrator();
+  const params = await searchParams;
+
+  let records: SeoRecord[] = [];
+  let loadError = false;
+
+  if (isDatabaseConfigured()) {
+    try {
+      records = await getPrismaClient().pageSeo.findMany({
+        orderBy: { pagePath: "asc" },
+        select: {
+          id: true,
+          pagePath: true,
+          pageTitle: true,
+          seoTitle: true,
+          metaDescription: true,
+          canonicalUrl: true,
+          ogImage: true,
+          noIndex: true,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to load SEO records:", error);
+      loadError = true;
+    }
+  }
+
+  const errorParam = first(params.error);
+  const saved = first(params.saved) === "1";
+
+  return (
+    <SeoManager
+      error={
+        errorParam
+          ? "The SEO record could not be saved. Review its path and URLs."
+          : null
+      }
+      loadError={loadError}
+      notice={saved ? "SEO metadata saved." : null}
+      records={records}
+    />
+  );
+}

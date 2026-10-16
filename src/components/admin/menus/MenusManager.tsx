@@ -275,7 +275,7 @@ function MenuForm({
           className={inputClass}
           defaultValue={item?.url ?? ""}
           name="url"
-          placeholder="/admissions or https://…"
+          placeholder="/admissions, https://…, or #"
           required
         />
       </label>

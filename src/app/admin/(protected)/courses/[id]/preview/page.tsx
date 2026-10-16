@@ -57,7 +57,7 @@ export default async function CoursePreviewPage({
       <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
         <CourseHero
           breadcrumbItems={[
-            { label: "Courses", href: "/courses" },
+            { label: "Courses", href: "/admin/courses" },
             { label: course.name },
           ]}
           heading={course.name}
