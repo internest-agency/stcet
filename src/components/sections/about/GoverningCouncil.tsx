@@ -238,7 +238,7 @@ export default function GoverningCouncil() {
             <SectionHeading as="h2">
               Leadership
               <br />
-              with purpose.
+              with Vision.
             </SectionHeading>
           </div>
 
@@ -264,8 +264,8 @@ export default function GoverningCouncil() {
               {/* Profile card */}
               <div className="relative isolate overflow-hidden rounded-lg border border-primary-900/10 bg-primary-900 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent-400/60 hover:shadow-xl hover:shadow-primary-900/15">
                 {/* Portrait */}
-                <div className="council-card-image flex flex-col items-center relative aspect-[4/5] overflow-hidden bg-primary-800">
-                  <FaUser className="text-gray-200/20 text-9xl mt-10" />
+                <div className="council-card-image flex flex-col items-center justify-center relative aspect-[4/5] overflow-hidden bg-primary-800">
+                  <FaUser className="text-gray-200/20 text-9xl" />
 
                   {/* Cinematic image overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/25 to-primary-900/10 opacity-90 transition-opacity duration-500 group-hover:opacity-100" />

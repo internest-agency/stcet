@@ -31,6 +31,8 @@ export const UPLOAD_CATEGORIES = [
   "committees",
   "pages",
   "faculty",
+  "about",
+  "events",
 ] as const;
 
 export type UploadCategory = (typeof UPLOAD_CATEGORIES)[number];

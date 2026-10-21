@@ -3,7 +3,7 @@ import { GiCheckMark } from "react-icons/gi";
 
 export default function MarqueeSection() {
   return (
-    <section className="bg-primary-0 dark:bg-primary-0">
+    <section className="bg-primary-100 dark:bg-primary-0">
       <Marquee
         className="text-xl py-4 text-center uppercase font-semibold text-gray-900"
         speed={100}

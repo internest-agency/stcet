@@ -1,5 +1,5 @@
 import AboutSection from "@/src/components/sections/home/about";
-import HeroSection from "@/src/components/sections/home/hero-section";
+// import HeroSection from "@/src/components/sections/home/hero-section";
 import MarqueeSection from "@/src/components/sections/home/marquee";
 import DepartmentSection from "@/src/components/sections/home/departments";
 import FacilitiesMarquee from "@/src/components/sections/home/facilities-marquee";
@@ -11,6 +11,7 @@ import GallerySection, {
 import { getPublicGalleryData } from "@/src/lib/queries/gallery";
 import { getPublicAdmissionsData } from "@/src/lib/queries/admissions";
 import { getPageSeo } from "@/src/lib/queries/seo";
+import HeroSection1 from "@/src/components/sections/home/hero-sectoin-1";
 
 const PAGE_PATH = "/";
 
@@ -86,7 +87,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
+      {/* <HeroSection /> */}
+      <HeroSection1 />
       <MarqueeSection />
       <AboutSection />
       <DepartmentSection departmentList={departments} />

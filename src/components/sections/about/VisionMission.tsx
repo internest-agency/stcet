@@ -1,70 +1,43 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  FaGraduationCap,
-  FaLightbulb,
-  FaUsers,
-  FaHandshake,
-  FaBullseye,
-} from "react-icons/fa6";
+import { FaGraduationCap } from "react-icons/fa6";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
+import {
+  aboutVisionMission as defaultVisionMission,
+  type AboutVisionMissionContent,
+} from "@/src/lib/content/about-content";
+import { resolveAboutIcon } from "@/src/lib/content/about-icons";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const missionItems = [
-  {
-    number: "01",
-    title: "Quality Technical Education",
-    description:
-      "Provide quality technical education through innovative teaching, industry-relevant learning and strong academic foundations.",
-    icon: FaGraduationCap,
-  },
-  {
-    number: "02",
-    title: "Research & Innovation",
-    description:
-      "Promote research, innovation, entrepreneurship and lifelong learning among students and faculty.",
-    icon: FaLightbulb,
-  },
-  {
-    number: "03",
-    title: "Ethics & Leadership",
-    description:
-      "Foster ethical values, leadership, professional responsibility and a commitment to excellence.",
-    icon: FaUsers,
-  },
-  {
-    number: "04",
-    title: "Industry Collaboration",
-    description:
-      "Develop collaborations with industry, academia and society for knowledge exchange, practical learning and sustainable development.",
-    icon: FaHandshake,
-  },
-  {
-    number: "05",
-    title: "Future-Ready Graduates",
-    description:
-      "Prepare skilled, adaptable and socially responsible graduates to meet evolving global and local challenges.",
-    icon: FaBullseye,
-  },
-];
-
-const visionStatement =
-  "To be a centre of excellence in technical education, fostering knowledge, innovation and ethical values to develop competent professionals who contribute meaningfully to society and address the challenges of a changing world.";
 
 /**
  * Replace this URL with an approved STCET campus image
  * from your project's public folder.
  */
-const campusImage = "/images/campus-building.webp";
+const FALLBACK_CAMPUS_IMAGE = "/images/campus-building.webp";
 
-export default function VisionMission() {
+function splitTags(value: string | null | undefined): string[] {
+  return (value || "")
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
+export default function VisionMission({
+  content = defaultVisionMission,
+}: {
+  content?: AboutVisionMissionContent;
+}) {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const missionItems = content.missionItems ?? [];
+  const visionTags = splitTags(content.visionTags);
+  const campusImage = content.visionImagePath || FALLBACK_CAMPUS_IMAGE;
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -136,7 +109,7 @@ export default function VisionMission() {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [content]);
 
   return (
     <div ref={sectionRef}>
@@ -182,33 +155,32 @@ export default function VisionMission() {
               <div data-vision-element className="mb-8 flex items-center gap-4">
                 <span className="h-[2px] w-9 bg-accent-400" />
                 <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/75">
-                  Our Vision
+                  {content.visionEyebrow || "Our Vision"}
                 </span>
               </div>
-              <SectionHeading as="h3" className="text-white!">
-                Shaping a Brighter Tomorrow Through{" "}
-                <span className="text-accent-400">Knowledge</span> and{" "}
-                <span className="text-accent-400">Innovation.</span>
-              </SectionHeading>
-
-              <p
-                data-vision-element
-                className="mt-7 max-w-xl text-base leading-8 text-slate-300 sm:text-lg sm:leading-9"
-              >
-                {visionStatement}
-              </p>
+              <SectionHeading as="h3" className="text-white!" html={content.visionHeading ?? undefined} />
 
               <div
                 data-vision-element
-                className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60 sm:text-xs"
+                className="mt-7 max-w-xl text-base leading-8 text-slate-300 sm:text-lg sm:leading-9"
               >
-                <span className="h-[2px] w-10 bg-accent-400" />
-                <span>People</span>
-                <span className="text-accent-400">•</span>
-                <span>Progress</span>
-                <span className="text-accent-400">•</span>
-                <span>A Better Tomorrow</span>
+                <RichText html={content.visionStatement} />
               </div>
+
+              {visionTags.length ? (
+                <div
+                  data-vision-element
+                  className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/60 sm:text-xs"
+                >
+                  <span className="h-[2px] w-10 bg-accent-400" />
+                  {visionTags.map((tag, index) => (
+                    <Fragment key={`${tag}-${index}`}>
+                      {index > 0 ? <span className="text-accent-400">•</span> : null}
+                      <span>{tag}</span>
+                    </Fragment>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             {/* Right campus image */}
@@ -239,11 +211,12 @@ export default function VisionMission() {
               {/* Image caption */}
               <div className="absolute bottom-7 left-6 right-6 sm:bottom-10 sm:left-10">
                 <p className="text-xs uppercase tracking-[0.25em] text-white/70">
-                  S. Thangapazham College of Engineering & Technology
+                  {content.visionCaptionTitle ||
+                    "S. Thangapazham College of Engineering & Technology"}
                 </p>
                 <div className="mt-3 h-px w-full bg-white/25" />
                 <div className="mt-3 text-sm font-medium text-white">
-                  Engineering the Future
+                  {content.visionCaptionSubtitle || "Engineering the Future"}
                 </div>
               </div>
             </div>
@@ -275,21 +248,19 @@ export default function VisionMission() {
             {/* Main heading and description */}
             <div className="grid gap-7 lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:gap-16">
               <div>
-                <SectionHeading as="h2">
-                  Turning Our Vision
-                  <span className="block text-accent-500">Into Action.</span>
-                </SectionHeading>
+                <SectionHeading as="h2" html={content.missionHeading ?? undefined} />
               </div>
 
               <div className="lg:border-l lg:border-primary-900/15 lg:pl-8 lg:pb-1">
-                <p className="max-w-lg text-base leading-8 text-slate-600 sm:text-lg sm:leading-9">
-                  Our commitment to nurturing capable professionals through
-                  education, discovery, collaboration and responsibility.
-                </p>
+                <RichText
+                  html={content.missionIntro}
+                  className="max-w-lg text-base leading-8 text-slate-600 sm:text-lg sm:leading-9"
+                />
 
                 <div className="mt-6 flex items-center gap-3">
                   <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary-700 sm:text-xs">
-                    Educate · Innovate · Empower
+                    {splitTags(content.missionTags).join(" · ") ||
+                      "Educate · Innovate · Empower"}
                   </span>
                 </div>
               </div>
@@ -305,11 +276,12 @@ export default function VisionMission() {
             className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
           >
             {missionItems.map((item, index) => {
-              const Icon = item.icon;
+              const Icon = resolveAboutIcon(item.icon, FaGraduationCap);
+              const number = String(index + 1).padStart(2, "0");
 
               return (
                 <article
-                  key={item.number}
+                  key={item.id ?? `${item.title}-${index}`}
                   data-mission-item
                   className={`group relative isolate flex min-h-[280px] flex-col overflow-hidden rounded border border-primary-900/10 bg-white p-6 transition-all duration-500 hover:shadow-xl hover:shadow-primary-900/10 sm:p-7 ${
                     index === 0 ? "lg:col-span-2" : ""
@@ -333,7 +305,7 @@ export default function VisionMission() {
                     </div>
 
                     <span className="text-sm font-semibold tracking-[0.15em] text-accent-500">
-                      {item.number}
+                      {number}
                     </span>
                   </div>
 
@@ -346,9 +318,10 @@ export default function VisionMission() {
                     >
                       {item.title}
                     </SectionHeading>
-                    <p className="mt-3 max-w-lg text-sm leading-7 text-slate-600 sm:text-base">
-                      {item.description}
-                    </p>
+                    <RichText
+                      html={item.description}
+                      className="mt-3 max-w-lg text-sm leading-7 text-slate-600 sm:text-base"
+                    />
                   </div>
                 </article>
               );

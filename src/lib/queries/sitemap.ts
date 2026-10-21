@@ -30,16 +30,23 @@ export interface SitemapPageSeo {
   updatedAt: Date;
 }
 
+export interface SitemapEvent {
+  slug: string;
+  updatedAt: Date;
+}
+
 export interface SitemapData {
   courses: SitemapCourse[];
   institutionalPages: SitemapInstitutionalPage[];
   pageSeo: SitemapPageSeo[];
+  events: SitemapEvent[];
 }
 
 const EMPTY: SitemapData = {
   courses: [],
   institutionalPages: [],
   pageSeo: [],
+  events: [],
 };
 
 /**
@@ -64,7 +71,7 @@ export async function getSitemapData(): Promise<SitemapData> {
   try {
     const prisma = getPrismaClient();
 
-    const [courses, institutionalPages, pageSeo] = await Promise.all([
+    const [courses, institutionalPages, pageSeo, events] = await Promise.all([
       prisma.course.findMany({
         select: {
           slug: true,
@@ -86,9 +93,13 @@ export async function getSitemapData(): Promise<SitemapData> {
           updatedAt: true,
         },
       }),
+      prisma.event.findMany({
+        where: { isPublished: true },
+        select: { slug: true, updatedAt: true },
+      }),
     ]);
 
-    return { courses, institutionalPages, pageSeo };
+    return { courses, institutionalPages, pageSeo, events };
   } catch (error) {
     console.error(
       "Sitemap data query failed; serving static routes only.",

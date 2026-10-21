@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         destination: "/admin/institutional-pages",
         permanent: false,
       },
+      {
+        source: "/news-and-events",
+        destination: "/events",
+        permanent: true,
+      },
     ];
   },
 };

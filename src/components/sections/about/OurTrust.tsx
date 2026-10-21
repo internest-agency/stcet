@@ -4,56 +4,26 @@ import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaQuoteRight } from "react-icons/fa";
-import {
-  FaGraduationCap,
-  FaLightbulb,
-  FaAward,
-  FaHeart,
-  FaArrowUpRightFromSquare,
-} from "react-icons/fa6";
+import { FaGraduationCap } from "react-icons/fa6";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
+import {
+  aboutTrust as defaultTrust,
+  type AboutTrustContent,
+} from "@/src/lib/content/about-content";
+import { resolveAboutIcon } from "@/src/lib/content/about-icons";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const trustPillars = [
-  {
-    number: "01",
-    title: "Quality",
-    description:
-      "We are committed to maintaining high standards and creating meaningful learning experiences that contribute to the academic and personal development of students.",
-    icon: FaGraduationCap,
-    tag: "Learning Standards",
-  },
-  {
-    number: "02",
-    title: "Opportunity",
-    description:
-      "We believe in expanding access to quality higher education, enabling students to pursue their aspirations, build confidence and realise their potential.",
-    icon: FaLightbulb,
-    tag: "Access & Growth",
-  },
-  {
-    number: "03",
-    title: "Excellence",
-    description:
-      "We continually strive to learn, improve and raise our standards across our educational initiatives, creating an environment that encourages continuous growth.",
-    icon: FaAward,
-    tag: "Continuous Progress",
-  },
-  {
-    number: "04",
-    title: "Values",
-    description:
-      "We aim to nurture responsible, disciplined and confident individuals who uphold strong values and contribute positively to their professions and society.",
-    icon: FaHeart,
-    tag: "Character & Purpose",
-  },
-];
-
-export default function OurTrust() {
+export default function OurTrust({
+  content = defaultTrust,
+}: {
+  content?: AboutTrustContent;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
+  const pillars = content.pillars ?? [];
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -141,7 +111,7 @@ export default function OurTrust() {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [content]);
 
   return (
     <section
@@ -155,34 +125,29 @@ export default function OurTrust() {
           <div>
             <div className="trust-eyebrow mb-6 flex items-center gap-3">
               <span className="text-xs font-bold uppercase tracking-[0.24em] text-primary-700">
-                Our Trust
+                {content.eyebrow || "Our Trust"}
               </span>
             </div>
 
-            <SectionHeading as="h2">
-              Four pillars.
-              <br />
-              <span className="text-accent-400">One purpose.</span>
-            </SectionHeading>
+            <SectionHeading as="h2" html={content.heading ?? undefined} />
           </div>
 
           <div className="trust-intro lg:border-l lg:border-primary-900/15 lg:pb-1 lg:pl-8">
-            <p className="max-w-2xl text-base leading-8 text-gray-600 sm:text-lg sm:leading-9">
-              The Trust oversees four educational institutions across the
-              southern districts of Tamil Nadu. Our approach is guided by a
-              commitment to quality, opportunity, excellence and values.
-            </p>
+            <RichText
+              html={content.intro}
+              className="max-w-2xl text-base leading-8 text-gray-600 sm:text-lg sm:leading-9"
+            />
           </div>
         </div>
 
         {/* PILLAR CARDS */}
         <div className="mt-12 grid grid-cols-1 gap-5 sm:mt-16 sm:grid-cols-2 lg:gap-6">
-          {trustPillars.map((pillar) => {
-            const Icon = pillar.icon;
+          {pillars.map((pillar, index) => {
+            const Icon = resolveAboutIcon(pillar.icon, FaGraduationCap);
 
             return (
               <article
-                key={pillar.number}
+                key={pillar.id ?? `${pillar.title}-${index}`}
                 className="trust-pillar group relative isolate flex min-h-[310px] flex-col overflow-hidden border border-primary-900/10 bg-[#F7F8FA] p-6 transition-all duration-500 hover:-translate-y-1 hover:bg-white hover:shadow-xl hover:shadow-primary-900/[0.07] sm:min-h-[330px] sm:p-8 lg:p-10"
               >
                 {/* Card header */}
@@ -200,9 +165,10 @@ export default function OurTrust() {
                     {pillar.title}
                   </SectionHeading>
 
-                  <p className="mt-4 max-w-xl text-sm leading-7 text-gray-600 sm:text-base sm:leading-8">
-                    {pillar.description}
-                  </p>
+                  <RichText
+                    html={pillar.description}
+                    className="mt-4 max-w-xl text-sm leading-7 text-gray-600 sm:text-base sm:leading-8"
+                  />
                 </div>
 
                 {/* Card footer */}
@@ -232,27 +198,25 @@ export default function OurTrust() {
               <div className="flex items-center gap-3">
                 <span className="h-2 w-2 rounded-full bg-accent-400" />
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/75">
-                  STCET
+                  {content.closingEyebrow || "STCET"}
                 </span>
               </div>
 
               <span className="mt-4 block text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">
-                Our Approach
+                {content.closingLabel || "Our Approach"}
               </span>
             </div>
 
             <div>
-              <p className="max-w-4xl text-xl font-semibold leading-8 tracking-tight text-white sm:text-2xl sm:leading-9 lg:text-3xl lg:leading-10">
-                Our institution is committed to creating a learning environment
-                where students can develop the knowledge, skills and confidence
-                required to navigate an evolving engineering landscape and build
-                meaningful futures.
-              </p>
+              <RichText
+                html={content.closingStatement}
+                className="max-w-4xl text-xl font-semibold leading-8 tracking-tight text-white sm:text-2xl sm:leading-9 lg:text-3xl lg:leading-10"
+              />
 
               <div className="mt-8 flex items-center gap-4">
                 <span className="h-[2px] w-10 bg-accent-400" />
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
-                  Learn · Innovate · Grow
+                  {content.closingFooter || "Learn · Innovate · Grow"}
                 </span>
               </div>
             </div>

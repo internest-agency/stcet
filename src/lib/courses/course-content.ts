@@ -448,8 +448,7 @@ export const courseContent: Record<string, CourseContent> = {
     ],
     overviewKeyStatement:
       "While sharing a strong foundation with computer science, Information Technology places particular emphasis on using technology to develop, deploy and manage solutions in real-world environments.",
-    curriculumTitle:
-      "Learn how technology works, and how to put it to work.",
+    curriculumTitle: "Learn how technology works, and how to put it to work.",
     curriculumIntro:
       "The programme progresses from programming and data structures to databases, web technologies, software engineering, networking, cloud computing, cybersecurity, data analytics and emerging technologies.",
     slides: [
@@ -629,7 +628,7 @@ export const courseContent: Record<string, CourseContent> = {
     tagline: "Learn. Predict. Innovate.",
     description: "",
     heroImage: "/images/cse-ai-ml-hero-bg.webp",
-    overviewHeading: "Computing is at the heart of today's digital world.",
+    overviewHeading: "Redefine Computing with AI & ML",
     overviewParagraphs: [
       "Artificial Intelligence and Machine Learning are transforming the way technology interacts with the world. From intelligent applications and automation to healthcare, finance, transportation and communication, AI is becoming an integral part of modern life.",
       "The B.E. Computer Science and Engineering (Artificial Intelligence & Machine Learning) programme at STCET brings together the foundations of computer science with the principles and applications of AI and ML. Students develop a strong understanding of computing while learning how machines can process information, identify patterns, learn from data and support intelligent decision-making.",
@@ -703,7 +702,8 @@ export const courseContent: Record<string, CourseContent> = {
         title: "Natural Language Processing",
         description:
           "Explore how computers can process, understand and work with human language to build intelligent language-based applications.",
-        image: "/images/courses/ai-ml/learning/natural-language-processing.webp",
+        image:
+          "/images/courses/ai-ml/learning/natural-language-processing.webp",
       },
       {
         number: "10",

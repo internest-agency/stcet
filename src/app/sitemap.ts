@@ -35,7 +35,7 @@ const STATIC_ROUTES: StaticRoute[] = [
   { path: "/placements", changeFrequency: "monthly", priority: 0.7 },
   { path: "/scholarships", changeFrequency: "monthly", priority: 0.6 },
   { path: "/gallery", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/news-and-events", changeFrequency: "weekly", priority: 0.5 },
+  { path: "/events", changeFrequency: "weekly", priority: 0.6 },
   { path: "/careers", changeFrequency: "monthly", priority: 0.5 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
   { path: "/enquire-now", changeFrequency: "monthly", priority: 0.8 },
@@ -177,6 +177,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url,
       lastModified: page.updatedAt,
       changeFrequency: "monthly",
+      priority: 0.5,
+    });
+  }
+
+  // 5. Published events.
+  for (const event of data.events) {
+    const url = resolveCanonical(null, base, `/events/${event.slug}`);
+    if (!url) continue;
+
+    add({
+      url,
+      lastModified: event.updatedAt,
+      changeFrequency: "weekly",
       priority: 0.5,
     });
   }

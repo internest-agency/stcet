@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import {
   BookOpen,
   Building2,
+  CalendarDays,
   ChartNoAxesCombined,
   ChevronRight,
   ClipboardList,
@@ -29,6 +30,8 @@ const availableLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/enquiries", label: "Enquiries", icon: Inbox },
   { href: "/admin/contact-messages", label: "Contact Messages", icon: Mail },
+  { href: "/admin/events", label: "Events", icon: CalendarDays },
+  { href: "/admin/about", label: "About", icon: Building2 },
   { href: "/admin/courses", label: "Courses", icon: GraduationCap },
   { href: "/admin/faculty", label: "Faculty", icon: UserRound },
   { href: "/admin/gallery", label: "Gallery", icon: Image },
@@ -42,7 +45,11 @@ const availableLinks = [
   { href: "/admin/users", label: "Users", icon: ShieldCheck },
   { href: "/admin/settings", label: "Settings", icon: Settings2 },
   { href: "/admin/menus", label: "Menus", icon: Menu },
-  { href: "/admin/institutional-pages", label: "Institutional Pages", icon: FileText },
+  {
+    href: "/admin/institutional-pages",
+    label: "Institutional Pages",
+    icon: FileText,
+  },
 ];
 
 function titleForPath(pathname: string) {
@@ -54,6 +61,7 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/admin/admissions")) return "Admissions";
   if (pathname.startsWith("/admin/scholarships")) return "Scholarships";
   if (pathname.startsWith("/admin/placements")) return "Placements";
+  if (pathname.startsWith("/admin/events")) return "Events";
   if (pathname.startsWith("/admin/infrastructure")) return "Infrastructure";
   if (pathname.startsWith("/admin/committees")) return "Committees";
   if (pathname.startsWith("/admin/media")) return "Media";
@@ -61,7 +69,9 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/admin/users")) return "Users";
   if (pathname.startsWith("/admin/settings")) return "Settings";
   if (pathname.startsWith("/admin/menus")) return "Menus";
-  if (pathname.startsWith("/admin/institutional-pages")) return "Institutional Pages";
+  if (pathname.startsWith("/admin/institutional-pages"))
+    return "Institutional Pages";
+  if (pathname.startsWith("/admin/about")) return "About";
   return "Dashboard";
 }
 

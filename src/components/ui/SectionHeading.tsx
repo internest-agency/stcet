@@ -5,11 +5,18 @@ import type { ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { sanitizeHtml } from "@/src/lib/content/html";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 interface SectionHeadingProps {
-  children: ReactNode;
+  children?: ReactNode;
+  /**
+   * Server-sanitized HTML for headings whose text is stored in the database.
+   * When provided it replaces `children`, keeping the same element, classes and
+   * word-reveal animation. Do not combine with `children`.
+   */
+  html?: string;
   id?: string;
   className?: string;
   animate?: boolean;
@@ -19,6 +26,7 @@ interface SectionHeadingProps {
 
 export default function SectionHeading({
   children,
+  html,
   id = "",
   className = "",
   animate = true,
@@ -80,7 +88,7 @@ export default function SectionHeading({
     return () => {
       context.revert();
     };
-  }, [children, animate]);
+  }, [children, html, animate]);
 
   const headingSizes = {
     h1: "text-4xl leading-[0.94] sm:text-5xl lg:text-5xl xl:text-6xl",
@@ -98,27 +106,44 @@ export default function SectionHeading({
     ${className}
   `;
 
+  const safeHtml = html !== undefined ? sanitizeHtml(html) : undefined;
+
   const content = <>{children}</>;
 
   if (as === "h1") {
     return (
-      <h1 ref={headingRef} id={id} className={headingClasses}>
-        {content}
-      </h1>
+      <h1
+        ref={headingRef}
+        id={id}
+        className={headingClasses}
+        {...(safeHtml !== undefined
+          ? { dangerouslySetInnerHTML: { __html: safeHtml } }
+          : { children: content })}
+      />
     );
   }
 
   if (as === "h3") {
     return (
-      <h3 ref={headingRef} id={id} className={headingClasses}>
-        {content}
-      </h3>
+      <h3
+        ref={headingRef}
+        id={id}
+        className={headingClasses}
+        {...(safeHtml !== undefined
+          ? { dangerouslySetInnerHTML: { __html: safeHtml } }
+          : { children: content })}
+      />
     );
   }
 
   return (
-    <h2 ref={headingRef} id={id} className={headingClasses}>
-      {content}
-    </h2>
+    <h2
+      ref={headingRef}
+      id={id}
+      className={headingClasses}
+      {...(safeHtml !== undefined
+        ? { dangerouslySetInnerHTML: { __html: safeHtml } }
+        : { children: content })}
+    />
   );
 }

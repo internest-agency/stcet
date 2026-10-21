@@ -6,15 +6,21 @@ import IndustryEngagement from "@/src/components/sections/placement/IndustryEnga
 import PlacementFuture from "@/src/components/sections/placement/PlacementFuture";
 import PlacementCell from "@/src/components/sections/placement/PlacementCell";
 import ManagedPlacementContent from "@/src/components/sections/placement/ManagedPlacementContent";
-import { getPublishedPlacementContent } from "@/src/lib/queries/placements";
+import {
+  getPublishedPlacementContent,
+  getPublishedPlacementLeadership,
+} from "@/src/lib/queries/placements";
 
 export default async function PlacementPage() {
-  const content = await getPublishedPlacementContent();
+  const [content, leadership] = await Promise.all([
+    getPublishedPlacementContent(),
+    getPublishedPlacementLeadership(),
+  ]);
   return (
     <>
       <PlacementHero />
       <PlacementCell />
-      <PlacementHead />
+      <PlacementHead content={leadership ?? undefined} />
       <IndustryConnect />
       <CareerReadiness />
       <IndustryEngagement />

@@ -7,18 +7,34 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
+import {
+  placementLeadershipContent as defaultContent,
+  type PlacementLeadershipContent,
+} from "@/src/lib/content/placement-leadership-content";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const qualifications = [
-  "Qualification details",
-  "Professional experience",
-  "Relevant industry experience",
-];
-
-export default function PlacementHead() {
+export default function PlacementHead({
+  content = defaultContent,
+}: {
+  content?: PlacementLeadershipContent;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
+
+  const eyebrow = content.eyebrow || defaultContent.eyebrow;
+  const heading = content.heading || defaultContent.heading;
+  const description = content.description || defaultContent.description;
+  const officerName = content.officerName || defaultContent.officerName;
+  const officerDesignation =
+    content.officerDesignation || defaultContent.officerDesignation;
+  const officerImagePath =
+    content.officerImagePath || defaultContent.officerImagePath;
+  const officerImageAlt =
+    content.officerImageAlt ||
+    `${officerName ?? "Placement officer"}, ${officerDesignation ?? ""}`.trim();
+  const items = content.items;
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -131,13 +147,11 @@ export default function PlacementHead() {
               />
 
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-                Placement Leadership
+                {eyebrow}
               </span>
             </div>
 
-            <SectionHeading as="h2">
-              Guiding Students Towards Careers.
-            </SectionHeading>
+            <SectionHeading as="h2" html={heading ?? undefined} />
           </div>
 
           {/* =========================================
@@ -151,22 +165,25 @@ export default function PlacementHead() {
 
             <div className="placement-head-image">
               <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-                <Image
-                  src="/images/placements/placeholder.webp"
-                  alt="Mr. B. Rajesh, Placement Cell"
-                  fill
-                  sizes="230px"
-                  className="object-cover"
-                />
+                {officerImagePath ? (
+                  <Image
+                    src={officerImagePath}
+                    alt={officerImageAlt}
+                    fill
+                    sizes="230px"
+                    className="object-cover"
+                    unoptimized={!officerImagePath.startsWith("/images/")}
+                  />
+                ) : null}
               </div>
 
               <div className="mt-4 border-t border-gray-200 pt-4">
                 <p className="text-lg font-extrabold tracking-tight text-primary-700">
-                  Mr. B. Rajesh
+                  {officerName}
                 </p>
 
                 <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent-400">
-                  Placement Cell
+                  {officerDesignation}
                 </p>
               </div>
             </div>
@@ -176,35 +193,35 @@ export default function PlacementHead() {
             ===================================== */}
 
             <div className="placement-head-content max-w-2xl">
-              <p className="text-gray-800">
-                The Placement Cell is headed by{" "}
-                <strong className="font-semibold text-primary-700">
-                  Mr. B. Rajesh
-                </strong>{" "}
-                who will be working closely with students and departments to
-                identify career aspirations, strengthen employability skills and
-                facilitate opportunities for interaction with the industry.
-              </p>
+              <RichText html={description} className="text-gray-800" />
 
               {/* Qualifications */}
               <div className="border-t border-gray-300 pt-7 mt-7">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                  Qualifications & Experience
+                  Qualifications &amp; Experience
                 </span>
 
                 <div className="mt-5">
-                  {qualifications.map((qualification, index) => (
+                  {items.map((item, index) => (
                     <div
-                      key={qualification}
+                      key={item.id ?? `${index}-${item.title}`}
                       className="qualification-item flex items-center gap-4 border-b border-gray-200 py-4 first:pt-0"
                     >
                       <span className="text-[10px] font-bold text-accent-400">
                         {String(index + 1).padStart(2, "0")}
                       </span>
 
-                      <span className="text-sm text-gray-700">
-                        {qualification}
-                      </span>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm text-gray-700">
+                          {item.title}
+                        </span>
+
+                        {item.description ? (
+                          <p className="mt-0.5 text-xs text-gray-500">
+                            {item.description}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                   ))}
                 </div>

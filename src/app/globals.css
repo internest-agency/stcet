@@ -17,7 +17,7 @@
 @source inline("leading-{tight,snug,normal,relaxed,loose}");
 @source inline("tracking-{tight,normal,wide}");
 @source inline("text-{left,center,right}");
-@source inline("text-{primary,secondary,accent}-{500,600,700,800,900}");
+@source inline("text-{primary,secondary,accent}-{400,500,600,700,800,900}");
 @source inline("text-gray-{400,500,600,700,800,900}");
 @source inline("{mt,mb}-{1,2,3,4,5,6,8}");
 @source inline("space-y-{1,2,3,4}");

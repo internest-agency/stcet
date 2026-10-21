@@ -160,7 +160,7 @@ export default function OurLegacy() {
                 />
 
                 <div className="mb-4 uppercase text-gray-400 text-sm">
-                  01 - Begin
+                  01 - Beginning
                 </div>
 
                 <SectionHeading as="h3" customSize={true} className="text-2xl">

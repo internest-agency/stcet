@@ -11,7 +11,6 @@ const common = {
 
 export const companySchema = z.object({
   name: z.string().trim().min(2).max(191),
-  slug: z.string().trim().min(2).max(191).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   websiteUrl: z.string().trim().url().max(2048).optional().nullable(),
   logoPath: text(2048),
   sortOrder: common.sortOrder,
@@ -19,3 +18,21 @@ export const companySchema = z.object({
   isPublished: common.isPublished,
 });
 export const programmeSchema = z.object(common);
+
+export const leadershipSchema = z.object({
+  eyebrow: text(191),
+  heading: text(500),
+  description: text(50_000),
+  officerName: text(191),
+  officerDesignation: text(191),
+  officerImagePath: text(2048),
+  officerImageAlt: text(255),
+  isPublished: z.boolean().default(false),
+});
+
+export const leadershipItemSchema = z.object({
+  title: z.string().trim().min(2).max(191),
+  description: text(500),
+  sortOrder: common.sortOrder,
+  isPublished: common.isPublished,
+});

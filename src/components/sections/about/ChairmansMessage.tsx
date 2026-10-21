@@ -6,11 +6,20 @@ import { gsap } from "gsap";
 import { SplitText } from "gsap/SplitText";
 
 import Container from "../../ui/Container";
+import RichText from "../../ui/RichText";
 import SectionHeading from "../../ui/SectionHeading";
+import {
+  aboutChairmanMessage as defaultMessage,
+  type AboutChairmanMessageContent,
+} from "@/src/lib/content/about-content";
 
 gsap.registerPlugin(SplitText);
 
-export default function ChairmansMessage() {
+export default function ChairmansMessage({
+  message = defaultMessage,
+}: {
+  message?: AboutChairmanMessageContent;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -132,7 +141,9 @@ export default function ChairmansMessage() {
     return () => {
       context.revert();
     };
-  }, []);
+  }, [message]);
+
+  const imagePath = message.imagePath || null;
 
   return (
     <section
@@ -158,41 +169,46 @@ export default function ChairmansMessage() {
               />
 
               <span className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">
-                Chairman&apos;s Message
+                {message.eyebrow || "Chairman's Message"}
               </span>
             </div>
 
-            <SectionHeading as="h2" className="text-white! mb-8">
-              Education is
-              <br />
-              more than
-              <br />
-              knowledge.
-            </SectionHeading>
+            <SectionHeading as="h2" className="text-white! mb-8" html={message.heading ?? undefined} />
 
             {/* Chairman Image Placeholder */}
             <div className="chairman-image relative mb-8 aspect-[4/5] max-w-sm overflow-hidden bg-primary-700/40">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:h-32 sm:w-32">
-                    <Image
-                      src="/images/gallery/user.png"
-                      width={120}
-                      height={120}
-                      alt="chairman-image"
-                      className="h-full w-full"
-                    />
+              {imagePath ? (
+                <Image
+                  src={imagePath}
+                  alt={message.name || "Chairman"}
+                  fill
+                  unoptimized={!imagePath.startsWith("/images/")}
+                  sizes="(max-width: 1024px) 100vw, 30vw"
+                  className="object-cover object-center"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:h-32 sm:w-32">
+                      <Image
+                        src="/images/gallery/user.png"
+                        width={120}
+                        height={120}
+                        alt="chairman-image"
+                        className="h-full w-full"
+                      />
+                    </div>
+
+                    <p className="mt-6 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                      Chairman
+                    </p>
+
+                    <p className="mt-2 text-sm font-semibold text-white/60">
+                      {message.name || "Thiru. S. Thangapazham"}
+                    </p>
                   </div>
-
-                  <p className="mt-6 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                    Chairman
-                  </p>
-
-                  <p className="mt-2 text-sm font-semibold text-white/60">
-                    Thiru. S. Thangapazham
-                  </p>
                 </div>
-              </div>
+              )}
 
               {/* Accent line */}
               <span
@@ -213,44 +229,35 @@ export default function ChairmansMessage() {
           <div className="relative">
             {/* Large quote */}
             <div className="chairman-quote">
-              <p className="max-w-3xl text-lg leading-relaxed text-white sm:text-2xl lg:text-xl">
-                At S. Thangapazham College of Engineering and Technology, we
-                believe that education is not merely about acquiring knowledge;
-                it is about developing the ability to think, question, create
-                and contribute. Engineering, in particular, calls for a strong
-                foundation in fundamentals, a practical approach to
-                problem-solving and the ability to adapt to a constantly
-                changing world.
-              </p>
+              <RichText
+                html={message.quote}
+                className="max-w-3xl text-lg leading-relaxed text-white sm:text-2xl lg:text-xl"
+              />
             </div>
 
             {/* Remaining message */}
             <div className="mt-10 max-w-3xl space-y-6 border-t border-white/15 pt-10">
-              <p className="chairman-paragraph text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-                Our endeavour is to create an academic environment where
-                students are encouraged to explore their potential, embrace new
-                ideas and develop the confidence to pursue their aspirations.
-                Alongside academic and technical competence, we place great
-                importance on discipline, integrity, responsibility and respect
-                for others.
-              </p>
+              <RichText
+                html={message.body}
+                className="text-base leading-7 text-white/70 sm:text-lg sm:leading-8"
+              />
 
-              <p className="chairman-paragraph text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-                As an institution, our aspiration is to nurture capable
-                professionals and grounded individuals who are prepared not only
-                for the opportunities of today, but also for the challenges and
-                possibilities of tomorrow.
-              </p>
+              {message.closingStatement ? (
+                <RichText
+                  html={message.closingStatement}
+                  className="text-base leading-7 text-white/70 sm:text-lg sm:leading-8"
+                />
+              ) : null}
             </div>
 
             {/* Signature */}
             <div className="chairman-signature mt-12 border-t border-white/15 pt-7 sm:mt-14">
               <p className="text-lg font-extrabold tracking-tight text-white sm:text-xl">
-                Thiru. S. Thangapazham
+                {message.name || "Thiru. S. Thangapazham"}
               </p>
 
               <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-accent-400">
-                Chairman
+                {message.designation || "Chairman"}
               </p>
             </div>
           </div>

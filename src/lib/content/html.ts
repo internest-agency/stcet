@@ -123,6 +123,7 @@ export const ALLOWED_HTML_CLASSES = new Set<string>([
   "text-secondary-700",
   "text-secondary-800",
   "text-secondary-900",
+  "text-accent-400",
   "text-accent-500",
   "text-accent-600",
   "text-accent-700",

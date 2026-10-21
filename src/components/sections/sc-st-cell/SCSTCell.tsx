@@ -53,7 +53,7 @@ export default function SCSTCell() {
           HERO
       -------------------------------- */}
       <EditorialHero
-        image="/images/committee-hero.webp"
+        image="/images/sc-st-cover-image.webp"
         imageAlt="STCET campus"
       >
         <Breadcrumb

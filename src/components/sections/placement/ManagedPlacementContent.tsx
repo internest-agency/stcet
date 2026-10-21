@@ -1,8 +1,92 @@
 import Image from "next/image";
-import type { IndustryInteraction, PlacementCompany, TrainingProgramme } from "@/src/generated/prisma/client";
+import type {
+  IndustryInteraction,
+  PlacementCompany,
+  TrainingProgramme,
+} from "@/src/generated/prisma/client";
 import Container from "@/src/components/ui/Container";
 
-export default function ManagedPlacementContent({ companies, programmes, interactions }: { companies: PlacementCompany[]; programmes: TrainingProgramme[]; interactions: IndustryInteraction[] }) {
-  if (!companies.length && !programmes.length && !interactions.length) return null;
-  return <section className="bg-white py-14 sm:py-18"><Container><p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Managed placement content</p>{companies.length ? <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{companies.map((company) => <article className="flex min-h-24 items-center gap-3 rounded border border-gray-200 p-3" key={company.id}>{company.logoPath ? <Image alt={`${company.name} logo`} className="h-12 w-20 object-contain" height={48} src={company.logoPath} unoptimized width={80} /> : null}<p className="text-sm font-bold text-gray-800">{company.name}</p></article>)}</div> : null}{programmes.length ? <div className="mt-10"><h2 className="text-2xl font-bold text-primary-700">Training programmes</h2><div className="mt-4 grid gap-4 md:grid-cols-2">{programmes.map((item) => <article className="rounded border border-gray-200 p-5" key={item.id}><h3 className="font-bold">{item.title}</h3>{item.description ? <p className="mt-2 text-sm text-gray-600">{item.description}</p> : null}</article>)}</div></div> : null}{interactions.length ? <div className="mt-10"><h2 className="text-2xl font-bold text-primary-700">Industry interactions</h2><div className="mt-4 flex flex-wrap gap-3">{interactions.map((item) => <span className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700" key={item.id}>{item.title}</span>)}</div></div> : null}</Container></section>;
+export default function ManagedPlacementContent({
+  companies,
+  programmes,
+  interactions,
+}: {
+  companies: PlacementCompany[];
+  programmes: TrainingProgramme[];
+  interactions: IndustryInteraction[];
+}) {
+  if (!companies.length && !programmes.length && !interactions.length)
+    return null;
+  return (
+    <section className="bg-white py-14 sm:py-18">
+      <Container>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+          Managed placement content
+        </p>
+        {companies.length ? (
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {companies.map((company) => (
+              <article
+                className="flex min-h-24 items-center gap-3 rounded border border-gray-200 p-3"
+                key={company.id}
+              >
+                {company.logoPath ? (
+                  <Image
+                    alt={`${company.name} logo`}
+                    className="h-12 w-20 object-contain"
+                    height={48}
+                    src={company.logoPath}
+                    unoptimized
+                    width={80}
+                  />
+                ) : null}
+                <p className="text-sm font-bold text-gray-800">
+                  {company.name}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : null}
+        {programmes.length ? (
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold text-primary-700">
+              Training programmes
+            </h2>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {programmes.map((item) => (
+                <article
+                  className="rounded border border-gray-200 p-5"
+                  key={item.id}
+                >
+                  <h3 className="font-bold">{item.title}</h3>
+                  {item.description ? (
+                    <p className="mt-2 text-sm text-gray-600">
+                      {item.description}
+                    </p>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {interactions.length ? (
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold text-primary-700">
+              Industry interactions
+            </h2>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {interactions.map((item) => (
+                <span
+                  className="rounded bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700"
+                  key={item.id}
+                >
+                  {item.title}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </Container>
+    </section>
+  );
 }

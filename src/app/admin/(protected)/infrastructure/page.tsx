@@ -30,7 +30,7 @@ export default async function InfrastructurePage({
           </p>
         </div>
         <Link
-          className="inline-flex min-h-10 items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-bold"
+          className="inline-flex min-h-10 items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-bold"
           href="/infrastructure"
           target="_blank"
         >

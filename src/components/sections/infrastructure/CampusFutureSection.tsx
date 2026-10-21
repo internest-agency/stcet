@@ -102,7 +102,7 @@ export default function CampusFutureSection() {
             </div>
 
             <SectionHeading as="h2">
-              A Campus Designed for the Feature
+              A Campus Designed for the Future
             </SectionHeading>
 
             <div ref={contentRef} className="mt-7 max-w-lg">

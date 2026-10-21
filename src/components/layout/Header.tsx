@@ -290,8 +290,7 @@ export default function Header({
 }: HeaderProps) {
   const pathname = usePathname();
 
-  const items =
-    menuItems && menuItems.length > 0 ? menuItems : FALLBACK_NAV;
+  const items = menuItems && menuItems.length > 0 ? menuItems : FALLBACK_NAV;
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

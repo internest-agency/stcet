@@ -12,7 +12,11 @@ import type { CommitteeMember } from "@/src/generated/prisma/client";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function InternalComplaintsCommittee({ members }: { members: CommitteeMember[] }) {
+export default function InternalComplaintsCommittee({
+  members,
+}: {
+  members: CommitteeMember[];
+}) {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -49,7 +53,7 @@ export default function InternalComplaintsCommittee({ members }: { members: Comm
     <div ref={sectionRef}>
       {/* HERO */}
       <EditorialHero
-        image="/images/committee-hero.webp"
+        image="/images/icc-cover-image.webp"
         imageAlt="STCET campus and student support"
       >
         <Breadcrumb
@@ -166,7 +170,9 @@ export default function InternalComplaintsCommittee({ members }: { members: Comm
                       </td>
 
                       <td className="px-8 py-7 align-top">
-                        <span className="text-gray-600">{member.designation ?? "—"}</span>
+                        <span className="text-gray-600">
+                          {member.designation ?? "—"}
+                        </span>
 
                         {member.role && (
                           <span className="mt-1 block text-sm text-gray-500">
@@ -195,12 +201,12 @@ export default function InternalComplaintsCommittee({ members }: { members: Comm
                     {member.memberName}
                   </h3>
 
-                  <p className="mt-2 text-gray-600">{member.designation ?? "—"}</p>
+                  <p className="mt-2 text-gray-600">
+                    {member.designation ?? "—"}
+                  </p>
 
                   {member.role && (
-                    <p className="mt-1 text-sm text-gray-500">
-                      {member.role}
-                    </p>
+                    <p className="mt-1 text-sm text-gray-500">{member.role}</p>
                   )}
                 </article>
               ))}

@@ -650,3 +650,165 @@ model ContactMessage {
   @@index([email])
   @@index([createdAt])
 }
+
+model AboutFounder {
+  @@map("AboutFounder")
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(191)
+  designation String?  @db.VarChar(191)
+  roleLabel   String?  @db.VarChar(191)
+  imagePath   String?  @db.VarChar(2048)
+  biography   String?  @db.Text
+  quote       String?  @db.Text
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model AboutChairmanMessage {
+  @@map("AboutChairmanMessage")
+  id               Int      @id @default(autoincrement())
+  eyebrow          String?  @db.VarChar(191)
+  heading          String?  @db.Text
+  quote            String?  @db.Text
+  body             String?  @db.Text
+  closingStatement String?  @db.Text
+  name             String?  @db.VarChar(191)
+  designation      String?  @db.VarChar(191)
+  imagePath        String?  @db.VarChar(2048)
+  isPublished      Boolean  @default(true)
+  createdAt        DateTime @default(now()) @db.DateTime(3)
+  updatedAt        DateTime @updatedAt @db.DateTime(3)
+}
+
+model AboutVisionMission {
+  @@map("AboutVisionMission")
+  id                    Int      @id @default(autoincrement())
+  visionEyebrow         String?  @db.VarChar(191)
+  visionHeading         String?  @db.Text
+  visionStatement       String?  @db.Text
+  visionTags            String?  @db.VarChar(255)
+  visionImagePath       String?  @db.VarChar(2048)
+  visionCaptionTitle    String?  @db.VarChar(255)
+  visionCaptionSubtitle String?  @db.VarChar(255)
+  missionHeading        String?  @db.Text
+  missionIntro          String?  @db.Text
+  missionTags           String?  @db.VarChar(255)
+  isPublished           Boolean  @default(true)
+  createdAt             DateTime @default(now()) @db.DateTime(3)
+  updatedAt             DateTime @updatedAt @db.DateTime(3)
+}
+
+model AboutMissionItem {
+  @@map("AboutMissionItem")
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(191)
+  description String?  @db.Text
+  icon        String?  @db.VarChar(64)
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model AboutTrust {
+  @@map("AboutTrust")
+  id               Int      @id @default(autoincrement())
+  eyebrow          String?  @db.VarChar(191)
+  heading          String?  @db.Text
+  intro            String?  @db.Text
+  closingEyebrow   String?  @db.VarChar(191)
+  closingLabel     String?  @db.VarChar(191)
+  closingStatement String?  @db.Text
+  closingFooter    String?  @db.VarChar(191)
+  isPublished      Boolean  @default(true)
+  createdAt        DateTime @default(now()) @db.DateTime(3)
+  updatedAt        DateTime @updatedAt @db.DateTime(3)
+}
+
+model AboutTrustPillar {
+  @@map("AboutTrustPillar")
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(191)
+  description String?  @db.Text
+  tag         String?  @db.VarChar(191)
+  icon        String?  @db.VarChar(64)
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model PlacementLeadership {
+  @@map("PlacementLeadership")
+  id                 Int      @id @default(autoincrement())
+  eyebrow            String?  @db.VarChar(191)
+  heading            String?  @db.Text
+  description        String?  @db.Text
+  officerName        String?  @db.VarChar(191)
+  officerDesignation String?  @db.VarChar(191)
+  officerImagePath   String?  @db.VarChar(2048)
+  officerImageAlt    String?  @db.VarChar(255)
+  isPublished        Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.DateTime(3)
+  updatedAt          DateTime @updatedAt @db.DateTime(3)
+
+  items              PlacementLeadershipItem[]
+}
+
+model PlacementLeadershipItem {
+  @@map("PlacementLeadershipItem")
+  id           Int      @id @default(autoincrement())
+  leadershipId Int
+  title        String   @db.VarChar(191)
+  description  String?  @db.Text
+  sortOrder    Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.DateTime(3)
+  updatedAt    DateTime @updatedAt @db.DateTime(3)
+
+  leadership   PlacementLeadership @relation(fields: [leadershipId], references: [id], onDelete: Cascade)
+
+  @@index([leadershipId, isPublished, sortOrder])
+}
+
+model Event {
+  @@map("event")
+  id               Int      @id @default(autoincrement())
+  title            String   @db.VarChar(191)
+  slug             String   @unique @db.VarChar(191)
+  shortDescription String?  @db.Text
+  description      String?  @db.Text
+  category         String?  @db.VarChar(120)
+  imagePath        String?  @db.VarChar(2048)
+  imageAlt         String?  @db.VarChar(255)
+  // Dates and times are stored as Asia/Kolkata wall-clock values, never as a
+  // UTC instant, so the value the admin enters is exactly what the public site
+  // shows. `startDate`/`endDate` are ISO `YYYY-MM-DD`; `startTime`/`endTime`
+  // are 24-hour `HH:mm`. ISO date strings sort chronologically, so ordering by
+  // `startDate` stays correct.
+  startDate        String   @db.VarChar(10)
+  startTime        String?  @db.VarChar(5)
+  endDate          String?  @db.VarChar(10)
+  endTime          String?  @db.VarChar(5)
+  isAllDay         Boolean  @default(false)
+  venue            String?  @db.VarChar(191)
+  locationDetails  String?  @db.Text
+  registrationUrl  String?  @db.VarChar(2048)
+  websiteUrl       String?  @db.VarChar(2048)
+  isPublished      Boolean  @default(false)
+  isFeatured       Boolean  @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now()) @db.DateTime(3)
+  updatedAt        DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, startDate])
+  @@index([isPublished, isFeatured, sortOrder])
+}

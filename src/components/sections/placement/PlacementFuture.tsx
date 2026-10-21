@@ -9,36 +9,36 @@ const journeySteps = [
     number: "01",
     title: "Discover Their Strengths",
     description:
-      "Help students understand their interests, strengths and career aspirations.",
+      "Identify individual strengths, interests and career aspirations.",
     keyword: "Discover",
   },
   {
     number: "02",
     title: "Build Relevant Skills",
     description:
-      "Develop the technical, analytical, communication and professional skills required for the workplace.",
+      "Build relevant knowlege, technical skills and essential competencies.",
     keyword: "Develop",
   },
   {
     number: "03",
     title: "Gain Practical Exposure",
     description:
-      "Connect learning with practical experiences through projects, internships, workshops and industry interactions.",
+      "Apply classroom learning through projects, internships and industry interactions.",
     keyword: "Experience",
   },
   {
     number: "04",
     title: "Develop Professional Confidence",
     description:
-      "Prepare students to communicate effectively, participate in recruitment processes and approach professional opportunities with confidence.",
-    keyword: "Confidence",
+      "Develope the confidence, communication skills and professionalism needed for the workplace.",
+    keyword: "Prepare",
   },
   {
     number: "05",
     title: "Pursue the Right Career Opportunities",
     description:
-      "Support students as they explore suitable career pathways and opportunities aligned with their skills and aspirations.",
-    keyword: "Opportunity",
+      "Explore and pursue career opportunities aligned with individual strengths and aspirations.",
+    keyword: "Launch",
   },
 ];
 
@@ -65,9 +65,10 @@ const PlacementFutureIntro = memo(function PlacementFutureIntro() {
         </SectionHeading>
 
         <p className="mt-3 max-w-2xl text-gray-600">
-          Career readiness is a progressive journey. Students build their
-          capabilities step by step, connecting learning, practical exposure and
-          professional development with their future career goals.
+          Career readiness is a journey that evolves with every stage of
+          learning. Through academic knowlege, practical experience and
+          professional development, students progressively build the skills,
+          confidence and capabilities need to achieve their career aspirations.
         </p>
       </div>
     </div>

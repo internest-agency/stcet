@@ -12,7 +12,7 @@ export default function FacilitiesMarquee() {
       >
         <p className="px-4 flex items-center gap-2">
           <GiDiamonds />
-          Seperate Hostels for Boys and Girls
+          Separate Hostels for Boys and Girls
         </p>
         <p className="px-4 flex items-center gap-2">
           <GiDiamonds />

@@ -9,7 +9,11 @@ import SectionHeading from "@/src/components/ui/SectionHeading";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import type { CommitteeMember } from "@/src/generated/prisma/client";
 
-export default function GrievanceRedressal({ members }: { members: CommitteeMember[] }) {
+export default function GrievanceRedressal({
+  members,
+}: {
+  members: CommitteeMember[];
+}) {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -50,7 +54,7 @@ export default function GrievanceRedressal({ members }: { members: CommitteeMemb
           HERO
       -------------------------------- */}
       <EditorialHero
-        image="/images/committee-hero.webp"
+        image="/images/grc-cover-image.webp"
         imageAlt="Students at STCET"
       >
         <Breadcrumb
@@ -160,7 +164,9 @@ export default function GrievanceRedressal({ members }: { members: CommitteeMemb
                       </td>
 
                       <td className="px-8 py-7">
-                        <span className="text-gray-600">{member.designation ?? "—"}</span>
+                        <span className="text-gray-600">
+                          {member.designation ?? "—"}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -180,7 +186,9 @@ export default function GrievanceRedressal({ members }: { members: CommitteeMemb
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
-                    <span className="text-sm text-gray-500">{member.designation ?? "—"}</span>
+                    <span className="text-sm text-gray-500">
+                      {member.designation ?? "—"}
+                    </span>
                   </div>
 
                   <h3 className="mt-4 text-lg font-semibold text-primary-800">
