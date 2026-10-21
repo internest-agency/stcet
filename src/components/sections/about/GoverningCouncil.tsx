@@ -218,10 +218,7 @@ export default function GoverningCouncil({
         ================================================= */}
         <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-5 xl:gap-7">
           {members.map((member) => (
-            <article
-              key={member.id}
-              className="council-card group relative"
-            >
+            <article key={member.id} className="council-card group relative">
               {/* Profile card */}
               <div className="relative isolate overflow-hidden rounded-lg border border-primary-900/10 bg-primary-900 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent-400/60 hover:shadow-xl hover:shadow-primary-900/15">
                 {/* Portrait */}
@@ -232,7 +229,11 @@ export default function GoverningCouncil({
                       className="absolute inset-0 h-full w-full object-cover"
                       fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      src={member.imagePath}
+                      src={
+                        member.imagePath
+                          ? member.imagePath
+                          : "/images/placeholder.jpg"
+                      }
                       unoptimized
                     />
                   ) : (

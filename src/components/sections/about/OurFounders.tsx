@@ -16,7 +16,7 @@ import {
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-const FALLBACK_IMAGE = "/images/gallery/user.png";
+const FALLBACK_IMAGE = "/images/placeholder.jpg";
 
 function FounderRow({
   founder,
@@ -118,7 +118,9 @@ function FounderRow({
   return (
     <article
       className={`founder-item grid border-b border-gray-200 ${
-        reversed ? "lg:grid-cols-[1.15fr_0.85fr]" : "lg:grid-cols-[0.85fr_1.15fr]"
+        reversed
+          ? "lg:grid-cols-[1.15fr_0.85fr]"
+          : "lg:grid-cols-[0.85fr_1.15fr]"
       }`}
     >
       {reversed ? (
