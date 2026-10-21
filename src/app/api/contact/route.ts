@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
+import { sendContactNotification } from "@/src/lib/zeptomail";
 
 export const runtime = "nodejs";
 
@@ -204,8 +205,8 @@ export async function POST(request: Request) {
     const realIp = request.headers.get("x-real-ip");
     const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
 
-    /* =====================================================
-       SAVE TO DATABASE
+/* =====================================================
+        SAVE TO DATABASE
     ===================================================== */
 
     const saved = await prisma.contactMessage.create({
@@ -217,6 +218,19 @@ export async function POST(request: Request) {
         message,
         clientIp,
       },
+    });
+
+    // Send admin notification (non-blocking, fire-and-forget)
+    // Email failure does not affect the user-facing response
+    sendContactNotification({
+      name,
+      email,
+      phone: cleanPhone,
+      subject,
+      message,
+      submittedAt: saved.createdAt.toISOString(),
+    }).catch((error) => {
+      console.error("[Contact API] Notification failed:", error);
     });
 
     return NextResponse.json(

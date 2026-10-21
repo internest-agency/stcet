@@ -40,7 +40,8 @@ export default async function AdmissionsPage() {
               ? "/images/admissions/admission-via-tnea-couselling.webp"
               : "/images/admissions/management-quota-admission.webp"),
           href:
-            route.linkHref || (idx === 0 ? "#tnea-journey" : "/enquire-now"),
+            route.linkHref ||
+            (idx === 0 ? "#tnea-journey" : "/enquire-now#application"),
           button:
             route.linkText ||
             (idx === 0 ? "Explore TNEA Process" : "Enquire Now"),
@@ -107,7 +108,7 @@ export default async function AdmissionsPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Button
-            href="/enquire-now"
+            href="/enquire-now#application"
             variant="accent"
             size="md"
             rightIcon={<FaCircleArrowRight />}
@@ -116,7 +117,7 @@ export default async function AdmissionsPage() {
           </Button>
 
           <Button
-            href="/contact"
+            href="/contact#application"
             variant="primary"
             size="md"
             rightIcon={<FaCircleArrowRight />}

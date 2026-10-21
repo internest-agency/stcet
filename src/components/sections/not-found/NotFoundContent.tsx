@@ -219,7 +219,7 @@ export default function NotFoundContent() {
             </Button>
 
             <Button
-              href="/enquire-now"
+              href="/enquire-now#application"
               variant="primary"
               size="md"
               className="w-full sm:w-auto"

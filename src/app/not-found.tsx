@@ -49,7 +49,6 @@ export default async function NotFound() {
         phoneNumber={settings.phoneNumber}
         altPhone={settings.alternativePhone}
         collegeName={settings.collegeName}
-        footerText={settings.footerText}
       />
 
       <GoToTop />

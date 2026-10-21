@@ -5,7 +5,17 @@ import { FiArrowUpRight, FiMapPin } from "react-icons/fi";
 import Container from "../../ui/Container";
 import SectionHeading from "../../ui/SectionHeading";
 
-export default function ContactMap() {
+interface ContactMapProps {
+  googleMapsEmbedUrl?: string | null;
+}
+
+export default function ContactMap({ googleMapsEmbedUrl }: ContactMapProps) {
+  // Default fallback URL if no saved setting
+  const defaultMapUrl =
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1968.9238610648977!2d77.39888979823965!3d9.25789983241468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0692274960ae49%3A0xf39171ab609456cb!2sS.Thangapazham%20Agricultural%20College!5e0!3m2!1sen!2sin!4v1790304548249!5m2!1sen!2sin";
+
+  const mapUrl = googleMapsEmbedUrl ?? defaultMapUrl;
+
   return (
     <section className="overflow-hidden bg-gray-100 py-14 sm:py-18 lg:py-20">
       <Container>
@@ -22,7 +32,7 @@ export default function ContactMap() {
           <div className="relative aspect-[16/7] min-h-[400px] w-full overflow-hidden sm:min-h-[400px] lg:min-h-[480px]">
             <iframe
               title="S. Thangapazham College of Engineering & Technology location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1968.9238610648977!2d77.39888979823965!3d9.25789983241468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0692274960ae49%3A0xf39171ab609456cb!2sS.Thangapazham%20Agricultural%20College!5e0!3m2!1sen!2sin!4v1790304548249!5m2!1sen!2sin"
+              src={mapUrl}
               className="absolute inset-0 h-full w-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

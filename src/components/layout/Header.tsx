@@ -54,7 +54,7 @@ const FALLBACK_NAV: MenuItemNode[] = [
   ["Infrastructure", "/infrastructure"],
   ["Placements", "/placements"],
   ["Careers", "/careers"],
-  ["Contact Us", "/contact"],
+  ["Contact Us", "/contact#application"],
 ].map(([title, url], index) => ({
   id: -(index + 1),
   parentId: null,
@@ -453,7 +453,7 @@ export default function Header({
           ===================================================== */}
           <div className="hidden lg:block">
             <Button
-              href="/enquire-now"
+              href="/enquire-now#application"
               variant="accent"
               size="md"
               rightIcon={<FaCircleArrowRight />}
@@ -468,7 +468,7 @@ export default function Header({
           <div className="flex items-center gap-2 lg:hidden">
             {/* Mobile Apply */}
             <Link
-              href="/enquire-now"
+              href="/enquire-now#application"
               onClick={closeMobileMenu}
               className="
                 hidden
@@ -624,7 +624,7 @@ export default function Header({
             "
           >
             <Link
-              href="/enquire-now"
+              href="/enquire-now#application"
               onClick={closeMobileMenu}
               className="
                 flex

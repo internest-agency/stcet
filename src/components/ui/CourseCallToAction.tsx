@@ -24,7 +24,7 @@ export default function CourseCallToAction({
   heading,
   eyebrow = "Take the next step",
   actionLabel = "Enquire Now",
-  actionHref = "/enquire-now",
+  actionHref = "/enquire-now#application",
   actionTitle = "Ready to begin?",
   actionDescription = "Explore your opportunities",
 }: CourseCallToActionProps) {

@@ -14,17 +14,18 @@ enum AdminRole {
 
 model AdminUser {
   @@map("adminuser")
-  id             Int               @id @default(autoincrement())
-  name           String            @db.VarChar(120)
-  email          String            @unique @db.VarChar(191)
-  passwordHash   String            @db.VarChar(255)
-  role           AdminRole         @default(CONTENT_EDITOR)
-  isActive       Boolean           @default(true)
-  sessionVersion Int               @default(0)
-  createdAt      DateTime          @default(now()) @db.DateTime(3)
-  updatedAt      DateTime          @updatedAt @db.DateTime(3)
-  auditLogs      AdminAuditLog[]
-  uploadedMedia  MediaAsset[]
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(120)
+  email              String               @unique @db.VarChar(191)
+  passwordHash       String               @db.VarChar(255)
+  role               AdminRole            @default(CONTENT_EDITOR)
+  isActive           Boolean              @default(true)
+  sessionVersion     Int                  @default(0)
+  createdAt          DateTime             @default(now()) @db.DateTime(3)
+  updatedAt          DateTime             @updatedAt @db.DateTime(3)
+  auditLogs          AdminAuditLog[]
+  uploadedMedia      MediaAsset[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model AdminLoginAttempt {
@@ -49,6 +50,21 @@ model AdminAuditLog {
 
   @@index([actorId, createdAt])
   @@index([entityType, entityId, createdAt])
+}
+
+model PasswordResetToken {
+  @@map("passwordresettoken")
+  id        String    @id @default(cuid())
+  tokenHash String    @unique @db.Char(64)
+  userId    Int
+  expiresAt DateTime  @db.DateTime(3)
+  usedAt    DateTime? @db.DateTime(3)
+  createdAt DateTime  @default(now()) @db.DateTime(3)
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Course {
@@ -547,6 +563,19 @@ model SiteSettings {
   footerText             String?        @db.Text
   defaultSeoTitle        String?        @db.VarChar(191)
   defaultMetaDescription String?        @db.VarChar(320)
+  googleMapsEmbedUrl     String?        @db.VarChar(2048)
+  // ZeptoMail email notification settings
+  zeptoEnabled           Boolean        @default(false)
+  zeptoApiEndpoint       String?        @db.VarChar(512)
+  zeptoTokenEncrypted    String?        @db.Text
+  zeptoTokenSalt         String?        @db.VarChar(64)
+  zeptoSenderEmail       String?        @db.VarChar(255)
+  zeptoSenderName        String?        @db.VarChar(191)
+  zeptoAdminEmail        String?        @db.VarChar(255)
+  zeptoNotifyContact     Boolean        @default(true)
+  zeptoNotifyEnquiry     Boolean        @default(true)
+  zeptoLastTestAt        DateTime?
+  zeptoLastTestResult    String?
   createdAt              DateTime       @default(now()) @db.DateTime(3)
   updatedAt              DateTime       @updatedAt @db.DateTime(3)
 }

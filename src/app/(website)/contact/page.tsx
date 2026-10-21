@@ -5,8 +5,11 @@ import Button from "@/src/components/ui/Button";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import { FaCircleArrowRight } from "react-icons/fa6";
+import { getSiteSettings } from "@/src/lib/admin/settings";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
+
   return (
     <>
       <EditorialHero
@@ -39,7 +42,7 @@ export default function ContactPage() {
         </div>
       </EditorialHero>
       <ContactMain />
-      <ContactMap />
+      <ContactMap googleMapsEmbedUrl={settings.googleMapsEmbedUrl} />
     </>
   );
 }

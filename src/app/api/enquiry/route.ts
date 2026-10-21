@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
+import { sendEnquiryNotification } from "@/src/lib/zeptomail";
 
 export const runtime = "nodejs";
 
@@ -439,6 +440,31 @@ export async function POST(request: Request) {
     if (!savedEnquiry) {
       throw new Error("Failed to generate unique enquiry number after retries.");
     }
+
+// Collect course preferences for notification (already validated above)
+    const notificationPreferences = [
+      data.coursePreference1,
+      data.coursePreference2,
+      data.coursePreference3,
+      data.coursePreference4,
+      data.coursePreference5,
+    ].filter(Boolean);
+
+    // Send admin notification (non-blocking, fire-and-forget)
+    // Email failure does not affect the user-facing response
+    sendEnquiryNotification({
+      enquiryNumber: savedEnquiry.enquiryNumber,
+      studentName: data.studentName,
+      studentEmail: data.studentEmail,
+      studentMobile: cleanStudentMobile,
+      parentName: data.parentName,
+      parentMobile: cleanParentMobile,
+      parentEmail: data.parentEmail,
+      coursePreferences: notificationPreferences,
+      submittedAt: savedEnquiry.submittedAt.toISOString(),
+    }).catch((error) => {
+      console.error("[Enquiry API] Notification failed:", error);
+    });
 
     /* =====================================================
        SUCCESS RESPONSE

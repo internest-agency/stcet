@@ -3,7 +3,11 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaCircleArrowRight, FaGraduationCap, FaMagnifyingGlass } from "react-icons/fa6";
+import {
+  FaCircleArrowRight,
+  FaGraduationCap,
+  FaMagnifyingGlass,
+} from "react-icons/fa6";
 import Container from "@/src/components/ui/Container";
 
 export interface CourseListItem {
@@ -32,12 +36,15 @@ export default function CoursesExplorer({ courses }: CoursesExplorerProps) {
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
       const matchesDegree =
-        selectedDegree === "All" || course.degree.toLowerCase() === selectedDegree.toLowerCase();
+        selectedDegree === "All" ||
+        course.degree.toLowerCase() === selectedDegree.toLowerCase();
       const matchesSearch =
         searchQuery.trim() === "" ||
         course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (course.tagline && course.tagline.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()));
+        (course.tagline &&
+          course.tagline.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (course.description &&
+          course.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
       return matchesDegree && matchesSearch;
     });
@@ -140,7 +147,9 @@ export default function CoursesExplorer({ courses }: CoursesExplorerProps) {
                       </p>
                     ) : (
                       <p className="mt-3 text-xs leading-relaxed text-gray-500 sm:text-sm">
-                        Comprehensive four-year undergraduate curriculum offering foundational computing and practical industry training.
+                        Comprehensive four-year undergraduate curriculum
+                        offering foundational computing and practical industry
+                        training.
                       </p>
                     )}
 
@@ -155,7 +164,7 @@ export default function CoursesExplorer({ courses }: CoursesExplorerProps) {
                       </Link>
 
                       <Link
-                        href="/enquire-now"
+                        href="/enquire-now#application"
                         className="text-[11px] font-bold uppercase tracking-wider text-gray-400 hover:text-primary-700"
                       >
                         Enquire
@@ -169,9 +178,12 @@ export default function CoursesExplorer({ courses }: CoursesExplorerProps) {
         ) : (
           <div className="rounded-2xl border border-gray-200 bg-white py-16 text-center">
             <FaGraduationCap className="mx-auto size-12 text-gray-300" />
-            <h4 className="mt-4 text-base font-bold text-gray-800">No Programmes Found</h4>
+            <h4 className="mt-4 text-base font-bold text-gray-800">
+              No Programmes Found
+            </h4>
             <p className="mt-1 text-xs text-gray-500">
-              No course matches the selected criteria. Try resetting your search or filter.
+              No course matches the selected criteria. Try resetting your search
+              or filter.
             </p>
             <button
               type="button"

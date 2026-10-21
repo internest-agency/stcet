@@ -37,8 +37,12 @@ const STATIC_ROUTES: StaticRoute[] = [
   { path: "/gallery", changeFrequency: "monthly", priority: 0.5 },
   { path: "/events", changeFrequency: "weekly", priority: 0.6 },
   { path: "/careers", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/enquire-now", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/contact#application", changeFrequency: "monthly", priority: 0.6 },
+  {
+    path: "/enquire-now#application",
+    changeFrequency: "monthly",
+    priority: 0.8,
+  },
   { path: "/iqac", changeFrequency: "monthly", priority: 0.5 },
   { path: "/sc-st-cell", changeFrequency: "monthly", priority: 0.4 },
   {
@@ -100,10 +104,16 @@ export const dynamic = "force-dynamic";
  * a cross-origin canonical means the page's real canonical lives elsewhere, so
  * it is excluded from the sitemap.
  */
-function resolveCanonical(value: string | null | undefined, base: string, fallbackPath: string) {
+function resolveCanonical(
+  value: string | null | undefined,
+  base: string,
+  fallbackPath: string,
+) {
   try {
     const absolute = new URL(value?.trim() || fallbackPath, base);
-    return absolute.origin === new URL(base).origin ? absolute.toString() : null;
+    return absolute.origin === new URL(base).origin
+      ? absolute.toString()
+      : null;
   } catch {
     return null;
   }
@@ -112,7 +122,9 @@ function resolveCanonical(value: string | null | undefined, base: string, fallba
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
   const data = await getSitemapData();
-  const seoByPath = new Map(data.pageSeo.map((record) => [record.pagePath, record]));
+  const seoByPath = new Map(
+    data.pageSeo.map((record) => [record.pagePath, record]),
+  );
 
   const entries = new Map<string, MetadataRoute.Sitemap[number]>();
   const add = (entry: MetadataRoute.Sitemap[number]) => {
@@ -141,7 +153,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const course of data.courses) {
     if (!course.isPublished || course.noIndex) continue;
 
-    const url = resolveCanonical(course.canonicalUrl, base, `/courses/${course.slug}`);
+    const url = resolveCanonical(
+      course.canonicalUrl,
+      base,
+      `/courses/${course.slug}`,
+    );
     if (!url) continue;
 
     add({

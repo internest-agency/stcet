@@ -69,7 +69,7 @@ export default function EnquirySupport() {
                 your enquiry.
               </p>
               <Button
-                href={"/contact"}
+                href={"/contact#application"}
                 variant="accent"
                 size="md"
                 rightIcon={<FaCircleArrowRight />}

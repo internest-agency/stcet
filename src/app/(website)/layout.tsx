@@ -40,7 +40,6 @@ export default async function WebsiteLayout({
           phoneNumber={settings.phoneNumber}
           altPhone={settings.alternativePhone}
           collegeName={settings.collegeName}
-          footerText={settings.footerText}
         />
       </SmoothScroll>
       <EnquireNow />

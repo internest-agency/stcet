@@ -17,7 +17,7 @@ const globalForPrisma = globalThis as typeof globalThis & {
 // to be restarted after `prisma generate`, because Turbopack can retain the
 // previously compiled generated client, which then rejects new fields (e.g.
 // `instructions`) with a PrismaClientValidationError.
-const prismaSchemaRevision = "20261021160000";
+const prismaSchemaRevision = "20261021190000";
 
 // The MariaDB driver reports connection failures to the pool, which surfaces
 // them to Prisma only as a generic "pool timeout" (45028). That hides the

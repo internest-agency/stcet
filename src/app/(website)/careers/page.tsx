@@ -37,7 +37,7 @@ export default function CareerPage() {
           </Button>
 
           <Button
-            href="/contact"
+            href="/contact#application"
             variant="primary"
             rightIcon={<FaCircleArrowRight />}
           >

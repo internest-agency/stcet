@@ -147,7 +147,7 @@ export default function HeroSection1() {
             className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center"
           >
             <Button
-              href={"/enquire-now"}
+              href={"/enquire-now#application"}
               variant="accent"
               size="md"
               rightIcon={<FiArrowRight />}

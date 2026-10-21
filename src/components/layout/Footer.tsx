@@ -6,38 +6,40 @@ import { BsEnvelope } from "react-icons/bs";
 import { FaFacebook, FaYoutube, FaLinkedin } from "react-icons/fa";
 import { PiInstagramLogoFill } from "react-icons/pi";
 import { FaXTwitter } from "react-icons/fa6";
-import { getSiteSettings } from "@/src/lib/admin/settings";
+import { FaWhatsapp } from "react-icons/fa6";
+import {
+  getSiteSettings,
+  parseSocialLinks,
+  SocialLinksConfig,
+} from "@/src/lib/admin/settings";
 
-type SocialKey = "instagram" | "youtube" | "facebook" | "linkedin" | "x";
-
-const socialNetworks: {
-  key: SocialKey;
-  label: string;
-  Icon: ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
-}[] = [
-  { key: "instagram", label: "Instagram", Icon: PiInstagramLogoFill },
-  { key: "youtube", label: "YouTube", Icon: FaYoutube },
-  { key: "facebook", label: "Facebook", Icon: FaFacebook },
-  { key: "linkedin", label: "LinkedIn", Icon: FaLinkedin },
-  { key: "x", label: "X", Icon: FaXTwitter },
-];
-
-function configuredSocialLinks(value: unknown) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
-
-  return socialNetworks.flatMap(({ key, label, Icon }) => {
-    const candidate = (value as Record<string, unknown>)[key];
-    if (typeof candidate !== "string") return [];
-
-    try {
-      const url = new URL(candidate);
-      if (url.protocol !== "https:" && url.protocol !== "http:") return [];
-      return [{ key, label, Icon, href: url.toString() }];
-    } catch {
-      return [];
-    }
-  });
-}
+const socialNetworks = Object.entries(SocialLinksConfig).map(([key, label]) => {
+  let Icon: ComponentType<{ "aria-hidden"?: boolean; className?: string }>;
+  switch (key) {
+    case "instagram":
+      Icon = PiInstagramLogoFill;
+      break;
+    case "facebook":
+      Icon = FaFacebook;
+      break;
+    case "youtube":
+      Icon = FaYoutube;
+      break;
+    case "linkedin":
+      Icon = FaLinkedin;
+      break;
+    case "x":
+      Icon = FaXTwitter;
+      break;
+    case "whatsapp":
+      Icon = FaWhatsapp;
+      break;
+    default:
+      const PlaceholderIcon: React.FC = () => null;
+      Icon = PlaceholderIcon;
+  }
+  return { key, label, Icon };
+});
 
 interface FooterNavLink {
   label: string;
@@ -104,20 +106,24 @@ export default async function Footer({
   phoneNumber,
   altPhone,
   collegeName,
-  footerText,
 }: {
   address: string | null;
   contactEmail: string | null;
   phoneNumber: string | null;
   altPhone: string | null;
   collegeName: string | null;
-  footerText: string | null;
 }) {
   const settings = await getSiteSettings();
   const { importantLinks, quickLinks } = parseFooterLinks(
     settings.footerLinks ?? null,
   );
-  const configuredLinks = configuredSocialLinks(settings.socialLinks);
+  const { valid: configuredLinks } = parseSocialLinks(settings.socialLinks);
+
+  // Attach icons to the parsed social links
+  const linksWithIcons = configuredLinks.map((link) => {
+    const network = socialNetworks.find((n) => n.key === link.key);
+    return { ...link, Icon: network?.Icon ?? (() => null) };
+  });
 
   return (
     <footer className="relative overflow-hidden bg-[url('/images/boys-hostel.webp')] bg-cover bg-center">
@@ -219,7 +225,10 @@ export default async function Footer({
                   </Link>
                 </li>
                 <li>
-                  <Link className={footerLinkClass} href="/enquire-now">
+                  <Link
+                    className={footerLinkClass}
+                    href="/enquire-now#application"
+                  >
                     Contact
                   </Link>
                 </li>
@@ -284,14 +293,14 @@ export default async function Footer({
               </li>
             </ul>
 
-            {configuredLinks.length > 0 ? (
+            {linksWithIcons.length > 0 ? (
               <nav aria-label="Social media" className="mt-6">
                 <ul className="flex flex-wrap gap-2.5">
-                  {configuredLinks.map(({ key, label, Icon, href }) => (
+                  {linksWithIcons.map(({ key, label, Icon, href }) => (
                     <li key={key}>
                       <a
                         aria-label={label}
-                        className="grid size-10 place-items-center rounded-full text-accent-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-300"
+                        className="grid size-10 place-items-center rounded-full text-accent-300 bg-white/10 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-300"
                         href={href}
                         rel="noopener noreferrer"
                         target="_blank"
@@ -315,3 +324,5 @@ export default async function Footer({
     </footer>
   );
 }
+
+Footer.displayName = "Footer";

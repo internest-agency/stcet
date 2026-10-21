@@ -28,7 +28,7 @@ export default function ExperienceSTCET() {
               need to learn, explore and grow.
             </p>
             <Button
-              href="/enquire-now"
+              href="/enquire-now#application"
               variant="accent"
               rightIcon={<FaCircleArrowRight />}
             >
