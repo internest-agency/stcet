@@ -557,6 +557,8 @@ model Faculty {
   name           String    @db.VarChar(191)
   designation    String    @db.VarChar(191)
   department     String?   @db.VarChar(191)
+  group          String?   @db.VarChar(191)
+  groupId        Int?
   auFin          String?   @db.VarChar(64)
   aicteId        String?   @db.VarChar(128)
   qualification  String?   @db.VarChar(255)
@@ -571,9 +573,26 @@ model Faculty {
   createdAt      DateTime  @default(now()) @db.DateTime(3)
   updatedAt      DateTime  @updatedAt @db.DateTime(3)
 
+  groupRef FacultyGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
   @@index([isPublished, sortOrder])
   @@index([designation])
   @@index([auFin])
+  @@index([groupId])
+}
+
+model FacultyGroup {
+  @@map("FacultyGroup")
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(191)
+  slug      String    @unique @db.VarChar(191)
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now()) @db.DateTime(3)
+  updatedAt DateTime  @updatedAt @db.DateTime(3)
+
+  members Faculty[]
+
+  @@index([sortOrder])
 }
 
 model Enquiry {
@@ -738,6 +757,22 @@ model AboutTrustPillar {
   description String?  @db.Text
   tag         String?  @db.VarChar(191)
   icon        String?  @db.VarChar(64)
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @db.DateTime(3)
+
+  @@index([isPublished, sortOrder])
+}
+
+model GoverningCouncilMember {
+  @@map("GoverningCouncilMember")
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(191)
+  role        String   @db.VarChar(191)
+  imagePath   String?  @db.VarChar(2048)
+  imageAlt    String?  @db.VarChar(255)
+  biography   String?  @db.Text
   sortOrder   Int      @default(0)
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now()) @db.DateTime(3)

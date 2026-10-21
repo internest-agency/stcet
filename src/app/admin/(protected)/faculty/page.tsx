@@ -46,6 +46,7 @@ export default async function AdminFacultyPage({
       <FacultyManager
         canPublish={isAdministrator(admin)}
         designations={facets.designations}
+        groups={facets.groups}
         members={faculty.members}
         page={faculty.page}
         pageCount={faculty.pageCount}

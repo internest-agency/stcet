@@ -4,6 +4,7 @@ import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import { getPublishedFaculty } from "@/src/lib/queries/faculty";
+import { getFacultyGroups } from "@/src/lib/queries/faculty-groups";
 import { getPageSeo } from "@/src/lib/queries/seo";
 
 const PAGE_PATH = "/faculty";
@@ -32,7 +33,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
 };
 
 export default async function FacultyPage() {
-  const members = await getPublishedFaculty();
+  const [members, groups] = await Promise.all([
+    getPublishedFaculty(),
+    getFacultyGroups(),
+  ]);
 
   return (
     <>
@@ -54,7 +58,7 @@ export default async function FacultyPage() {
           college.
         </p>
       </EditorialHero>
-      <FacultyGrid members={members} />
+      <FacultyGrid groups={groups} members={members} />
     </>
   );
 }

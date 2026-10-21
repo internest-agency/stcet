@@ -21,6 +21,8 @@ function readFaculty(formData: FormData) {
     name: formData.get("name"),
     designation: formData.get("designation"),
     department: formData.get("department") ?? "",
+    group: formData.get("group") ?? "",
+    groupId: formData.get("groupId") ?? "",
     auFin: formData.get("auFin") ?? "",
     aicteId: formData.get("aicteId") ?? "",
     qualification: formData.get("qualification") ?? "",
@@ -35,11 +37,17 @@ function readFaculty(formData: FormData) {
   });
 }
 
-function facultyData(content: FacultyEditorInput, isPublished: boolean) {
+function facultyData(
+  content: FacultyEditorInput,
+  isPublished: boolean,
+  group: { id: number; name: string } | null,
+) {
   return {
     name: content.name,
     designation: content.designation,
     department: content.department || null,
+    group: group?.name ?? null,
+    groupId: group?.id ?? null,
     auFin: content.auFin || null,
     aicteId: content.aicteId || null,
     qualification: content.qualification || null,
@@ -54,9 +62,11 @@ function facultyData(content: FacultyEditorInput, isPublished: boolean) {
   };
 }
 
-function refreshFaculty() {
+  function refreshFaculty() {
   revalidatePath("/admin/faculty");
+  revalidatePath("/admin/faculty/groups");
   revalidatePath("/faculty");
+  revalidatePath("/faculties");
   revalidatePath("/");
 }
 
@@ -93,6 +103,13 @@ export async function saveFaculty(formData: FormData): Promise<FacultyActionResu
     };
   }
 
+  const resolvedGroup = parsed.data.groupId
+    ? await prisma.facultyGroup.findUnique({ where: { id: parsed.data.groupId }, select: { id: true, name: true } })
+    : null;
+  if (parsed.data.groupId && !resolvedGroup) {
+    return { success: false, error: "Select a valid faculty group." };
+  }
+
   const photo = parsed.data.photo || "";
   if (
     !(await validateImageReferences(
@@ -104,7 +121,7 @@ export async function saveFaculty(formData: FormData): Promise<FacultyActionResu
   }
 
   const isPublished = isAdministrator(admin) && parsed.data.isPublished;
-  const data = facultyData(parsed.data, isPublished);
+  const data = facultyData(parsed.data, isPublished, resolvedGroup);
 
   try {
     const member = await prisma.$transaction(async (transaction) => {

@@ -173,10 +173,14 @@ export default function ChairmansMessage({
               </span>
             </div>
 
-            <SectionHeading as="h2" className="text-white! mb-8" html={message.heading ?? undefined} />
+            <SectionHeading
+              as="h2"
+              className="text-white! mb-8"
+              html={message.heading ?? undefined}
+            />
 
             {/* Chairman Image Placeholder */}
-            <div className="chairman-image relative mb-8 aspect-[4/5] max-w-sm overflow-hidden bg-primary-700/40">
+            <div className="chairman-image relative mb-8 aspect-[4/3] max-w-sm overflow-hidden bg-primary-700/40">
               {imagePath ? (
                 <Image
                   src={imagePath}

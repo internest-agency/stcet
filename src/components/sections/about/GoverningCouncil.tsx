@@ -12,58 +12,19 @@ import SectionHeading from "../../ui/SectionHeading";
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-const councilMembers = [
-  {
-    number: "01",
-    name: "Shri.Murugesan T",
-    role: "Chairman",
-    image: "/images/council/murugesan-t.jpg",
-  },
-  {
-    number: "02",
-    name: "Shri.Balakrishnan G",
-    role: "Trust Nominee",
-    image: "/images/council/balakrishnan-g.jpg",
-  },
-  {
-    number: "03",
-    name: "Shri.Murugaiah A",
-    role: "Trust Nominee",
-    image: "/images/council/murugaiah-a.jpg",
-  },
-  {
-    number: "04",
-    name: "Shri.Tamil Veeran R",
-    role: "Academic Expert",
-    image: "/images/council/tamil-veeran-r.jpg",
-  },
-  {
-    number: "05",
-    name: "Shri.Bala Murugan C",
-    role: "Academic Expert",
-    image: "/images/council/bala-murugan-c.jpg",
-  },
-  {
-    number: "06",
-    name: "Prof.Dr.Manikandan V",
-    role: "Faculty from Affiliated College",
-    image: "/images/council/manikandan-v.jpg",
-  },
-  {
-    number: "07",
-    name: "Shri.Rajkumar C",
-    role: "Industrial Expert",
-    image: "/images/council/rajkumar-c.jpg",
-  },
-  {
-    number: "08",
-    name: "Prof.Dr.Sundaram M",
-    role: "Member Secretary (ex-officio)",
-    image: "/images/council/sundaram-m.jpg",
-  },
-];
+export interface GoverningCouncilMember {
+  id: number;
+  name: string;
+  role: string;
+  imagePath: string | null;
+  imageAlt: string | null;
+}
 
-export default function GoverningCouncil() {
+export default function GoverningCouncil({
+  members,
+}: {
+  members: GoverningCouncilMember[];
+}) {
   const sectionRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -256,16 +217,27 @@ export default function GoverningCouncil() {
             FUTURISTIC GOVERNING COUNCIL GRID
         ================================================= */}
         <div className="mt-14 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-5 xl:gap-7">
-          {councilMembers.map((member) => (
+          {members.map((member) => (
             <article
-              key={member.number}
+              key={member.id}
               className="council-card group relative"
             >
               {/* Profile card */}
               <div className="relative isolate overflow-hidden rounded-lg border border-primary-900/10 bg-primary-900 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent-400/60 hover:shadow-xl hover:shadow-primary-900/15">
                 {/* Portrait */}
                 <div className="council-card-image flex flex-col items-center justify-center relative aspect-[4/5] overflow-hidden bg-primary-800">
-                  <FaUser className="text-gray-200/20 text-9xl" />
+                  {member.imagePath ? (
+                    <Image
+                      alt={member.imageAlt || member.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      src={member.imagePath}
+                      unoptimized
+                    />
+                  ) : (
+                    <FaUser className="text-gray-200/20 text-9xl" />
+                  )}
 
                   {/* Cinematic image overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/25 to-primary-900/10 opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
@@ -283,7 +255,7 @@ export default function GoverningCouncil() {
 
                   {/* Member identity */}
                   <div className="council-card-content absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                    <h3 className="text-lg uppercase font-semibold leading-tight tracking-tight text-white">
+                    <h3 className="text-lg font-semibold leading-tight tracking-tight text-white">
                       {member.name}
                     </h3>
 
@@ -298,6 +270,12 @@ export default function GoverningCouncil() {
             </article>
           ))}
         </div>
+
+        {members.length === 0 ? (
+          <p className="mt-14 rounded-lg border border-dashed border-primary-900/15 bg-primary-50/40 px-6 py-12 text-center text-sm text-gray-600 sm:mt-16 lg:mt-20">
+            Governing Council members will be listed here soon.
+          </p>
+        ) : null}
       </Container>
     </section>
   );

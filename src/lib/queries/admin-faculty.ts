@@ -64,6 +64,8 @@ export async function getAdminFaculty(options: {
       name: true,
       designation: true,
       department: true,
+      group: true,
+      groupId: true,
       auFin: true,
       aicteId: true,
       qualification: true,
@@ -91,7 +93,7 @@ export async function getAdminFaculty(options: {
 export async function getAdminFacultyFacets() {
   await requireAdmin();
   const prisma = getPrismaClient();
-  const [designations, departments] = await Promise.all([
+  const [designations, departments, groups] = await Promise.all([
     prisma.faculty.findMany({
       distinct: ["designation"],
       orderBy: { designation: "asc" },
@@ -102,6 +104,10 @@ export async function getAdminFacultyFacets() {
       orderBy: { department: "asc" },
       select: { department: true },
     }),
+    prisma.facultyGroup.findMany({
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      select: { id: true, name: true },
+    }),
   ]);
 
   return {
@@ -111,5 +117,6 @@ export async function getAdminFacultyFacets() {
     departments: departments
       .map((row) => row.department)
       .filter((value): value is string => Boolean(value)),
+    groups,
   };
 }

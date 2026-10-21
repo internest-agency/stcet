@@ -8,6 +8,8 @@ export interface PublicFacultyMember {
   name: string;
   designation: string;
   department: string | null;
+  group: string | null;
+  groupId: number | null;
   auFin: string | null;
   aicteId: string | null;
   qualification: string | null;
@@ -17,6 +19,7 @@ export interface PublicFacultyMember {
   phone: string | null;
   photo: string | null;
   bio: string | null;
+  sortOrder: number;
 }
 
 export async function getPublishedFaculty(): Promise<PublicFacultyMember[]> {
@@ -34,6 +37,8 @@ export async function getPublishedFaculty(): Promise<PublicFacultyMember[]> {
         name: true,
         designation: true,
         department: true,
+        group: true,
+        groupId: true,
         auFin: true,
         aicteId: true,
         qualification: true,
@@ -43,6 +48,7 @@ export async function getPublishedFaculty(): Promise<PublicFacultyMember[]> {
         phone: true,
         photo: true,
         bio: true,
+        sortOrder: true,
       },
     });
   } catch {

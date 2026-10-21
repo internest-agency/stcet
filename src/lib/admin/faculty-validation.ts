@@ -27,10 +27,23 @@ const optionalExperience = z.preprocess(
   z.coerce.number().finite().min(0).max(80).optional(),
 );
 
+const optionalGroupId = z.preprocess(
+  (value) =>
+    typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(2_147_483_647)
+    .optional(),
+);
+
 export const facultyEditorSchema = z.object({
   name: z.string().trim().min(2).max(191),
   designation: z.string().trim().min(1).max(191),
   department: optionalText(191),
+  group: optionalText(191),
+  groupId: optionalGroupId,
   auFin: optionalText(64),
   aicteId: optionalText(128),
   qualification: optionalText(255),

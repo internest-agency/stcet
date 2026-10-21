@@ -37,6 +37,8 @@ export type FacultyRow = {
   name: string;
   designation: string;
   department: string | null;
+  group: string | null;
+  groupId: number | null;
   auFin: string | null;
   aicteId: string | null;
   qualification: string | null;
@@ -169,12 +171,14 @@ function useFacultyAction(
 function FacultyForm({
   member,
   canPublish,
+  groups,
   onToggleDirty,
   onRequestClose,
   onSaved,
 }: {
   member?: FacultyRow;
   canPublish: boolean;
+  groups: { id: number; name: string }[];
   onToggleDirty: (dirty: boolean) => void;
   onRequestClose: () => void;
   onSaved: (message: string) => void;
@@ -225,6 +229,21 @@ function FacultyForm({
               maxLength={191}
               name="department"
             />
+          </Field>
+          <Field id={`${id}-group`} label="Group">
+            <select
+              className={inputClass}
+              defaultValue={member?.groupId ? String(member.groupId) : ""}
+              id={`${id}-group`}
+              name="groupId"
+            >
+              <option value="">No group</option>
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
           </Field>
           <Field id={`${id}-qualification`} label="Qualification">
             <input
@@ -503,6 +522,7 @@ export default function FacultyManager({
   status,
   sort,
   designations,
+  groups,
 }: {
   canPublish: boolean;
   members: FacultyRow[];
@@ -515,6 +535,7 @@ export default function FacultyManager({
   status: "all" | "published" | "draft";
   sort: "updated" | "name" | "designation" | "order";
   designations: string[];
+  groups: { id: number; name: string }[];
 }) {
   const router = useRouter();
   const [editor, setEditor] = useState<
@@ -911,6 +932,11 @@ export default function FacultyManager({
                           {member.auFin ? `AU-FIN ${member.auFin}` : "No AU-FIN"} ·{" "}
                           {member.aicteId ? `AICTE ${member.aicteId}` : "No AICTE"}
                         </span>
+                        {member.group ? (
+                          <span className="mt-0.5 block text-primary-600">
+                            Group: {member.group}
+                          </span>
+                        ) : null}
                       </p>
                     </td>
                     <td className="px-3 py-2 text-sm text-gray-600">{member.sortOrder}</td>
@@ -978,6 +1004,11 @@ export default function FacultyManager({
                             {member.auFin ? `AU-FIN ${member.auFin}` : "No AU-FIN"} ·{" "}
                             {member.aicteId ? `AICTE ${member.aicteId}` : "No AICTE"}
                           </p>
+                          {member.group ? (
+                            <p className="mt-1 text-[11px] text-primary-600">
+                              Group: {member.group}
+                            </p>
+                          ) : null}
                           <p className="mt-1 text-[11px] text-gray-500">
                             Order {member.sortOrder} ·{" "}
                             <span
@@ -1078,6 +1109,7 @@ export default function FacultyManager({
           ) : (
             <FacultyForm
               canPublish={canPublish}
+              groups={groups}
               member={editor.mode === "edit" ? editor.member : undefined}
               onRequestClose={closeEditor}
               onSaved={handleSaved}

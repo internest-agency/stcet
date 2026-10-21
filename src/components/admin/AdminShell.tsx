@@ -21,6 +21,7 @@ import {
   Settings2,
   ShieldCheck,
   UserRound,
+  Users,
   X,
 } from "lucide-react";
 import { logoutAdmin } from "@/src/app/admin/actions";
@@ -32,8 +33,10 @@ const availableLinks = [
   { href: "/admin/contact-messages", label: "Contact Messages", icon: Mail },
   { href: "/admin/events", label: "Events", icon: CalendarDays },
   { href: "/admin/about", label: "About", icon: Building2 },
+  { href: "/admin/governing-council", label: "Governing Council", icon: UserRound },
   { href: "/admin/courses", label: "Courses", icon: GraduationCap },
   { href: "/admin/faculty", label: "Faculty", icon: UserRound },
+  { href: "/admin/faculty/groups", label: "Faculty Groups", icon: Users },
   { href: "/admin/gallery", label: "Gallery", icon: Image },
   { href: "/admin/admissions", label: "Admissions", icon: ClipboardList },
   { href: "/admin/scholarships", label: "Scholarships", icon: BookOpen },
@@ -56,6 +59,7 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/admin/enquiries")) return "Enquiries";
   if (pathname.startsWith("/admin/contact-messages")) return "Contact Messages";
   if (pathname.startsWith("/admin/courses")) return "Courses";
+  if (pathname.startsWith("/admin/faculty/groups")) return "Faculty Groups";
   if (pathname.startsWith("/admin/faculty")) return "Faculty";
   if (pathname.startsWith("/admin/gallery")) return "Gallery";
   if (pathname.startsWith("/admin/admissions")) return "Admissions";
@@ -72,6 +76,8 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/admin/institutional-pages"))
     return "Institutional Pages";
   if (pathname.startsWith("/admin/about")) return "About";
+  if (pathname.startsWith("/admin/governing-council"))
+    return "Governing Council";
   return "Dashboard";
 }
 

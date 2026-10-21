@@ -32,6 +32,7 @@ export const UPLOAD_CATEGORIES = [
   "pages",
   "faculty",
   "about",
+  "council",
   "events",
 ] as const;
 

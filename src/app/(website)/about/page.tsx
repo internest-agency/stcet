@@ -6,9 +6,13 @@ import OurLegacy from "@/src/components/sections/about/OurLegacy";
 import OurTrust from "@/src/components/sections/about/OurTrust";
 import VisionMission from "@/src/components/sections/about/VisionMission";
 import { getPublishedAboutContent } from "@/src/lib/queries/about";
+import { getPublishedGoverningCouncilMembers } from "@/src/lib/queries/governing-council";
 
 export default async function AboutPage() {
-  const content = await getPublishedAboutContent();
+  const [content, councilMembers] = await Promise.all([
+    getPublishedAboutContent(),
+    getPublishedGoverningCouncilMembers(),
+  ]);
 
   return (
     <>
@@ -16,7 +20,7 @@ export default async function AboutPage() {
       <OurLegacy />
       <OurFounders founders={content?.founders} />
       <ChairmansMessage message={content?.chairman ?? undefined} />
-      <GoverningCouncil />
+      <GoverningCouncil members={councilMembers} />
       <OurTrust content={content?.trust ?? undefined} />
       <VisionMission content={content?.visionMission ?? undefined} />
     </>

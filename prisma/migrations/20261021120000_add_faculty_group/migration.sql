@@ -1,0 +1,1 @@
+ALTER TABLE `faculty` ADD COLUMN `group` VARCHAR(191) NULL;
