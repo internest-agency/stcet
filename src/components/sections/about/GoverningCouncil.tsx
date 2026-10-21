@@ -220,25 +220,21 @@ export default function GoverningCouncil({
           {members.map((member) => (
             <article key={member.id} className="council-card group relative">
               {/* Profile card */}
-              <div className="relative isolate overflow-hidden rounded-lg border border-primary-900/10 bg-primary-900 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-accent-400/60 hover:shadow-xl hover:shadow-primary-900/15">
+              <div className="relative isolate overflow-hidden rounded-lg shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl">
                 {/* Portrait */}
                 <div className="council-card-image flex flex-col items-center justify-center relative aspect-[4/5] overflow-hidden bg-primary-800">
-                  {member.imagePath ? (
-                    <Image
-                      alt={member.imageAlt || member.name}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      fill
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      src={
-                        member.imagePath
-                          ? member.imagePath
-                          : "/images/placeholder.jpg"
-                      }
-                      unoptimized
-                    />
-                  ) : (
-                    <FaUser className="text-gray-200/20 text-9xl" />
-                  )}
+                  <Image
+                    alt={member.imageAlt || member.name}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    fill
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    src={
+                      member.imagePath
+                        ? member.imagePath
+                        : "/images/placeholder.jpg"
+                    }
+                    unoptimized
+                  />
 
                   {/* Cinematic image overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/25 to-primary-900/10 opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
