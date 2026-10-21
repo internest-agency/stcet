@@ -176,10 +176,6 @@ function FacultyGroupSection({
         >
           {group.name}
         </h3>
-        <span className="text-xs font-semibold text-gray-400">
-          {group.members.length}{" "}
-          {group.members.length === 1 ? "member" : "members"}
-        </span>
       </div>
 
       <div className={gridClass}>
