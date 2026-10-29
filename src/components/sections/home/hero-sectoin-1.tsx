@@ -151,7 +151,7 @@ export default function HeroSection1() {
               variant="accent"
               size="md"
               rightIcon={<FiArrowRight />}
-              className="min-h-12 px-7 text-sm font-semibold tracking-wide shadow-[0_12px_30px_-12px_rgba(255,100,45,0.8)] focus:ring-offset-[#031637] sm:text-base"
+              className="min-h-12 px-7 text-sm font-semibold tracking-wide sm:text-base"
             >
               Enquire Now
             </Button>
@@ -186,8 +186,6 @@ export default function HeroSection1() {
             Creating opportunities
           </p>
         </div>
-
-        <div className="pointer-events-none absolute right-16 top-24 hidden h-3 w-3 rounded-full bg-[#ff642d] shadow-[0_0_25px_8px_rgba(255,100,45,0.2)] lg:block" />
       </div>
     </section>
   );

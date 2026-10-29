@@ -143,6 +143,7 @@ export default function Dropdown({
                   duration-200
                   hover:bg-primary-700
                   hover:text-white
+                  active:text-white
                   focus:bg-primary-700
                   focus:text-white
                   focus:outline-none

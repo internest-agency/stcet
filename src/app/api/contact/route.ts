@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
 import { sendContactNotification } from "@/src/lib/zeptomail";
+import { rateLimit, getClientIp } from "@/src/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -28,6 +29,36 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    /* =====================================================
+       RATE LIMITING
+    ===================================================== */
+
+    const clientIp = getClientIp(request);
+    const rateLimitResult = rateLimit(`contact:${clientIp}`, {
+      windowMs: 60 * 60 * 1000, // 1 hour
+      maxRequests: 5, // 5 requests per hour per IP
+    });
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Too many requests. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetTime - Date.now()) / 1000
+            ).toString(),
+          },
+        },
+      );
+    }
+
     /* =====================================================
        PARSE INCOMING REQUEST (FormData or JSON)
     ===================================================== */
@@ -98,6 +129,19 @@ export async function POST(request: Request) {
         {
           success: false,
           message: `Please complete all required fields: ${missing.join(", ")}.`,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // Length validation
+    if (name.length > 100 || email.length > 191 || phone.length > 20 || subject.length > 200 || message.length > 5000) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Input exceeds maximum allowed length.",
         },
         {
           status: 400,
@@ -198,12 +242,8 @@ export async function POST(request: Request) {
     }
 
     /* =====================================================
-       CLIENT IP
+       CLIENT IP (already obtained for rate limiting)
     ===================================================== */
-
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const realIp = request.headers.get("x-real-ip");
-    const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
 
 /* =====================================================
         SAVE TO DATABASE

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "security-audit": {
+      "source": "xsourabhsharma/ai-security-audit-pro",
+      "sourceType": "github",
+      "skillPath": "skills/security-audit/SKILL.md",
+      "computedHash": "bd44577335a84cac9270efe85333b162f629cbab3c3a0a6ac2e5087c9379d9cb"
+    },
+    "web-app-penetration-testing": {
+      "source": "usestrix/strix",
+      "sourceType": "github",
+      "skillPath": "skills/web-app-penetration-testing/SKILL.md",
+      "computedHash": "4a26881a2e8d289611e12557aea27f729facfa4aef777ddcb43a6b6f7d6fe2ee"
+    },
+    "website-security-audit": {
+      "source": "smartworldarafath/rea_skill",
+      "sourceType": "github",
+      "skillPath": "skills/website-security-audit/SKILL.md",
+      "computedHash": "b5fadbb3c9a76669a8d98155fe777fe564a9027744468c97cb426be2e856fe81"
+    }
+  }
+}

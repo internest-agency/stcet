@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
 import { sendEnquiryNotification } from "@/src/lib/zeptomail";
+import { rateLimit, getClientIp } from "@/src/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -70,6 +71,36 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    /* =====================================================
+       RATE LIMITING
+    ===================================================== */
+
+    const clientIp = getClientIp(request);
+    const rateLimitResult = rateLimit(`enquiry:${clientIp}`, {
+      windowMs: 60 * 60 * 1000, // 1 hour
+      maxRequests: 5, // 5 requests per hour per IP
+    });
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Too many requests. Please try again later.",
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetTime - Date.now()) / 1000
+            ).toString(),
+          },
+        },
+      );
+    }
+
     /* =====================================================
        PARSE INCOMING REQUEST (FormData or JSON)
     ===================================================== */
@@ -192,6 +223,26 @@ export async function POST(request: Request) {
           message: `Please complete the following required fields: ${missingFields.join(
             ", ",
           )}.`,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // Length validation
+    if (
+      (data.studentName && data.studentName.length > 200) ||
+      (data.studentEmail && data.studentEmail.length > 191) ||
+      (data.studentMobile && data.studentMobile.length > 20) ||
+      (data.parentName && data.parentName.length > 200) ||
+      (data.parentMobile && data.parentMobile.length > 20) ||
+      (data.parentEmail && data.parentEmail.length > 191)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Input exceeds maximum allowed length.",
         },
         {
           status: 400,
@@ -361,12 +412,8 @@ export async function POST(request: Request) {
     }
 
     /* =====================================================
-       GET CLIENT IP
+       CLIENT IP (already obtained for rate limiting)
     ===================================================== */
-
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const realIp = request.headers.get("x-real-ip");
-    const clientIp = forwardedFor?.split(",")[0]?.trim() || realIp || "unknown";
 
     /* =====================================================
        SAVE TO DATABASE (WITH UNIQUE ENQUIRY NUMBER RETRY)

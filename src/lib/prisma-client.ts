@@ -52,7 +52,12 @@ function reportDatabaseError(error: unknown) {
   }
 
   lastDatabaseError = { signature, loggedAt: now };
-  console.error(`[prisma] database connection error: ${signature}`);
+  // Log minimal error info without sensitive details
+  if (process.env.NODE_ENV === "production") {
+    console.error(`[prisma] database connection error`);
+  } else {
+    console.error(`[prisma] database connection error: ${signature}`);
+  }
 }
 
 function readPositiveInt(value: string | undefined, fallback: number) {
