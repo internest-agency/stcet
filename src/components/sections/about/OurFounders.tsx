@@ -52,16 +52,6 @@ function FounderRow({
         className="pointer-events-none absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
         aria-hidden="true"
       />
-
-      {/* Number */}
-      <span
-        aria-hidden="true"
-        className={`pointer-events-none absolute bottom-6 text-[5rem] font-black leading-none tracking-[-0.08em] text-white/20 sm:text-[7rem] ${
-          reversed ? "right-6" : "left-6"
-        }`}
-      >
-        {number}
-      </span>
     </div>
   );
 
