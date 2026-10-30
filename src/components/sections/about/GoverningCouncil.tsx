@@ -16,6 +16,7 @@ export interface GoverningCouncilMember {
   id: number;
   name: string;
   role: string;
+  biography: string | null;
   imagePath: string | null;
   imageAlt: string | null;
 }
@@ -256,9 +257,12 @@ export default function GoverningCouncil({
                       {member.name}
                     </h3>
 
-                    <div className="mt-3 flex items-center justify-between border-t border-white/20 pt-3">
+                    <div className="mt-3 flex flex-col gap-1 border-t border-white/20 pt-3">
                       <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
                         {member.role}
+                      </span>
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                        {member.biography}
                       </span>
                     </div>
                   </div>

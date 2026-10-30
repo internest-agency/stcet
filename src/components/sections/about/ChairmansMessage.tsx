@@ -180,7 +180,7 @@ export default function ChairmansMessage({
             />
 
             {/* Chairman Image Placeholder */}
-            <div className="chairman-image relative mb-8 aspect-[4/3] max-w-sm overflow-hidden bg-primary-700/40">
+            <div className="chairman-image relative mb-8 aspect-4/3 max-w-sm overflow-hidden bg-primary-700/40">
               {imagePath ? (
                 <Image
                   src={imagePath}

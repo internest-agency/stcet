@@ -33,7 +33,7 @@ function FounderRow({
 
   const imageColumn = (
     <div
-      className={`relative aspect-[4/4.5] overflow-hidden bg-gray-200 sm:aspect-[4/4] lg:aspect-auto lg:min-h-[560px] ${
+      className={`relative aspect-3/4 overflow-hidden bg-gray-200 sm:aspect-3/4 lg:aspect-auto lg:min-h-[560px] ${
         reversed ? "order-1 lg:order-2" : ""
       }`}
     >

@@ -8,6 +8,7 @@ export interface PublicGoverningCouncilMember {
   id: number;
   name: string;
   role: string;
+  biography: string | null;
   imagePath: string | null;
   imageAlt: string | null;
 }
@@ -33,6 +34,7 @@ export async function getPublishedGoverningCouncilMembers(): Promise<
         id: true,
         name: true,
         role: true,
+        biography: true,
         imagePath: true,
         imageAlt: true,
       },
