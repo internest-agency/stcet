@@ -33,29 +33,30 @@ function FounderRow({
 
   const imageColumn = (
     <div
-      className={`relative aspect-3/4 overflow-hidden bg-gray-200 sm:aspect-3/4 lg:aspect-auto lg:min-h-[560px] ${
+      className={`relative overflow-hidden bg-gray-200 ${
         reversed ? "order-1 lg:order-2" : ""
       }`}
     >
       <Image
         src={image}
         alt={founder.name}
-        fill
+        width={1200}
+        height={1600}
         unoptimized={!image.startsWith("/images/")}
         sizes="(max-width: 1024px) 100vw, 40vw"
-        className="object-cover grayscale transition-transform duration-700 ease-out hover:scale-105"
+        className="block h-auto w-full object-contain transition-transform duration-700 ease-out hover:scale-105"
       />
 
       {/* Image overlay */}
       <div
-        className="absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
+        className="pointer-events-none absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
         aria-hidden="true"
       />
 
       {/* Number */}
       <span
         aria-hidden="true"
-        className={`absolute bottom-6 text-[5rem] font-black leading-none tracking-[-0.08em] text-white/20 sm:text-[7rem] ${
+        className={`pointer-events-none absolute bottom-6 text-[5rem] font-black leading-none tracking-[-0.08em] text-white/20 sm:text-[7rem] ${
           reversed ? "right-6" : "left-6"
         }`}
       >
@@ -242,9 +243,7 @@ export default function OurFounders({
   return (
     <section ref={sectionRef} className="overflow-hidden bg-gray-50">
       <Container className="py-14 sm:py-18 lg:py-20">
-        {/* -------------------------------------------------
-            SECTION INTRO
-        ------------------------------------------------- */}
+        {/* SECTION INTRO */}
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
           {/* Heading */}
           <div>
@@ -276,9 +275,7 @@ export default function OurFounders({
           </div>
         </div>
 
-        {/* -------------------------------------------------
-            FOUNDERS
-        ------------------------------------------------- */}
+        {/* FOUNDERS */}
         <div className="mt-12 border-t border-gray-200">
           {founders.map((founder, index) => (
             <FounderRow
