@@ -240,17 +240,6 @@ export default function GoverningCouncil({
                   {/* Cinematic image overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/25 to-primary-900/10 opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
 
-                  {/* Subtle futuristic grid */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-20"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)",
-                      backgroundSize: "32px 32px",
-                    }}
-                  />
-
                   {/* Member identity */}
                   <div className="council-card-content absolute inset-x-0 bottom-0 p-5 sm:p-6">
                     <h3 className="text-lg font-semibold leading-tight tracking-tight text-white">

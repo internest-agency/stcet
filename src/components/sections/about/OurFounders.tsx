@@ -46,12 +46,6 @@ function FounderRow({
         sizes="(max-width: 1024px) 100vw, 40vw"
         className="block h-auto w-full object-contain transition-transform duration-700 ease-out hover:scale-105"
       />
-
-      {/* Image overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-linear-to-t from-primary-900/50 via-transparent to-transparent"
-        aria-hidden="true"
-      />
     </div>
   );
 
