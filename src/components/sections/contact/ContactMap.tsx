@@ -12,7 +12,7 @@ interface ContactMapProps {
 export default function ContactMap({ googleMapsEmbedUrl }: ContactMapProps) {
   // Default fallback URL if no saved setting
   const defaultMapUrl =
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1968.9238610648977!2d77.39888979823965!3d9.25789983241468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b0692274960ae49%3A0xf39171ab609456cb!2sS.Thangapazham%20Agricultural%20College!5e0!3m2!1sen!2sin!4v1790304548249!5m2!1sen!2sin";
+    "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d492.23165722871585!2d77.39902961467885!3d9.257405686588836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1794479997662!5m2!1sen!2sin";
 
   const mapUrl = googleMapsEmbedUrl ?? defaultMapUrl;
 

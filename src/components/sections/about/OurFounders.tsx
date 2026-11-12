@@ -103,9 +103,7 @@ function FounderRow({
   return (
     <article
       className={`founder-item grid border-b border-gray-200 ${
-        reversed
-          ? "lg:grid-cols-[1.15fr_0.85fr]"
-          : "lg:grid-cols-[0.85fr_1.15fr]"
+        reversed ? "lg:grid-cols-[1.15fr_0.5fr]" : "lg:grid-cols-[0.5fr_1.15fr]"
       }`}
     >
       {reversed ? (

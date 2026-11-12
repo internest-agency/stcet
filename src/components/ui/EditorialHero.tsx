@@ -27,9 +27,9 @@ export default function EditorialHero({
   imageAlt,
   overlayClassName = "bg-linear-to-r from-primary-800 via-primary-800/80 to-transparent",
   showOverlay = true,
-  imageClassName = "object-cover object-bottom-right",
+  imageClassName = "object-cover object-right",
   className = "",
-  minHeight = "min-h-[680px] xl:min-h-screen 2xl:min-h-[800px]",
+  minHeight = "min-h-[500px] xl:min-h-screen 2xl:min-h-[500px]",
 }: EditorialHeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
 

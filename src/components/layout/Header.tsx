@@ -422,13 +422,13 @@ export default function Header({
                 collegeName ??
                 "S. Thangapazham College of Engineering and Technology"
               }
-              width={80}
-              height={40}
+              width={160}
+              height={160}
               priority
               className="
                 h-auto
-                w-[76px]
-                sm:w-[76px]
+                w-[120px]
+                sm:w-[120px]
               "
             />
           </Link>
