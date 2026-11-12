@@ -356,13 +356,12 @@ export default function SettingsForm({
             </div>
             <input
               className={input}
-              defaultValue={settings?.zeptoApiEndpoint ?? "https://api.zeptomail.com/v1.1/email"}
+              defaultValue={settings?.zeptoApiEndpoint ?? "https://cpaas.zoho.com/v1.1/email"}
               name="zeptoApiEndpoint"
-              placeholder="https://api.zeptomail.com/v1.1/email"
-              disabled={!settings?.zeptoEnabled}
+              placeholder="https://cpaas.zoho.com/v1.1/email"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Official ZeptoMail send endpoint. Change only if required.
+              Official Zoho ZeptoMail/CPaaS send endpoint (e.g. https://cpaas.zoho.com/v1.1/email).
             </p>
           </label>
 
@@ -376,8 +375,7 @@ export default function SettingsForm({
                 className={`${input} pr-10`}
                 type={showToken ? "text" : "password"}
                 name="zeptoToken"
-                placeholder="Enter your ZeptoMail Send Mail Token"
-                disabled={!settings?.zeptoEnabled}
+                placeholder="Enter your ZeptoMail Send Mail Token (leave blank to keep existing)"
                 autoComplete="new-password"
               />
               <button
@@ -404,9 +402,8 @@ export default function SettingsForm({
               className={input}
               defaultValue={settings?.zeptoSenderEmail ?? ""}
               name="zeptoSenderEmail"
-              type="email"
+              type="text"
               placeholder="noreply@yourdomain.com"
-              disabled={!settings?.zeptoEnabled}
             />
             <p className="mt-1 text-xs text-gray-500">
               The verified sender address configured in your ZeptoMail account.
@@ -423,7 +420,6 @@ export default function SettingsForm({
               defaultValue={settings?.zeptoSenderName ?? "STCET Website"}
               name="zeptoSenderName"
               placeholder="STCET Website"
-              disabled={!settings?.zeptoEnabled}
             />
           </label>
 
@@ -436,9 +432,8 @@ export default function SettingsForm({
               className={input}
               defaultValue={settings?.zeptoAdminEmail ?? ""}
               name="zeptoAdminEmail"
-              type="email"
+              type="text"
               placeholder="admin@yourdomain.com"
-              disabled={!settings?.zeptoEnabled}
             />
             <p className="mt-1 text-xs text-gray-500">
               Email address that will receive form submission notifications.
@@ -452,7 +447,6 @@ export default function SettingsForm({
               type="checkbox"
               name="zeptoNotifyContact"
               defaultChecked={settings?.zeptoNotifyContact ?? false}
-              disabled={!settings?.zeptoEnabled}
               className="h-4 w-4 rounded border-gray-300 text-primary-700 focus:ring-primary-500"
             />
             <span className="text-sm text-gray-700">Contact form submissions</span>
@@ -462,7 +456,6 @@ export default function SettingsForm({
               type="checkbox"
               name="zeptoNotifyEnquiry"
               defaultChecked={settings?.zeptoNotifyEnquiry ?? false}
-              disabled={!settings?.zeptoEnabled}
               className="h-4 w-4 rounded border-gray-300 text-primary-700 focus:ring-primary-500"
             />
             <span className="text-sm text-gray-700">Admissions enquiry submissions</span>

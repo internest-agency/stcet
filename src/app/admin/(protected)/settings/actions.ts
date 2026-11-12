@@ -21,23 +21,25 @@ const footerLinksSchema = z.object({
   quickLinks: z.array(footerLinkSchema).default([]),
 });
 
-const socialLinkSchema = z
-  .string()
-  .trim()
-  .refine(
-    (value) => {
-      if (value === "" || value === "#") return true;
-      try {
-        const url = new URL(value);
-        return url.protocol === "https:" || url.protocol === "http:";
-      } catch {
-        return false;
-      }
-    },
-    "Enter a valid HTTPS URL or # for placeholder.",
-  )
-  .optional()
-  .nullable();
+const optionalUrlField = (label: string) =>
+  z
+    .string()
+    .trim()
+    .refine(
+      (value) => {
+        if (value === "" || value === "#") return true;
+        try {
+          const url = new URL(value);
+          return url.protocol === "https:" || url.protocol === "http:";
+        } catch {
+          return false;
+        }
+      },
+      { message: `${label} must be a valid URL (http/https), or left empty.` },
+    )
+    .optional()
+    .nullable()
+    .transform((v) => (v == null || v === "" ? null : v.trim()));
 
 const googleMapsEmbedSchema = z
   .string()
@@ -64,45 +66,120 @@ const zeptoEndpointSchema = z
       if (value === "") return true;
       try {
         const url = new URL(value);
-        return url.protocol === "https:" && url.hostname.endsWith("zeptomail.com");
+        if (url.protocol !== "https:") return false;
+        const host = url.hostname.toLowerCase();
+        return (
+          host === "cpaas.zoho.com" ||
+          host.endsWith(".zoho.com") ||
+          host.endsWith("zeptomail.com")
+        );
       } catch {
         return false;
       }
     },
-    "Enter a valid ZeptoMail API endpoint (HTTPS, zeptomail.com domain)",
+    "Enter a valid ZeptoMail/Zoho CPaaS API endpoint (HTTPS, e.g. https://cpaas.zoho.com/v1.1/email)",
   )
   .optional()
   .nullable();
 
-const schema = z.object({
-  collegeName: z.string().trim().min(2).max(191),
-  contactEmail: z.string().trim().email().max(255).optional().nullable(),
-  phoneNumber: z.string().trim().max(50).optional().nullable(),
-  alternativePhone: z.string().trim().max(50).optional().nullable(),
-  address: z.string().trim().max(10_000).optional().nullable(),
-  footerText: z.string().trim().max(10_000).optional().nullable(),
-  defaultSeoTitle: z.string().trim().max(191).optional().nullable(),
-  defaultMetaDescription: z.string().trim().max(320).optional().nullable(),
-  logoPath: z.string().trim().max(2048).optional().nullable(),
-  faviconPath: z.string().trim().max(2048).optional().nullable(),
-  socialInstagram: socialLinkSchema,
-  socialYoutube: socialLinkSchema,
-  socialFacebook: socialLinkSchema,
-  socialLinkedin: socialLinkSchema,
-  socialX: socialLinkSchema,
-  socialWhatsapp: socialLinkSchema,
-  googleMapsEmbed: googleMapsEmbedSchema,
+const baseSchema = z.object({
+  collegeName: z.string().trim().min(2, "College name must be at least 2 characters.").max(191),
+  contactEmail: z
+    .string()
+    .trim()
+    .max(255)
+    .optional()
+    .nullable()
+    .refine(
+      (v) => !v || v === "" || z.string().email().safeParse(v).success,
+      "Contact email must be a valid email address.",
+    )
+    .transform((v) => (v == null || v === "" ? null : v)),
+  phoneNumber: z.string().trim().max(50).optional().nullable().transform((v) => v || null),
+  alternativePhone: z.string().trim().max(50).optional().nullable().transform((v) => v || null),
+  address: z.string().trim().max(10_000).optional().nullable().transform((v) => v || null),
+  footerText: z.string().trim().max(10_000).optional().nullable().transform((v) => v || null),
+  defaultSeoTitle: z.string().trim().max(191).optional().nullable().transform((v) => v || null),
+  defaultMetaDescription: z.string().trim().max(320).optional().nullable().transform((v) => v || null),
+  logoPath: z.string().trim().max(2048).optional().nullable().transform((v) => v || null),
+  faviconPath: z.string().trim().max(2048).optional().nullable().transform((v) => v || null),
+  socialInstagram: optionalUrlField("Instagram URL"),
+  socialYoutube: optionalUrlField("YouTube URL"),
+  socialFacebook: optionalUrlField("Facebook URL"),
+  socialLinkedin: optionalUrlField("LinkedIn URL"),
+  socialX: optionalUrlField("X (Twitter) URL"),
+  socialWhatsapp: optionalUrlField("WhatsApp URL"),
+  googleMapsEmbed: googleMapsEmbedSchema.transform((v) => (v == null || v === "" ? null : v)),
   // ZeptoMail
-  zeptoEnabled: z.boolean().optional(),
-  zeptoApiEndpoint: zeptoEndpointSchema,
-  zeptoToken: z.string().optional().nullable(), // plaintext from form, will be encrypted
-  zeptoSenderEmail: z.string().trim().email().max(255).optional().nullable(),
-  zeptoSenderName: z.string().trim().max(191).optional().nullable(),
-  zeptoAdminEmail: z.string().trim().email().max(255).optional().nullable(),
-  zeptoNotifyContact: z.boolean().optional(),
-  zeptoNotifyEnquiry: z.boolean().optional(),
+  zeptoEnabled: z.boolean().optional().default(false),
+  zeptoApiEndpoint: zeptoEndpointSchema.transform((v) => (v == null || v === "" ? null : v)),
+  zeptoToken: z.string().optional().nullable().transform((v) => (v == null || v === "" ? null : v)),
+  zeptoSenderEmail: z.string().trim().max(255).optional().nullable().transform((v) => (v == null || v === "" ? null : v)),
+  zeptoSenderName: z.string().trim().max(191).optional().nullable().transform((v) => (v == null || v === "" ? null : v)),
+  zeptoAdminEmail: z.string().trim().max(255).optional().nullable().transform((v) => (v == null || v === "" ? null : v)),
+  zeptoNotifyContact: z.boolean().optional().default(false),
+  zeptoNotifyEnquiry: z.boolean().optional().default(false),
   footerLinks: z.string().trim().optional().nullable(),
 });
+
+const schema = baseSchema.superRefine((data, ctx) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (data.zeptoEnabled) {
+    if (!data.zeptoSenderEmail || data.zeptoSenderEmail.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoSenderEmail"],
+        message: "Sender email is required when email notifications are enabled.",
+      });
+    } else if (!emailRegex.test(data.zeptoSenderEmail)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoSenderEmail"],
+        message: "Sender email must be a valid email address.",
+      });
+    }
+
+    if (!data.zeptoAdminEmail || data.zeptoAdminEmail.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoAdminEmail"],
+        message: "Admin notification email is required when email notifications are enabled.",
+      });
+    } else if (!emailRegex.test(data.zeptoAdminEmail)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoAdminEmail"],
+        message: "Admin notification email must be a valid email address.",
+      });
+    }
+  } else {
+    // When disabled, validate format only if a non-empty value is provided
+    if (data.zeptoSenderEmail && data.zeptoSenderEmail.trim() !== "" && !emailRegex.test(data.zeptoSenderEmail)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoSenderEmail"],
+        message: "Sender email must be a valid email address.",
+      });
+    }
+    if (data.zeptoAdminEmail && data.zeptoAdminEmail.trim() !== "" && !emailRegex.test(data.zeptoAdminEmail)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["zeptoAdminEmail"],
+        message: "Admin notification email must be a valid email address.",
+      });
+    }
+  }
+});
+
+function formatZodErrors(error: z.ZodError): string {
+  return error.issues
+    .map((issue) => {
+      const field = issue.path.length ? issue.path.join(".") : "form";
+      return `${field}: ${issue.message}`;
+    })
+    .join("; ");
+}
 
 export async function saveSettings(formData: FormData): Promise<never> {
   const admin = await requireAdministrator();
@@ -113,7 +190,7 @@ export async function saveSettings(formData: FormData): Promise<never> {
     return sendTestEmail();
   }
 
-  const parsed = schema.safeParse({
+  const raw = {
     collegeName: formData.get("collegeName"),
     contactEmail: formData.get("contactEmail") || null,
     phoneNumber: formData.get("phoneNumber") || null,
@@ -140,19 +217,29 @@ export async function saveSettings(formData: FormData): Promise<never> {
     zeptoNotifyContact: formData.get("zeptoNotifyContact") === "on",
     zeptoNotifyEnquiry: formData.get("zeptoNotifyEnquiry") === "on",
     footerLinks: formData.get("footerLinks") || null,
-  });
+  };
+
+  const parsed = schema.safeParse(raw);
+
+  if (!parsed.success) {
+    const message = formatZodErrors(parsed.error);
+    redirect(`/admin/settings?error=${encodeURIComponent(message)}`);
+  }
 
   if (
-    !parsed.success ||
     !(await validateImageReferences([
       parsed.data.logoPath ?? "",
       parsed.data.faviconPath ?? "",
     ]))
   ) {
-    redirect("/admin/settings?error=invalid");
+    redirect(
+      `/admin/settings?error=${encodeURIComponent(
+        "logoPath/faviconPath: One or more image references are invalid. Please re-upload the image.",
+      )}`,
+    );
   }
 
-  // Build socialLinks object from individual fields
+  // Build socialLinks as plain object from individual standard fields (no JSON input required)
   const socialLinks: Record<string, string | null> = {
     instagram: parsed.data.socialInstagram ?? null,
     youtube: parsed.data.socialYoutube ?? null,
@@ -162,13 +249,12 @@ export async function saveSettings(formData: FormData): Promise<never> {
     whatsapp: parsed.data.socialWhatsapp ?? null,
   };
 
-  // Parse footerLinks JSON
-  let footerLinks: Prisma.InputJsonValue | typeof Prisma.JsonNull =
-    Prisma.JsonNull;
+  // Parse footerLinks JSON (internal transport from form helper only)
+  let footerLinks: Prisma.InputJsonValue | typeof Prisma.JsonNull = Prisma.JsonNull;
   if (parsed.data.footerLinks) {
     try {
-      const raw = JSON.parse(parsed.data.footerLinks);
-      const validated = footerLinksSchema.safeParse(raw);
+      const footerRaw = JSON.parse(parsed.data.footerLinks);
+      const validated = footerLinksSchema.safeParse(footerRaw);
       footerLinks = validated.success
         ? (validated.data as Prisma.InputJsonValue)
         : Prisma.JsonNull;
@@ -191,9 +277,14 @@ export async function saveSettings(formData: FormData): Promise<never> {
     }
   }
 
-  // Encrypt ZeptoMail token if provided
-  let zeptoTokenEncrypted: string | null = null;
-  let zeptoTokenSalt: string | null = null;
+  const prisma = getPrismaClient();
+  const existing = await prisma.siteSettings.findFirst({
+    select: { id: true, zeptoTokenEncrypted: true, zeptoTokenSalt: true },
+  });
+
+  // Encrypt ZeptoMail token if provided; if blank keep existing token
+  let zeptoTokenEncrypted: string | null = existing?.zeptoTokenEncrypted ?? null;
+  let zeptoTokenSalt: string | null = existing?.zeptoTokenSalt ?? null;
   if (parsed.data.zeptoToken && parsed.data.zeptoToken.trim() !== "") {
     try {
       const packed = await encryptAndPack(parsed.data.zeptoToken.trim());
@@ -204,12 +295,20 @@ export async function saveSettings(formData: FormData): Promise<never> {
       }
     } catch (error) {
       console.error("[saveSettings] Token encryption failed:", error);
-      redirect("/admin/settings?error=zepto_encrypt");
+      const detail =
+        error instanceof Error && error.message
+          ? error.message
+          : "Unknown encryption error";
+      redirect(
+        `/admin/settings?error=${encodeURIComponent(
+          `send_mail_token: ${detail}`,
+        )}`,
+      );
     }
   }
 
   const zeptoEndpoint =
-    parsed.data.zeptoApiEndpoint?.trim() || "https://api.zeptomail.com/v1.1/email";
+    parsed.data.zeptoApiEndpoint?.trim() || "https://cpaas.zoho.com/v1.1/email";
 
   const values = {
     collegeName: parsed.data.collegeName,
@@ -225,22 +324,19 @@ export async function saveSettings(formData: FormData): Promise<never> {
     defaultSeoTitle: parsed.data.defaultSeoTitle ?? null,
     defaultMetaDescription: parsed.data.defaultMetaDescription ?? null,
     googleMapsEmbedUrl,
-    // ZeptoMail
+    // ZeptoMail - allow empty when disabled; token preserved if blank
     zeptoEnabled: parsed.data.zeptoEnabled ?? false,
-    zeptoApiEndpoint: parsed.data.zeptoEnabled ? zeptoEndpoint : null,
+    zeptoApiEndpoint: zeptoEndpoint,
     zeptoTokenEncrypted,
     zeptoTokenSalt,
-    zeptoSenderEmail: parsed.data.zeptoSenderEmail?.trim() ?? null,
-    zeptoSenderName: parsed.data.zeptoSenderName?.trim() ?? null,
-    zeptoAdminEmail: parsed.data.zeptoAdminEmail?.trim() ?? null,
+    zeptoSenderEmail: parsed.data.zeptoSenderEmail ?? null,
+    zeptoSenderName: parsed.data.zeptoSenderName ?? null,
+    zeptoAdminEmail: parsed.data.zeptoAdminEmail ?? null,
     zeptoNotifyContact: parsed.data.zeptoNotifyContact ?? false,
     zeptoNotifyEnquiry: parsed.data.zeptoNotifyEnquiry ?? false,
   };
 
-  const prisma = getPrismaClient();
-
   try {
-    const existing = await prisma.siteSettings.findFirst();
     const record = existing
       ? await prisma.siteSettings.update({ where: { id: existing.id }, data: values })
       : await prisma.siteSettings.create({ data: values });
@@ -255,7 +351,9 @@ export async function saveSettings(formData: FormData): Promise<never> {
     });
   } catch (error) {
     console.error("[saveSettings] Database error:", error);
-    redirect("/admin/settings?error=save");
+    const message =
+      error instanceof Error ? error.message : "Unknown database error";
+    redirect(`/admin/settings?error=${encodeURIComponent(`save: ${message}`)}`);
   }
 
   invalidateSiteSettingsCache();
@@ -283,27 +381,47 @@ async function sendTestEmail(): Promise<never> {
   });
 
   if (!settings || !settings.zeptoEnabled) {
-    redirect("/admin/settings?error=zepto_disabled");
+    redirect(
+      `/admin/settings?error=${encodeURIComponent(
+        "test_email: Email notifications are disabled. Enable and save settings first.",
+      )}`,
+    );
   }
 
   if (!settings.zeptoTokenEncrypted || !settings.zeptoTokenSalt) {
-    redirect("/admin/settings?error=zepto_no_token");
+    redirect(
+      `/admin/settings?error=${encodeURIComponent(
+        "test_email: Send Mail Token is missing. Save a valid token first.",
+      )}`,
+    );
   }
 
   if (!settings.zeptoSenderEmail || !settings.zeptoAdminEmail) {
-    redirect("/admin/settings?error=zepto_incomplete");
+    redirect(
+      `/admin/settings?error=${encodeURIComponent(
+        "test_email: Sender email and admin notification email are required.",
+      )}`,
+    );
   }
 
   // Decrypt token
   let token: string;
   try {
     token = await unpackAndDecrypt(settings.zeptoTokenEncrypted);
-  } catch {
-    redirect("/admin/settings?error=zepto_decrypt");
+  } catch (error) {
+    const detail =
+      error instanceof Error && error.message
+        ? error.message
+        : "Decryption failed";
+    redirect(
+      `/admin/settings?error=${encodeURIComponent(
+        `test_email: Could not decrypt Send Mail Token. ${detail}`,
+      )}`,
+    );
   }
 
   // Send test email via ZeptoMail
-  const endpoint = settings.zeptoApiEndpoint || "https://api.zeptomail.com/v1.1/email";
+  const endpoint = settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email";
   const senderEmail = settings.zeptoSenderEmail;
   const senderName = settings.zeptoSenderName || "STCET Website";
   const adminEmail = settings.zeptoAdminEmail;

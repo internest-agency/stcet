@@ -50,7 +50,7 @@ export async function getZeptoMailConfig(): Promise<ZeptoMailConfig | null> {
 
   return {
     enabled: true,
-    apiEndpoint: settings.zeptoApiEndpoint || "https://api.zeptomail.com/v1.1/email",
+    apiEndpoint: settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email",
     token,
     senderEmail: settings.zeptoSenderEmail,
     senderName: settings.zeptoSenderName || "STCET Website",

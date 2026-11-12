@@ -1,7 +1,7 @@
 import SettingsForm from "@/src/components/admin/settings/SettingsForm";
 import { requireAdministrator } from "@/src/lib/admin/authorization";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
-import { parseSocialLinks } from "@/src/lib/admin/settings";
+
 
 export const metadata = { title: "Settings | STCET Admin" };
 
@@ -65,14 +65,35 @@ export default async function SettingsPage({
   const error = scalar(params.error);
   const testResult = scalar(params.test_result);
 
+  const rawSocial = (() => {
+    const v = rawSettings?.socialLinks;
+    if (!v) return {} as Record<string, string | null>;
+    if (typeof v === "string") {
+      try {
+        const parsed = JSON.parse(v) as Record<string, unknown>;
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {} as Record<string, string | null>;
+      }
+    }
+    if (typeof v === "object" && !Array.isArray(v)) {
+      return v as Record<string, unknown>;
+    }
+    return {} as Record<string, string | null>;
+  })();
+
   const settings = rawSettings
     ? {
         ...rawSettings,
         footerLinks: parseFooterLinks(rawSettings.footerLinks),
-        socialLinks: parseSocialLinks(rawSettings.socialLinks).valid.reduce(
-          (acc, link) => ({ ...acc, [link.key]: link.href }),
-          {} as Record<string, string | null>,
-        ),
+        socialLinks: {
+          instagram: typeof rawSocial.instagram === "string" ? rawSocial.instagram : null,
+          youtube: typeof rawSocial.youtube === "string" ? rawSocial.youtube : null,
+          facebook: typeof rawSocial.facebook === "string" ? rawSocial.facebook : null,
+          linkedin: typeof rawSocial.linkedin === "string" ? rawSocial.linkedin : null,
+          x: typeof rawSocial.x === "string" ? rawSocial.x : null,
+          whatsapp: typeof rawSocial.whatsapp === "string" ? rawSocial.whatsapp : null,
+        },
         googleMapsEmbedUrl: rawSettings.googleMapsEmbedUrl ?? null,
         // ZeptoMail
         zeptoEnabled: rawSettings.zeptoEnabled ?? false,
@@ -121,11 +142,7 @@ export default async function SettingsPage({
           aria-live="polite"
           className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
         >
-          {error === "social"
-            ? "Settings could not be saved. The social links field must contain valid JSON."
-            : error === "save"
-              ? "Settings could not be saved due to a database error. Please try again."
-              : "Settings could not be saved. Use valid values and a valid social-links JSON object."}
+          <strong>Settings could not be saved:</strong> {error}
         </p>
       ) : null}
 
