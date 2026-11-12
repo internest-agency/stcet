@@ -29,7 +29,7 @@ export default function EditorialHero({
   showOverlay = true,
   imageClassName = "object-cover object-right",
   className = "",
-  minHeight = "min-h-150 sm:min-h-160 lg:min-h-170",
+  minHeight = "min-h-80 sm:min-h-100 lg:min-h-100",
 }: EditorialHeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
 

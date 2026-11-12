@@ -427,8 +427,8 @@ export default function Header({
               priority
               className="
                 h-auto
-                w-[100px]
-                sm:w-[100px]
+                w-[110px]
+                sm:w-[110px]
               "
             />
           </Link>

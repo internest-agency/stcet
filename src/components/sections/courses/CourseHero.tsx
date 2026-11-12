@@ -173,12 +173,12 @@ export default function CourseHero({
       ref={sectionRef}
       className="
         relative
-        min-h-150
+        min-h-80
         overflow-hidden
         bg-primary-800
         text-white
-        sm:min-h-160
-        lg:min-h-170
+        sm:min-h-100
+        lg:min-h-100
       "
     >
       {/* ==========================================
@@ -250,11 +250,11 @@ export default function CourseHero({
         <Breadcrumb
           items={breadcrumbItems}
           className="
-            mb-12
+            mt-8
+            mb-4
             [&_a]:text-white/55
             [&_a:hover]:text-white
             [&_span]:text-white/75
-            sm:mb-14
           "
         />
 
