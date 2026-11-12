@@ -56,17 +56,6 @@ function FounderRow({
       }`}
     >
       <div>
-        {/* Label */}
-        <div className="mb-8 flex items-center justify-between border-b border-gray-200 pb-5">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-            {roleLabel}
-          </span>
-
-          <span className="text-xs font-bold tracking-[0.18em] text-primary-700">
-            {number}
-          </span>
-        </div>
-
         {/* Name */}
         <SectionHeading as="h3" className="text-gray-800!">
           {founder.name}

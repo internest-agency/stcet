@@ -103,8 +103,7 @@ export const aboutChairmanMessage: AboutChairmanMessageContent = {
   heading: "Education is<br>more than<br>knowledge.",
   quote:
     "At S. Thangapazham College of Engineering and Technology, we believe that education is not merely about acquiring knowledge; it is about developing the ability to think, question, create and contribute. Engineering, in particular, calls for a strong foundation in fundamentals, a practical approach to problem-solving and the ability to adapt to a constantly changing world.",
-  body:
-    "<p>Our endeavour is to create an academic environment where students are encouraged to explore their potential, embrace new ideas and develop the confidence to pursue their aspirations. Alongside academic and technical competence, we place great importance on discipline, integrity, responsibility and respect for others.</p><p>As an institution, our aspiration is to nurture capable professionals and grounded individuals who are prepared not only for the opportunities of today, but also for the challenges and possibilities of tomorrow.</p>",
+  body: "<p>Our endeavour is to create an academic environment where students are encouraged to explore their potential, embrace new ideas and develop the confidence to pursue their aspirations. Alongside academic and technical competence, we place great importance on discipline, integrity, responsibility and respect for others.</p><p>As an institution, our aspiration is to nurture capable professionals and grounded individuals who are prepared not only for the opportunities of today, but also for the challenges and possibilities of tomorrow.</p>",
   closingStatement: null,
   name: "Thiru. S. Thangapazham",
   designation: "Chairman",
@@ -152,8 +151,7 @@ export const aboutVisionMission: AboutVisionMissionContent = {
     "To be a centre of excellence in technical education, fostering knowledge, innovation and ethical values to develop competent professionals who contribute meaningfully to society and address the challenges of a changing world.",
   visionTags: "People, Progress, A Better Tomorrow",
   visionImagePath: null,
-  visionCaptionTitle:
-    "S. Thangapazham College of Engineering & Technology",
+  visionCaptionTitle: "S. Thangapazham College of Engineering & Technology",
   visionCaptionSubtitle: "Engineering the Future",
   missionHeading:
     'Turning Our Vision<br><span class="text-accent-500">Into Action.</span>',
@@ -196,10 +194,9 @@ export const aboutTrustPillars: AboutTrustPillarContent[] = [
 
 export const aboutTrust: AboutTrustContent = {
   eyebrow: "Our Trust",
-  heading:
-    'Four pillars.<br><span class="text-accent-400">One purpose.</span>',
+  heading: 'Four pillars.<br><span class="text-accent-400">One purpose.</span>',
   intro:
-    "The Trust oversees four educational institutions across the southern districts of Tamil Nadu. Our approach is guided by a commitment to quality, opportunity, excellence and values.",
+    "The Trust oversees seven educational institutions across the southern districts of Tamil Nadu. Our approach is guided by a commitment to quality, opportunity, excellence and values.",
   closingEyebrow: "STCET",
   closingLabel: "Our Approach",
   closingStatement:

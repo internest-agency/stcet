@@ -170,8 +170,8 @@ export default function OurLegacy() {
                 <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                   S. Thangapazham College of Engineering and Technology is part
                   of the Thiru K. Subramania Nadar and Smt. Vadivoo Ammal
-                  Educational Trust, established in 2010 by Thiru. S.
-                  Thangapazham, a distinguished industrialist and
+                  Educational Trust, established in 2010 by <br />
+                  Thiru. S. Thangapazham, a distinguished industrialist and
                   philanthropist.
                 </p>
               </article>
@@ -193,9 +193,10 @@ export default function OurLegacy() {
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                   The Trust was founded in honour of Thiru. S.
-                  Thangapazham&apos;s parents, Shri. K. Subramania Nadar and
-                  Smt. Vadivoo Ammal, with a vision to contribute to education
-                  and expand access to quality higher education.
+                  Thangapazham&apos;s parents, <br />
+                  Shri. K. Subramania Nadar and Smt. Vadivoo Ammal, with a
+                  vision to contribute to education and expand access to quality
+                  higher education.
                 </p>
               </article>
 
