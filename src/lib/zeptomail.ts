@@ -48,13 +48,15 @@ export async function getZeptoMailConfig(): Promise<ZeptoMailConfig | null> {
     return null;
   }
 
+  const normalizedToken = token.trim().replace(/^Zoho-enczapikey\s+/i, "").trim();
+
   return {
     enabled: true,
-    apiEndpoint: settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email",
-    token,
-    senderEmail: settings.zeptoSenderEmail,
-    senderName: settings.zeptoSenderName || "STCET Website",
-    adminEmail: settings.zeptoAdminEmail,
+    apiEndpoint: (settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email").replace(/\/+$/, ""),
+    token: normalizedToken,
+    senderEmail: settings.zeptoSenderEmail.trim(),
+    senderName: (settings.zeptoSenderName || "STCET Website").trim(),
+    adminEmail: settings.zeptoAdminEmail.trim(),
     notifyContact: settings.zeptoNotifyContact,
     notifyEnquiry: settings.zeptoNotifyEnquiry,
   };
@@ -104,7 +106,33 @@ export async function sendZeptoMailEmail(
 
     return { success: true, message: "Email accepted by ZeptoMail" };
   } catch (error) {
-    const errorMsg = `ZeptoMail SDK error: ${error instanceof Error ? error.message : "Unknown error"}`;
+    let detail = "Unknown error";
+    if (error && typeof error === "object") {
+      const err = error as Record<string, unknown>;
+      const message = typeof err.message === "string" ? err.message : "";
+      const code = typeof err.code === "string" ? err.code : "";
+      const data = err.data ?? err.response ?? err.details ?? err.error;
+      detail = [code, message].filter(Boolean).join(": ");
+      if (data !== undefined) {
+        try {
+          detail += ` | ${typeof data === "string" ? data : JSON.stringify(data)}`;
+        } catch {
+          detail += ` | ${String(data)}`;
+        }
+      }
+      if (!detail) {
+        try {
+          detail = JSON.stringify(error);
+        } catch {
+          detail = String(error);
+        }
+      }
+    } else if (error instanceof Error) {
+      detail = error.message;
+    } else if (typeof error === "string") {
+      detail = error;
+    }
+    const errorMsg = `ZeptoMail SDK error: ${detail}`;
     console.error("[ZeptoMail] SDK error:", errorMsg);
     return { success: false, message: errorMsg, error: errorMsg };
   }

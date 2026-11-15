@@ -39,6 +39,8 @@ export async function getSiteSettings(): Promise<Settings> {
     defaultSeoTitle: null,
     defaultMetaDescription: null,
     googleMapsEmbedUrl: null,
+    customHeadCode: null,
+    customBodyEndCode: null,
     // ZeptoMail
     zeptoEnabled: false,
     zeptoApiEndpoint: null,
@@ -87,6 +89,24 @@ export async function getSiteSettings(): Promise<Settings> {
       });
 
       if (record) {
+        // Custom code columns are read separately so that a database that has
+        // not run the custom-code migration yet still returns the other
+        // settings instead of falling back to empty defaults.
+        let customHeadCode: string | null = null;
+        let customBodyEndCode: string | null = null;
+        try {
+          const customCode = await prisma.siteSettings.findFirst({
+            select: {
+              customHeadCode: true,
+              customBodyEndCode: true,
+            },
+          });
+          customHeadCode = customCode?.customHeadCode ?? null;
+          customBodyEndCode = customCode?.customBodyEndCode ?? null;
+        } catch {
+          // Migration not applied yet - custom code is simply unavailable.
+        }
+
         const rawSocialLinks = record.socialLinks ?? null;
         const socialLinksObj =
           typeof rawSocialLinks === "string"
@@ -123,6 +143,8 @@ export async function getSiteSettings(): Promise<Settings> {
           defaultSeoTitle: record.defaultSeoTitle ?? null,
           defaultMetaDescription: record.defaultMetaDescription ?? null,
           googleMapsEmbedUrl: record.googleMapsEmbedUrl ?? null,
+          customHeadCode,
+          customBodyEndCode,
           // ZeptoMail
           zeptoEnabled: record.zeptoEnabled ?? false,
           zeptoApiEndpoint: record.zeptoApiEndpoint ?? null,
@@ -297,6 +319,8 @@ export interface Settings {
   defaultSeoTitle: string | null;
   defaultMetaDescription: string | null;
   googleMapsEmbedUrl: string | null;
+  customHeadCode: string | null;
+  customBodyEndCode: string | null;
   // ZeptoMail
   zeptoEnabled: boolean;
   zeptoApiEndpoint: string | null;

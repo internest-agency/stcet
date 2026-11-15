@@ -564,6 +564,9 @@ model SiteSettings {
   defaultSeoTitle        String?        @db.VarChar(191)
   defaultMetaDescription String?        @db.VarChar(320)
   googleMapsEmbedUrl     String?        @db.VarChar(2048)
+  // Site-wide custom code injected into <head> and end of <body>
+  customHeadCode         String?        @db.Text
+  customBodyEndCode      String?        @db.Text
   // ZeptoMail email notification settings
   zeptoEnabled           Boolean        @default(false)
   zeptoApiEndpoint       String?        @db.VarChar(512)

@@ -16,7 +16,10 @@ import {
   X,
 } from "lucide-react";
 import ImageUploadField from "@/src/components/admin/ImageUploadField";
-import { savePageSeo } from "@/src/app/admin/(protected)/seo/actions";
+import {
+  saveCustomCode,
+  savePageSeo,
+} from "@/src/app/admin/(protected)/seo/actions";
 
 export type SeoRecord = {
   id: number;
@@ -345,15 +348,123 @@ function StatCard({ label: text, value }: { label: string; value: number }) {
   );
 }
 
+function CustomCodeForm({
+  headCode,
+  bodyCode,
+  notice,
+  error,
+}: {
+  headCode: string;
+  bodyCode: string;
+  notice: string | null;
+  error: string | null;
+}) {
+  const [open, setOpen] = useState(
+    Boolean(headCode || bodyCode || error || notice),
+  );
+
+  return (
+    <section className="rounded-lg border border-gray-200 bg-white">
+      <button
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 p-4 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-700"
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+      >
+        <span>
+          <span className="block text-sm font-bold text-gray-900">
+            Additional options
+          </span>
+          <span className="mt-0.5 block text-xs text-gray-500">
+            Site-wide code added inside the head and at the end of the body.
+          </span>
+        </span>
+        <span className="shrink-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
+          {open ? "Hide" : "Show"}
+        </span>
+      </button>
+
+      {open ? (
+        <form
+          action={saveCustomCode}
+          className="border-t border-gray-100 p-4"
+        >
+          {notice ? (
+            <p className="mb-3 rounded-md border border-secondary-200 bg-secondary-50 px-3 py-2 text-sm font-semibold text-secondary-800">
+              {notice}
+            </p>
+          ) : null}
+
+          {error ? (
+            <p className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              {error}
+            </p>
+          ) : null}
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <label className={label}>
+              Code inside &lt;head&gt;
+              <textarea
+                className={`${input} min-h-40 font-mono text-xs`}
+                defaultValue={headCode}
+                name="customHeadCode"
+                placeholder={`<meta name="google-site-verification" content="..." />\n<!-- analytics or styles -->`}
+                spellCheck={false}
+              />
+              <span className={hint}>
+                Added to the &lt;head&gt; of every page. Use for analytics,
+                verification meta tags, or custom styles.
+              </span>
+            </label>
+            <label className={label}>
+              Code at the end of &lt;body&gt;
+              <textarea
+                className={`${input} min-h-40 font-mono text-xs`}
+                defaultValue={bodyCode}
+                name="customBodyEndCode"
+                placeholder={`<script src="https://example.com/widget.js"></script>`}
+                spellCheck={false}
+              />
+              <span className={hint}>
+                Added just before the closing &lt;/body&gt; tag on every page.
+                Use for chat widgets or scripts that must load last.
+              </span>
+            </label>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <SaveButton>Save custom code</SaveButton>
+            <p className="text-xs text-gray-500">
+              Applies to the entire website.
+            </p>
+          </div>
+
+          <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Only paste code from trusted sources. These scripts run for every
+            visitor, including administrators. External scripts or connections
+            must also be allowed by the site&apos;s Content Security Policy.
+          </p>
+        </form>
+      ) : null}
+    </section>
+  );
+}
+
 export default function SeoManager({
   records,
+  customCode,
   notice = null,
   error = null,
+  codeNotice = null,
+  codeError = null,
   loadError = false,
 }: {
   records: SeoRecord[];
+  customCode: { headCode: string; bodyCode: string };
   notice?: string | null;
   error?: string | null;
+  codeNotice?: string | null;
+  codeError?: string | null;
   loadError?: boolean;
 }) {
   const [openId, setOpenId] = useState<number | "new" | null>(null);
@@ -450,6 +561,13 @@ export default function SeoManager({
           <Plus aria-hidden className="size-4" /> Add page SEO
         </button>
       </header>
+
+      <CustomCodeForm
+        bodyCode={customCode.bodyCode}
+        error={codeError}
+        headCode={customCode.headCode}
+        notice={codeNotice}
+      />
 
       {loadError ? (
         <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">

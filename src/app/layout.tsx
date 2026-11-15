@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Josefin_Sans, Nunito_Sans } from "next/font/google";
+import { getSiteSettings } from "@/src/lib/admin/settings";
+import { renderCustomCode } from "@/src/lib/custom-code";
 import { getSiteUrl } from "@/src/lib/site-url";
 import "./globals.css";
 
@@ -19,13 +21,21 @@ export const metadata: Metadata = {
   description: "A modern college website built with Next.js",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const settings = await getSiteSettings();
+  const headCode = renderCustomCode(settings.customHeadCode);
+  const bodyEndCode = renderCustomCode(settings.customBodyEndCode);
+
   return (
     <html
       lang="en"
       className={`${josefinSans.variable} ${nunitoSans.variable} h-full antialiased`}
     >
-      <body suppressHydrationWarning>{children}</body>
+      <head>{headCode}</head>
+      <body suppressHydrationWarning>
+        {children}
+        {bodyEndCode}
+      </body>
     </html>
   );
 }

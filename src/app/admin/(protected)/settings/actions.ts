@@ -420,13 +420,14 @@ async function sendTestEmail(): Promise<never> {
     );
   }
 
-  // Send test email via ZeptoMail
-  const endpoint = settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email";
-  const senderEmail = settings.zeptoSenderEmail;
-  const senderName = settings.zeptoSenderName || "STCET Website";
-  const adminEmail = settings.zeptoAdminEmail;
+  // Normalize token: allow users to paste with or without "Zoho-enczapikey " prefix
+  const normalizedToken = token.trim().replace(/^Zoho-enczapikey\s+/i, "").trim();
+  const endpoint = (settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email").replace(/\/+$/, "");
+  const senderEmail = settings.zeptoSenderEmail.trim();
+  const senderName = (settings.zeptoSenderName || "STCET Website").trim();
+  const adminEmail = settings.zeptoAdminEmail.trim();
 
-  const testSubject = "Test Email — STCET ZeptoMail Configuration";
+  const testSubject = "Test Email - STCET ZeptoMail Configuration";
   const testHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background: #1e3a5f; color: white; padding: 20px; text-align: center;">
@@ -446,59 +447,73 @@ async function sendTestEmail(): Promise<never> {
     </div>
   `;
 
-  const payload = {
-    from: { address: senderEmail, name: senderName },
-    to: [{ email_address: { address: adminEmail, name: "STCET Admin" } }],
-    subject: testSubject,
-    htmlbody: testHtml,
-  };
-
   let resultMessage = "";
   try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Zoho-enczapikey ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+    const { SendMailClient } = await import("zeptomail");
+    const client = new SendMailClient({
+      url: endpoint,
+      token: normalizedToken,
     });
 
-    const responseText = await response.text();
-    let responseData: unknown;
-    try {
-      responseData = JSON.parse(responseText);
-    } catch {
-      responseData = responseText;
-    }
+    const response = await client.sendMail({
+      from: { address: senderEmail, name: senderName },
+      to: [
+        {
+          email_address: {
+            address: adminEmail,
+            name: "STCET Admin",
+          },
+        },
+      ],
+      subject: testSubject,
+      htmlbody: testHtml,
+    });
 
-    if (response.ok) {
-      resultMessage = `Test email sent successfully. ZeptoMail response: ${JSON.stringify(responseData)}`;
-      await prisma.siteSettings.update({
-        where: { id: settings.id },
-        data: {
-          zeptoLastTestAt: new Date(),
-          zeptoLastTestResult: "success",
-        },
-      });
-    } else {
-      resultMessage = `ZeptoMail API error (${response.status}): ${JSON.stringify(responseData)}`;
-      await prisma.siteSettings.update({
-        where: { id: settings.id },
-        data: {
-          zeptoLastTestAt: new Date(),
-          zeptoLastTestResult: `error_${response.status}`,
-        },
-      });
-    }
-  } catch (error) {
-    console.error("[sendTestEmail] Failed:", error);
-    resultMessage = `Network error: ${error instanceof Error ? error.message : "Unknown error"}`;
+    const responseText =
+      typeof response === "string" ? response : JSON.stringify(response);
+    resultMessage = `Test email sent successfully. ZeptoMail response: ${responseText}`;
     await prisma.siteSettings.update({
       where: { id: settings.id },
       data: {
         zeptoLastTestAt: new Date(),
-        zeptoLastTestResult: "network_error",
+        zeptoLastTestResult: "success",
+      },
+    });
+  } catch (error) {
+    console.error("[sendTestEmail] Failed:", error);
+    let detail = "Unknown error";
+    if (error && typeof error === "object") {
+      const err = error as Record<string, unknown>;
+      const message = typeof err.message === "string" ? err.message : "";
+      const code = typeof err.code === "string" ? err.code : "";
+      const data = err.data ?? err.response ?? err.details ?? err.error;
+      detail = [code, message].filter(Boolean).join(": ");
+      if (data !== undefined) {
+        try {
+          detail += ` | ${typeof data === "string" ? data : JSON.stringify(data)}`;
+        } catch {
+          detail += ` | ${String(data)}`;
+        }
+      }
+      if (!detail) {
+        try {
+          detail = JSON.stringify(error);
+        } catch {
+          detail = String(error);
+        }
+      }
+    } else if (error instanceof Error) {
+      detail = error.message;
+    } else if (typeof error === "string") {
+      detail = error;
+    }
+
+    resultMessage = `ZeptoMail send failed: ${detail}`;
+    await prisma.siteSettings.update({
+      where: { id: settings.id },
+      data: {
+        zeptoLastTestAt: new Date(),
+        zeptoLastTestResult: "error",
       },
     });
   }

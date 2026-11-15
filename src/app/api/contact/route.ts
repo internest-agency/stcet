@@ -260,18 +260,37 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send admin notification (non-blocking, fire-and-forget)
-    // Email failure does not affect the user-facing response
-    sendContactNotification({
-      name,
-      email,
-      phone: cleanPhone,
-      subject,
-      message,
-      submittedAt: saved.createdAt.toISOString(),
-    }).catch((error) => {
-      console.error("[Contact API] Notification failed:", error);
-    });
+    // Send the admin notification before responding.
+    // The previous fire-and-forget call was being dropped when the request
+    // finished (especially on serverless/short-lived runtimes), so the email
+    // never went out. Awaiting guarantees the send is attempted, while still
+    // not failing the user-facing response if ZeptoMail is unavailable.
+    try {
+      const notification = await sendContactNotification({
+        name,
+        email,
+        phone: cleanPhone,
+        subject,
+        message,
+        submittedAt: saved.createdAt.toISOString(),
+      });
+
+      if (notification.success) {
+        console.log(
+          `[Contact API] Admin notification sent for message #${saved.id}`,
+        );
+      } else {
+        console.error(
+          `[Contact API] Admin notification NOT sent for message #${saved.id}: ${notification.message}`,
+          notification.error ?? "",
+        );
+      }
+    } catch (error) {
+      console.error(
+        `[Contact API] Notification failed for message #${saved.id}:`,
+        error,
+      );
+    }
 
     return NextResponse.json(
       {

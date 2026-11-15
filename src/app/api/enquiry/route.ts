@@ -497,21 +497,40 @@ export async function POST(request: Request) {
       data.coursePreference5,
     ].filter(Boolean);
 
-    // Send admin notification (non-blocking, fire-and-forget)
-    // Email failure does not affect the user-facing response
-    sendEnquiryNotification({
-      enquiryNumber: savedEnquiry.enquiryNumber,
-      studentName: data.studentName,
-      studentEmail: data.studentEmail,
-      studentMobile: cleanStudentMobile,
-      parentName: data.parentName,
-      parentMobile: cleanParentMobile,
-      parentEmail: data.parentEmail,
-      coursePreferences: notificationPreferences,
-      submittedAt: savedEnquiry.submittedAt.toISOString(),
-    }).catch((error) => {
-      console.error("[Enquiry API] Notification failed:", error);
-    });
+    // Send the admin notification before responding.
+    // The previous fire-and-forget call was being dropped when the request
+    // finished (especially on serverless/short-lived runtimes), so the email
+    // never went out. Awaiting guarantees the send is attempted, while still
+    // not failing the user-facing response if ZeptoMail is unavailable.
+    try {
+      const notification = await sendEnquiryNotification({
+        enquiryNumber: savedEnquiry.enquiryNumber,
+        studentName: data.studentName,
+        studentEmail: data.studentEmail,
+        studentMobile: cleanStudentMobile,
+        parentName: data.parentName,
+        parentMobile: cleanParentMobile,
+        parentEmail: data.parentEmail,
+        coursePreferences: notificationPreferences,
+        submittedAt: savedEnquiry.submittedAt.toISOString(),
+      });
+
+      if (notification.success) {
+        console.log(
+          `[Enquiry API] Admin notification sent for ${savedEnquiry.enquiryNumber}`,
+        );
+      } else {
+        console.error(
+          `[Enquiry API] Admin notification NOT sent for ${savedEnquiry.enquiryNumber}: ${notification.message}`,
+          notification.error ?? "",
+        );
+      }
+    } catch (error) {
+      console.error(
+        `[Enquiry API] Notification failed for ${savedEnquiry.enquiryNumber}:`,
+        error,
+      );
+    }
 
     /* =====================================================
        SUCCESS RESPONSE
