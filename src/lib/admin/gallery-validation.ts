@@ -19,6 +19,8 @@ export const galleryImageSchema = z.object({
   imagePath: z.string().trim().min(1).max(2048),
   sortOrder: z.coerce.number().int().min(0).max(99999),
   isPublished: z.boolean(),
+  showOnHome: z.boolean(),
+  showOnGalleryPage: z.boolean(),
 });
 
 export type GalleryCategoryInput = z.infer<typeof galleryCategorySchema>;

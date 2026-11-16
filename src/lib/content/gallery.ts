@@ -14,7 +14,7 @@ export const fallbackGalleryCategories = [
   "Student Life",
 ];
 
-export const fallbackGalleryItems: GalleryItem[] = [
+const allFallbackGalleryItems: GalleryItem[] = [
   {
     id: 1,
     title: "Engineering Block",
@@ -70,3 +70,7 @@ export const fallbackGalleryItems: GalleryItem[] = [
     image: "/images/gallery/stcet-dining-hall.jpg",
   },
 ];
+
+// Home page shows a featured subset; Gallery page shows the remaining images.
+export const fallbackHomeGalleryItems = allFallbackGalleryItems.slice(0, 4);
+export const fallbackGalleryItems = allFallbackGalleryItems.slice(4);

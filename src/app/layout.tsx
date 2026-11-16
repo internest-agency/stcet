@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${josefinSans.variable} ${nunitoSans.variable} h-full antialiased`}
     >
-      <head>{headCode}</head>
+      {headCode ? <head>{headCode}</head> : null}
       <body suppressHydrationWarning>
         {children}
         {bodyEndCode}

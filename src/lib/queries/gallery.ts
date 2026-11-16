@@ -4,38 +4,47 @@ import { connection } from "next/server";
 import {
   fallbackGalleryCategories,
   fallbackGalleryItems,
+  fallbackHomeGalleryItems,
   type GalleryItem,
 } from "@/src/lib/content/gallery";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
 
-export interface PublicGalleryData {
+export interface PublicGalleryPageData {
   categories: string[];
   items: GalleryItem[];
 }
 
-const fallback: PublicGalleryData = {
-  categories: fallbackGalleryCategories,
-  items: fallbackGalleryItems,
-};
+function toItems(
+  images: {
+    id: number;
+    title: string;
+    imagePath: string;
+    category: { name: string };
+  }[],
+): GalleryItem[] {
+  return images.map((image) => ({
+    id: image.id,
+    title: image.title,
+    category: image.category.name,
+    image: image.imagePath,
+  }));
+}
 
-export async function getPublicGalleryData(): Promise<PublicGalleryData> {
-  if (!isDatabaseConfigured()) return fallback;
+function categoriesFor(items: GalleryItem[]): string[] {
+  return ["All", ...new Set(items.map((item) => item.category))];
+}
+
+export async function getHomeGalleryItems(): Promise<GalleryItem[]> {
+  if (!isDatabaseConfigured()) return fallbackHomeGalleryItems;
 
   await connection();
 
   try {
     const prisma = getPrismaClient();
-    const totalImages = await prisma.galleryImage.count({
-      where: {
-        isPublished: true,
-        category: { isActive: true },
-      },
-    });
-    if (totalImages === 0) return fallback;
-
     const images = await prisma.galleryImage.findMany({
       where: {
         isPublished: true,
+        showOnHome: true,
         category: { isActive: true },
       },
       orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
@@ -43,28 +52,60 @@ export async function getPublicGalleryData(): Promise<PublicGalleryData> {
         id: true,
         title: true,
         imagePath: true,
-        category: { select: { name: true, sortOrder: true } },
+        category: { select: { name: true } },
       },
     });
-
-    const activeNames = [
-      ...new Set(images.map((image) => image.category.name)),
-    ];
-    const items = images.map((image) => ({
-      id: image.id,
-      title: image.title,
-      category: image.category.name,
-      image: image.imagePath,
-    }));
-
-    return {
-      categories: ["All", ...activeNames],
-      items,
-    };
+    if (images.length === 0) return fallbackHomeGalleryItems;
+    return toItems(images);
   } catch {
     console.error(
-      "Gallery data unavailable; rendering bundled gallery content.",
+      "Home gallery data unavailable; rendering bundled home gallery content.",
     );
-    return fallback;
+    return fallbackHomeGalleryItems;
+  }
+}
+
+export async function getGalleryPageData(): Promise<PublicGalleryPageData> {
+  if (!isDatabaseConfigured()) {
+    return {
+      categories: fallbackGalleryCategories,
+      items: fallbackGalleryItems,
+    };
+  }
+
+  await connection();
+
+  try {
+    const prisma = getPrismaClient();
+    const images = await prisma.galleryImage.findMany({
+      where: {
+        isPublished: true,
+        showOnGalleryPage: true,
+        category: { isActive: true },
+      },
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      select: {
+        id: true,
+        title: true,
+        imagePath: true,
+        category: { select: { name: true } },
+      },
+    });
+    if (images.length === 0) {
+      return {
+        categories: fallbackGalleryCategories,
+        items: fallbackGalleryItems,
+      };
+    }
+    const items = toItems(images);
+    return { categories: categoriesFor(items), items };
+  } catch {
+    console.error(
+      "Gallery page data unavailable; rendering bundled gallery content.",
+    );
+    return {
+      categories: fallbackGalleryCategories,
+      items: fallbackGalleryItems,
+    };
   }
 }

@@ -217,18 +217,22 @@ model GalleryCategory {
 
 model GalleryImage {
   @@map("galleryimage")
-  id          Int            @id @default(autoincrement())
-  title       String         @db.VarChar(191)
-  altText     String         @db.VarChar(255)
+  id          Int             @id @default(autoincrement())
+  title       String          @db.VarChar(191)
+  altText     String          @db.VarChar(255)
   categoryId  Int
-  imagePath   String         @unique @db.VarChar(2048)
-  isPublished Boolean        @default(false)
-  sortOrder   Int            @default(0)
-  createdAt   DateTime       @default(now()) @db.DateTime(3)
-  updatedAt   DateTime       @updatedAt @db.DateTime(3)
-  category    GalleryCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  imagePath   String          @unique @db.VarChar(2048)
+  isPublished      Boolean         @default(false)
+  showOnHome       Boolean         @default(false)
+  showOnGalleryPage Boolean        @default(true)
+  sortOrder        Int             @default(0)
+  createdAt        DateTime        @default(now()) @db.DateTime(3)
+  updatedAt        DateTime        @updatedAt @db.DateTime(3)
+  category         GalleryCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([isPublished, categoryId, sortOrder])
+  @@index([isPublished, showOnHome, sortOrder])
+  @@index([isPublished, showOnGalleryPage, sortOrder])
 }
 
 model AdmissionsIntro {

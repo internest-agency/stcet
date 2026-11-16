@@ -49,8 +49,8 @@ export default async function AdminGalleryPage({
           <p className="text-sm font-semibold text-primary-700">Content</p>
           <h2 className="mt-1 text-2xl font-bold text-gray-950">Gallery</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Organize campus images, accessible descriptions, and public
-            visibility.
+            Organize campus images and choose where they appear. You can show an
+            image on the home page, the gallery page, or both.
           </p>
         </div>
         <Link

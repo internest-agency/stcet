@@ -8,7 +8,7 @@ import WhyChooseAlterSection from "@/src/components/sections/home/why-choose-alt
 import GallerySection, {
   HomeGalleryItem,
 } from "@/src/components/sections/home/gallery";
-import { getPublicGalleryData } from "@/src/lib/queries/gallery";
+import { getHomeGalleryItems } from "@/src/lib/queries/gallery";
 import { getPublicAdmissionsData } from "@/src/lib/queries/admissions";
 import { getPageSeo } from "@/src/lib/queries/seo";
 import HeroSection1 from "@/src/components/sections/home/hero-sectoin-1";
@@ -26,12 +26,12 @@ export const generateMetadata = async () => {
 };
 
 export default async function HomePage() {
-  const [galleryData, admissionsData] = await Promise.all([
-    getPublicGalleryData(),
+  const [homeGallery, admissionsData] = await Promise.all([
+    getHomeGalleryItems(),
     getPublicAdmissionsData(),
   ]);
 
-  const seo = await getPageSeo(PAGE_PATH);
+  await getPageSeo(PAGE_PATH);
 
   const departments = [
     {
@@ -77,8 +77,8 @@ export default async function HomePage() {
   ];
 
   const homeGalleryItems: HomeGalleryItem[] | undefined =
-    galleryData.items && galleryData.items.length > 0
-      ? galleryData.items.map((item, idx) => ({
+    homeGallery.length > 0
+      ? homeGallery.map((item, idx) => ({
           number: String(idx + 1).padStart(2, "0"),
           title: item.title,
           image: item.image,

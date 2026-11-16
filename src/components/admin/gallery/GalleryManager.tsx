@@ -26,6 +26,8 @@ export type GalleryImageRow = {
   altText: string;
   imagePath: string;
   isPublished: boolean;
+  showOnHome: boolean;
+  showOnGalleryPage: boolean;
   sortOrder: number;
   categoryId: number;
   category: { name: string };
@@ -157,6 +159,35 @@ function GalleryImageForm({
         onChange={setImagePath}
         value={imagePath}
       />
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-semibold text-gray-700">
+          Show on pages
+        </legend>
+        <div className="flex flex-wrap gap-x-6 gap-y-1">
+          <label className="flex min-h-10 items-center gap-3 text-sm font-semibold text-gray-700">
+            <input
+              className="size-4 accent-primary-700"
+              defaultChecked={image?.showOnHome ?? false}
+              name="showOnHome"
+              type="checkbox"
+            />
+            Home page
+          </label>
+          <label className="flex min-h-10 items-center gap-3 text-sm font-semibold text-gray-700">
+            <input
+              className="size-4 accent-primary-700"
+              defaultChecked={image?.showOnGalleryPage ?? true}
+              name="showOnGalleryPage"
+              type="checkbox"
+            />
+            Gallery page
+          </label>
+        </div>
+        <p className="text-xs font-normal text-gray-500">
+          You can choose the home page, the gallery page, or both. Uncheck both
+          to keep the image saved without showing it publicly.
+        </p>
+      </fieldset>
       {canPublish ? (
         <label className="flex min-h-10 items-center gap-3 text-sm font-semibold text-gray-700">
           <input
@@ -165,7 +196,7 @@ function GalleryImageForm({
             name="isPublished"
             type="checkbox"
           />
-          Published on the public gallery
+          Published
         </label>
       ) : (
         <input name="isPublished" type="hidden" value="off" />
@@ -368,6 +399,10 @@ export default function GalleryManager({
           </p>
         </div>
         <div className="p-4 sm:p-5">
+          <p className="mb-4 text-sm text-gray-600">
+            Choose where each image appears: you can show it on the home page,
+            the gallery page, or both.
+          </p>
           {categories.some((category) => category.isActive) ? (
             <GalleryImageForm canPublish={canPublish} categories={categories} />
           ) : (
@@ -408,11 +443,28 @@ export default function GalleryManager({
                       <p className="mt-1 text-xs text-gray-500">
                         {image.category.name} · order {image.sortOrder}
                       </p>
-                      <span
-                        className={`mt-2 inline-flex rounded-sm px-2 py-1 text-xs font-bold ${image.isPublished ? "bg-secondary-50 text-secondary-800" : "bg-gray-100 text-gray-600"}`}
-                      >
-                        {image.isPublished ? "Published" : "Draft"}
-                      </span>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        <span
+                          className={`inline-flex rounded-sm px-2 py-1 text-xs font-bold ${image.isPublished ? "bg-secondary-50 text-secondary-800" : "bg-gray-100 text-gray-600"}`}
+                        >
+                          {image.isPublished ? "Published" : "Draft"}
+                        </span>
+                        {image.showOnHome ? (
+                          <span className="inline-flex rounded-sm bg-primary-50 px-2 py-1 text-xs font-bold text-primary-800">
+                            Home page
+                          </span>
+                        ) : null}
+                        {image.showOnGalleryPage ? (
+                          <span className="inline-flex rounded-sm bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700">
+                            Gallery page
+                          </span>
+                        ) : null}
+                        {!image.showOnHome && !image.showOnGalleryPage ? (
+                          <span className="inline-flex rounded-sm bg-amber-50 px-2 py-1 text-xs font-bold text-amber-800">
+                            Not shown
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   {canPublish ? <GalleryImageDeleteForm image={image} /> : null}

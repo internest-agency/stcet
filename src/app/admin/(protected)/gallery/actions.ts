@@ -128,6 +128,8 @@ export async function saveGalleryImage(formData: FormData): Promise<never> {
     imagePath: formData.get("imagePath"),
     sortOrder: formData.get("sortOrder"),
     isPublished: formData.get("isPublished") === "on",
+    showOnHome: formData.get("showOnHome") === "on",
+    showOnGalleryPage: formData.get("showOnGalleryPage") === "on",
   });
   if (!parsed.success) redirect("/admin/gallery?error=image-invalid");
 
@@ -180,6 +182,8 @@ export async function saveGalleryImage(formData: FormData): Promise<never> {
     imagePath: parsed.data.imagePath,
     sortOrder: parsed.data.sortOrder,
     isPublished,
+    showOnHome: parsed.data.showOnHome,
+    showOnGalleryPage: parsed.data.showOnGalleryPage,
   };
 
   try {
@@ -206,6 +210,8 @@ export async function saveGalleryImage(formData: FormData): Promise<never> {
             title: saved.title,
             categoryId: saved.categoryId,
             isPublished: saved.isPublished,
+            showOnHome: saved.showOnHome,
+            showOnGalleryPage: saved.showOnGalleryPage,
           },
         },
       });

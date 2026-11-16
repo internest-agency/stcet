@@ -3,7 +3,7 @@ import GalleryGrid from "@/src/components/sections/gallery/GalleryGrid";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
-import { getPublicGalleryData } from "@/src/lib/queries/gallery";
+import { getGalleryPageData } from "@/src/lib/queries/gallery";
 
 export const metadata: Metadata = {
   title: "Campus Gallery | S. Thangapazham College of Engineering & Technology",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const gallery = await getPublicGalleryData();
+  const gallery = await getGalleryPageData();
 
   return (
     <>
