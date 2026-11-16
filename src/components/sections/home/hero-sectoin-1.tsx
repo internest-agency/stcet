@@ -110,7 +110,7 @@ export default function HeroSection1() {
       />
 
       {/* Hero content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-1 flex-col justify-center px-6 pb-16 pt-28 sm:px-10 md:px-14 lg:px-16 lg:pb-20 lg:pt-36">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-1 flex-col justify-center px-6 pb-16 pt-28 sm:px-10 md:px-14 lg:px-16 lg:pb-20 lg:pt-40">
         <div className="max-w-3xl">
           <div
             data-hero-intro
@@ -124,7 +124,7 @@ export default function HeroSection1() {
             id="stcet-hero-title"
             as="h1"
             customSize={true}
-            className="text-[clamp(2.15rem,6.2vw,4.5rem)] leading-none! tracking-[-0.015em] text-white!"
+            className="text-[clamp(2.15rem,5.2vw,4rem)] leading-none! tracking-[-0.015em] text-white!"
           >
             Learning today
             <br />

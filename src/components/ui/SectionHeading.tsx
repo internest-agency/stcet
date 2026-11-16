@@ -91,9 +91,9 @@ export default function SectionHeading({
   }, [children, html, animate]);
 
   const headingSizes = {
-    h1: "text-4xl leading-[0.94] sm:text-5xl lg:text-5xl xl:text-6xl",
-    h2: "text-3xl leading-[0.98] sm:text-4xl lg:text-4xl xl:text-5xl",
-    h3: "text-2xl leading-[1.05] sm:text-3xl lg:text-3xl xl:text-4xl",
+    h1: "text-4xl leading-[0.94] sm:text-4xl lg:text-4xl xl:text-5xl",
+    h2: "text-3xl leading-[0.98] sm:text-3xl lg:text-3xl xl:text-4xl",
+    h3: "text-2xl leading-[1.05] sm:text-2xl lg:text-2xl xl:text-3xl",
   } as const;
 
   const headingClasses = `

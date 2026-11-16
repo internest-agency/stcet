@@ -181,7 +181,7 @@ export default function PlacementHero() {
       ref={sectionRef}
       className="relative overflow-hidden bg-primary-800 text-white"
     >
-      <div className="grid min-h-[680px] lg:min-h-[760px] lg:grid-cols-2">
+      <div className="grid min-h-[680px] lg:min-h-[760px] lg:grid-cols-2 pt-12">
         {/* =========================================================
             LEFT — CONTENT
         ========================================================= */}

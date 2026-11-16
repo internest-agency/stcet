@@ -21,7 +21,7 @@ export default async function PlacementPage() {
       <PlacementHero />
       <PlacementCell />
       <PlacementHead content={leadership ?? undefined} />
-      <IndustryConnect />
+      <IndustryConnect {...content} />
       <CareerReadiness />
       <IndustryEngagement />
       {/* <ManagedPlacementContent {...content} /> */}

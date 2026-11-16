@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
+import type { PlacementCompany } from "@/src/generated/prisma/client";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Container from "../../ui/Container";
 import Image from "next/image";
@@ -17,70 +18,76 @@ const logoPlaceholders = [
   "Company Logo",
 ];
 
-const recruiters = [
-  {
-    url: "/images/placements/recruiters/accenture-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/ashok-leyland-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/birla-soft-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/cognizant-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/hyundai-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/infosys-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/rane-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/royal-enfield-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/tcs-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/tessolve-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/texmo-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/wipro-logo.webp",
-    alt: "alt-text",
-  },
-  {
-    url: "/images/placements/recruiters/zoho-logo.webp",
-    alt: "alt-text",
-  },
-];
+// const companies = [
+//   {
+//     url: "/images/placements/companies/accenture-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/ashok-leyland-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/birla-soft-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/cognizant-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/hyundai-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/infosys-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/rane-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/royal-enfield-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/tcs-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/tessolve-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/texmo-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/wipro-logo.webp",
+//     alt: "alt-text",
+//   },
+//   {
+//     url: "/images/placements/companies/zoho-logo.webp",
+//     alt: "alt-text",
+//   },
+// ];
 
-export default function IndustryConnect() {
+export default function IndustryConnect({
+  companies,
+}: {
+  companies: PlacementCompany[];
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  const visibleCompanies = companies.filter((company) => company.logoPath?.trim());
 
   useLayoutEffect(() => {
     const context = gsap.context(() => {
       const track = trackRef.current;
 
-      if (!track) return;
+      if (!track || visibleCompanies.length === 0) return;
 
       const animation = gsap.to(track, {
         xPercent: -50,
@@ -103,7 +110,7 @@ export default function IndustryConnect() {
     }, sectionRef);
 
     return () => context.revert();
-  }, []);
+  }, [visibleCompanies.length]);
 
   return (
     <section
@@ -123,22 +130,24 @@ export default function IndustryConnect() {
         </div>
       </Container>
 
-      <div ref={trackRef} className="flex w-max items-center">
-        {[...recruiters, ...recruiters].map((recruiter, index) => (
-          <div
-            key={`recruiter-${index}`}
-            className="flex items-center border border-gray-300 mx-2"
-          >
-            <Image
-              src={recruiter.url}
-              className="w-45 h-18"
-              width={400}
-              height={160}
-              alt={recruiter.alt}
-            />
-          </div>
-        ))}
-      </div>
+      {visibleCompanies.length > 0 ? (
+        <div ref={trackRef} className="flex w-max items-center">
+          {[...visibleCompanies, ...visibleCompanies].map((recruiter, index) => (
+            <div
+              key={`${recruiter.id}-${index}`}
+              className="mx-2 flex items-center border border-gray-300 bg-white"
+            >
+              <Image
+                src={recruiter.logoPath!.trim()}
+                className="h-18 w-45 object-contain p-2"
+                width={400}
+                height={160}
+                alt={recruiter.name}
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }
