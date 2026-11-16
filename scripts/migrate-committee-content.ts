@@ -23,15 +23,60 @@ const seed: SeedCommittee[] = [
     name: "Anti-Ragging Committee",
     pageTitle: "Anti-Ragging Committee",
     members: [
-      { memberName: "Prof.Dr.Sundaram M", designation: "Chairman", role: "Committee", sortOrder: 0 },
-      { memberName: "Inspector of Police, Vasudevanallur", designation: "Member", role: "Committee", sortOrder: 1 },
-      { memberName: "Thasildhar,Sivagiri", designation: "Member", role: "Committee", sortOrder: 2 },
-      { memberName: "Shri.Thavamani.G", designation: "NGO Official", role: "Committee", sortOrder: 3 },
-      { memberName: "Shri.Sam David Raja", designation: "Representative Non Teaching", role: "Committee", sortOrder: 4 },
-      { memberName: "Prof.Dr.Sundaram M", designation: "Chairman", role: "Squad", sortOrder: 5 },
-      { memberName: "Shri.Rajesh.B", designation: "HoD", role: "Squad", sortOrder: 6 },
-      { memberName: "Shri.Kaliponraj.N", designation: "Faculty Member", role: "Squad", sortOrder: 7 },
-      { memberName: "Shri.Sam David Raja", designation: "Representative Non Teaching", role: "Squad", sortOrder: 8 },
+      {
+        memberName: "Dr. R. Raja",
+        designation: "Chairman",
+        role: "Committee",
+        sortOrder: 0,
+      },
+      {
+        memberName: "Inspector of Police, Vasudevanallur",
+        designation: "Member",
+        role: "Committee",
+        sortOrder: 1,
+      },
+      {
+        memberName: "Thasildhar,Sivagiri",
+        designation: "Member",
+        role: "Committee",
+        sortOrder: 2,
+      },
+      {
+        memberName: "Shri.Thavamani.G",
+        designation: "NGO Official",
+        role: "Committee",
+        sortOrder: 3,
+      },
+      {
+        memberName: "Shri.Sam David Raja",
+        designation: "Representative Non Teaching",
+        role: "Committee",
+        sortOrder: 4,
+      },
+      {
+        memberName: "Dr. R. Raja",
+        designation: "Chairman",
+        role: "Squad",
+        sortOrder: 5,
+      },
+      {
+        memberName: "Shri.Rajesh.B",
+        designation: "HoD",
+        role: "Squad",
+        sortOrder: 6,
+      },
+      {
+        memberName: "Shri.Kaliponraj.N",
+        designation: "Faculty Member",
+        role: "Squad",
+        sortOrder: 7,
+      },
+      {
+        memberName: "Shri.Sam David Raja",
+        designation: "Representative Non Teaching",
+        role: "Squad",
+        sortOrder: 8,
+      },
     ],
   },
   {
@@ -39,9 +84,24 @@ const seed: SeedCommittee[] = [
     name: "Grievance Redressal Committee",
     pageTitle: "Grievance Redressal Committee",
     members: [
-      { memberName: "Prof.Dr.Sundaram M", designation: "Chairman", role: null, sortOrder: 0 },
-      { memberName: "Shri.Bala Murugan.C", designation: "Member", role: null, sortOrder: 1 },
-      { memberName: "Shri.Rajesh.B", designation: "Member", role: null, sortOrder: 2 },
+      {
+        memberName: "Dr. R. Raja",
+        designation: "Chairman",
+        role: null,
+        sortOrder: 0,
+      },
+      {
+        memberName: "Shri.Bala Murugan.C",
+        designation: "Member",
+        role: null,
+        sortOrder: 1,
+      },
+      {
+        memberName: "Shri.Rajesh.B",
+        designation: "Member",
+        role: null,
+        sortOrder: 2,
+      },
     ],
   },
   {
@@ -49,10 +109,30 @@ const seed: SeedCommittee[] = [
     name: "Internal Complaints Committee",
     pageTitle: "Internal Complaints Committee",
     members: [
-      { memberName: "Prof.Dr.Sundaram M", designation: "Chairman", role: null, sortOrder: 0 },
-      { memberName: "Sri.Kaliponraj N", designation: "Senior Faculty", role: null, sortOrder: 1 },
-      { memberName: "Sri.Sriram A", designation: "Deputy Warden", role: "Boys hostel", sortOrder: 2 },
-      { memberName: "Mrs.Selvakani M", designation: "Lady Faculty Member", role: null, sortOrder: 3 },
+      {
+        memberName: "Dr. R. Raja",
+        designation: "Chairman",
+        role: null,
+        sortOrder: 0,
+      },
+      {
+        memberName: "Sri.Kaliponraj N",
+        designation: "Senior Faculty",
+        role: null,
+        sortOrder: 1,
+      },
+      {
+        memberName: "Sri.Sriram A",
+        designation: "Deputy Warden",
+        role: "Boys hostel",
+        sortOrder: 2,
+      },
+      {
+        memberName: "Mrs.Selvakani M",
+        designation: "Lady Faculty Member",
+        role: null,
+        sortOrder: 3,
+      },
     ],
   },
 ];
@@ -74,7 +154,9 @@ async function main() {
 
   try {
     for (const entry of seed) {
-      let committee = await prisma.committee.findUnique({ where: { slug: entry.slug } });
+      let committee = await prisma.committee.findUnique({
+        where: { slug: entry.slug },
+      });
       if (!committee) {
         committee = await prisma.committee.create({
           data: {
@@ -87,12 +169,18 @@ async function main() {
         });
         console.log(`  committee ${entry.slug}: created (id ${committee.id})`);
       } else {
-        console.log(`  committee ${entry.slug}: already present (id ${committee.id})`);
+        console.log(
+          `  committee ${entry.slug}: already present (id ${committee.id})`,
+        );
       }
 
-      const existing = await prisma.committeeMember.count({ where: { committeeSlug: entry.slug } });
+      const existing = await prisma.committeeMember.count({
+        where: { committeeSlug: entry.slug },
+      });
       if (existing > 0) {
-        console.log(`  members ${entry.slug}: skipped (${existing} already present)`);
+        console.log(
+          `  members ${entry.slug}: skipped (${existing} already present)`,
+        );
         continue;
       }
 
@@ -113,7 +201,9 @@ async function main() {
 
     const committees = await prisma.committee.count();
     const members = await prisma.committeeMember.count();
-    console.log(`Migration complete. ${committees} committee(s), ${members} member(s).`);
+    console.log(
+      `Migration complete. ${committees} committee(s), ${members} member(s).`,
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -337,6 +337,140 @@ Source: Enquiry Form — https://stcet.ac.in/enquire-now
 }
 
 /**
+ * Sends a confirmation email to the visitor who submitted the contact form.
+ */
+export async function sendContactVisitorConfirmation(data: {
+  name: string;
+  email: string;
+  subject: string;
+  submittedAt: string;
+}): Promise<ZeptoMailResult> {
+  const config = await getZeptoMailConfig();
+  if (!config) {
+    return { success: false, message: "ZeptoMail not configured" };
+  }
+
+  const htmlbody = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #1e3a5f; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        <h1 style="margin: 0; font-size: 24px;">STCET Website</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9;">Message received</p>
+      </div>
+      <div style="background: #f9f9f9; padding: 24px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
+        <p style="margin: 0 0 16px; color: #333; font-size: 16px;">
+          Hello ${escapeHtml(data.name)},
+        </p>
+        <p style="margin: 0 0 16px; color: #333;">
+          Thank you for contacting STCET. We have received your message and our team will get back to you shortly.
+        </p>
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; margin: 20px 0;">
+          <p style="margin: 0 0 8px; color: #1e3a5f;"><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
+          <p style="margin: 0; color: #666; font-size: 13px;">
+            <strong>Submitted:</strong> ${new Date(data.submittedAt).toLocaleString()}
+          </p>
+        </div>
+        <p style="margin: 0; color: #666; font-size: 13px;">
+          This is an automated confirmation. Please do not reply to this email.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendZeptoMailEmail(config, {
+    to: [{ address: data.email, name: data.name }],
+    subject: `We have received your message — STCET`,
+    htmlbody,
+    textbody: `
+Hello ${data.name},
+
+Thank you for contacting STCET. We have received your message and our team will get back to you shortly.
+
+Subject: ${data.subject}
+Submitted: ${new Date(data.submittedAt).toLocaleString()}
+
+This is an automated confirmation. Please do not reply to this email.
+    `.trim(),
+  });
+}
+
+/**
+ * Sends a confirmation email to the student who submitted the admission enquiry.
+ */
+export async function sendEnquiryVisitorConfirmation(data: {
+  enquiryNumber: string;
+  studentName: string;
+  studentEmail: string;
+  coursePreferences: string[];
+  submittedAt: string;
+}): Promise<ZeptoMailResult> {
+  const config = await getZeptoMailConfig();
+  if (!config) {
+    return { success: false, message: "ZeptoMail not configured" };
+  }
+
+  const preferences = data.coursePreferences.filter(Boolean).map((p) => escapeHtml(p));
+  const htmlbody = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: #1e3a5f; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        <h1 style="margin: 0; font-size: 24px;">STCET Website</h1>
+        <p style="margin: 8px 0 0; opacity: 0.9;">Admission enquiry received</p>
+      </div>
+      <div style="background: #f9f9f9; padding: 24px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
+        <p style="margin: 0 0 16px; color: #333; font-size: 16px;">
+          Hello ${escapeHtml(data.studentName)},
+        </p>
+        <p style="margin: 0 0 16px; color: #333;">
+          Thank you for your admission enquiry. It has been received successfully and our admissions team will contact you shortly.
+        </p>
+        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 12px; margin-bottom: 20px; text-align: center;">
+          <strong style="color: #856404;">Enquiry Number: ${escapeHtml(data.enquiryNumber)}</strong>
+          <p style="margin: 8px 0 0; color: #856404; font-size: 13px;">Please quote this number in any future correspondence.</p>
+        </div>
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 4px; padding: 16px; margin: 20px 0;">
+          <p style="margin: 0 0 8px; color: #1e3a5f;"><strong>Course preferences:</strong></p>
+          ${preferences.length ? `<ol style="margin: 0; padding-left: 20px; color: #333;">${preferences.map((p) => `<li>${p}</li>`).join("")}</ol>` : '<p style="margin: 0; color: #666;">None specified</p>'}
+        </div>
+        <p style="margin: 0; color: #666; font-size: 13px;">
+          Submitted: ${new Date(data.submittedAt).toLocaleString()}<br>
+          This is an automated confirmation. Please do not reply to this email.
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendZeptoMailEmail(config, {
+    to: [{ address: data.studentEmail, name: data.studentName }],
+    subject: `Admission enquiry received — ${data.enquiryNumber} — STCET`,
+    htmlbody,
+    textbody: `
+Hello ${data.studentName},
+
+Thank you for your admission enquiry. It has been received successfully and our admissions team will contact you shortly.
+
+Enquiry Number: ${data.enquiryNumber}
+Course Preferences: ${data.coursePreferences.filter(Boolean).join(", ") || "None specified"}
+Submitted: ${new Date(data.submittedAt).toLocaleString()}
+
+This is an automated confirmation. Please do not reply to this email.
+    `.trim(),
+  });
+}
+
+/**
  * Sends a password reset email to an admin user.
  */
 export async function sendPasswordResetEmail(data: {

@@ -1,9 +1,31 @@
 import { NextResponse } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
-import { sendEnquiryNotification } from "@/src/lib/zeptomail";
+import {
+  sendEnquiryNotification,
+  sendEnquiryVisitorConfirmation,
+} from "@/src/lib/zeptomail";
 import { rateLimit, getClientIp } from "@/src/lib/rate-limit";
 
 export const runtime = "nodejs";
+
+type MailResult = { success: boolean; message: string; error?: string };
+
+/** Runs one mail send and always logs the outcome (senders return errors as values). */
+async function sendAndLog(label: string, send: () => Promise<MailResult>) {
+  try {
+    const result = await send();
+    if (result.success) {
+      console.log(`[Enquiry API] ${label} sent`);
+    } else {
+      console.error(
+        `[Enquiry API] ${label} NOT sent: ${result.message}`,
+        result.error ?? "",
+      );
+    }
+  } catch (error) {
+    console.error(`[Enquiry API] ${label} failed:`, error);
+  }
+}
 
 /* =========================================================
    TYPES
@@ -497,40 +519,36 @@ export async function POST(request: Request) {
       data.coursePreference5,
     ].filter(Boolean);
 
-    // Send the admin notification before responding.
-    // The previous fire-and-forget call was being dropped when the request
-    // finished (especially on serverless/short-lived runtimes), so the email
-    // never went out. Awaiting guarantees the send is attempted, while still
-    // not failing the user-facing response if ZeptoMail is unavailable.
-    try {
-      const notification = await sendEnquiryNotification({
-        enquiryNumber: savedEnquiry.enquiryNumber,
-        studentName: data.studentName,
-        studentEmail: data.studentEmail,
-        studentMobile: cleanStudentMobile,
-        parentName: data.parentName,
-        parentMobile: cleanParentMobile,
-        parentEmail: data.parentEmail,
-        coursePreferences: notificationPreferences,
-        submittedAt: savedEnquiry.submittedAt.toISOString(),
-      });
-
-      if (notification.success) {
-        console.log(
-          `[Enquiry API] Admin notification sent for ${savedEnquiry.enquiryNumber}`,
-        );
-      } else {
-        console.error(
-          `[Enquiry API] Admin notification NOT sent for ${savedEnquiry.enquiryNumber}: ${notification.message}`,
-          notification.error ?? "",
-        );
-      }
-    } catch (error) {
-      console.error(
-        `[Enquiry API] Notification failed for ${savedEnquiry.enquiryNumber}:`,
-        error,
-      );
-    }
+    // Send both emails before responding. Fire-and-forget calls were being
+    // dropped when the request finished, so neither email went out. Awaiting
+    // guarantees both sends are attempted while still keeping the submission
+    // successful if ZeptoMail is unavailable.
+    await Promise.all([
+      sendAndLog(`Admin notification for ${savedEnquiry.enquiryNumber}`, () =>
+        sendEnquiryNotification({
+          enquiryNumber: savedEnquiry.enquiryNumber,
+          studentName: data.studentName,
+          studentEmail: data.studentEmail,
+          studentMobile: cleanStudentMobile,
+          parentName: data.parentName,
+          parentMobile: cleanParentMobile,
+          parentEmail: data.parentEmail,
+          coursePreferences: notificationPreferences,
+          submittedAt: savedEnquiry.submittedAt.toISOString(),
+        }),
+      ),
+      sendAndLog(
+        `Visitor confirmation to ${data.studentEmail} for ${savedEnquiry.enquiryNumber}`,
+        () =>
+          sendEnquiryVisitorConfirmation({
+            enquiryNumber: savedEnquiry.enquiryNumber,
+            studentName: data.studentName,
+            studentEmail: data.studentEmail,
+            coursePreferences: notificationPreferences,
+            submittedAt: savedEnquiry.submittedAt.toISOString(),
+          }),
+      ),
+    ]);
 
     /* =====================================================
        SUCCESS RESPONSE
