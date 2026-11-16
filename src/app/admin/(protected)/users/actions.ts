@@ -1,4 +1,5 @@
 "use server";
+
 import { AdminRole, Prisma } from "@/src/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -6,8 +7,179 @@ import { requireAdministrator } from "@/src/lib/admin/authorization";
 import { hashAdminPassword } from "@/src/lib/admin/password";
 import { getPrismaClient } from "@/src/lib/prisma";
 import { z } from "zod";
-const createSchema = z.object({ name: z.string().trim().min(2).max(120), email: z.string().trim().email().max(191), password: z.string().min(12).max(256), role: z.nativeEnum(AdminRole) });
-const updateSchema = z.object({ id: z.coerce.number().int().positive(), name: z.string().trim().min(2).max(120), email: z.string().trim().email().max(191), role: z.nativeEnum(AdminRole), isActive: z.boolean() });
-function duplicate(error: unknown) { return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"; }
-export async function createAdminUser(formData: FormData): Promise<never> { const admin = await requireAdministrator(); const parsed = createSchema.safeParse({ name: formData.get("name"), email: String(formData.get("email") ?? "").toLowerCase(), password: formData.get("password"), role: formData.get("role") }); if (!parsed.success) redirect("/admin/users?error=invalid"); try { const user = await getPrismaClient().adminUser.create({ data: { name: parsed.data.name, email: parsed.data.email, passwordHash: await hashAdminPassword(parsed.data.password), role: parsed.data.role } }); await getPrismaClient().adminAuditLog.create({ data: { actorId: admin.id, action: "create", entityType: "AdminUser", entityId: String(user.id), details: { email: user.email, role: user.role } } }); } catch (error) { if (duplicate(error)) redirect("/admin/users?error=duplicate"); redirect("/admin/users?error=save"); } revalidatePath("/admin/users"); redirect("/admin/users?saved=1"); }
-export async function updateAdminUser(formData: FormData): Promise<never> { const admin = await requireAdministrator(); const parsed = updateSchema.safeParse({ id: formData.get("id"), name: formData.get("name"), email: String(formData.get("email") ?? "").toLowerCase(), role: formData.get("role"), isActive: formData.get("isActive") === "on" }); if (!parsed.success) redirect("/admin/users?error=invalid"); const prisma = getPrismaClient(); const target = await prisma.adminUser.findUnique({ where: { id: parsed.data.id } }); if (!target) redirect("/admin/users?error=missing"); if (target.id === admin.id && (parsed.data.role !== target.role || !parsed.data.isActive)) redirect("/admin/users?error=self"); const removesAdmin = target.role === AdminRole.SUPER_ADMIN && (!parsed.data.isActive || parsed.data.role !== AdminRole.SUPER_ADMIN); if (removesAdmin && await prisma.adminUser.count({ where: { role: AdminRole.SUPER_ADMIN, isActive: true } }) <= 1) redirect("/admin/users?error=last-admin"); try { const user = await prisma.adminUser.update({ where: { id: target.id }, data: { name: parsed.data.name, email: parsed.data.email, role: parsed.data.role, isActive: parsed.data.isActive, sessionVersion: target.isActive && !parsed.data.isActive ? { increment: 1 } : undefined } }); await prisma.adminAuditLog.create({ data: { actorId: admin.id, action: "update", entityType: "AdminUser", entityId: String(user.id), details: { email: user.email, role: user.role, isActive: user.isActive } } }); } catch (error) { if (duplicate(error)) redirect("/admin/users?error=duplicate"); redirect("/admin/users?error=save"); } revalidatePath("/admin/users"); redirect("/admin/users?saved=1"); }
+
+const createSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(191),
+  password: z.string().min(12).max(256),
+  role: z.nativeEnum(AdminRole),
+});
+
+const updateSchema = z.object({
+  id: z.coerce.number().int().positive(),
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(191),
+  role: z.nativeEnum(AdminRole),
+  isActive: z.boolean(),
+});
+
+const deleteSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+
+function duplicate(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  );
+}
+
+function foreignKeyConstraint(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2003"
+  );
+}
+
+export async function createAdminUser(formData: FormData): Promise<never> {
+  const admin = await requireAdministrator();
+  const parsed = createSchema.safeParse({
+    name: formData.get("name"),
+    email: String(formData.get("email") ?? "").toLowerCase(),
+    password: formData.get("password"),
+    role: formData.get("role"),
+  });
+  if (!parsed.success) redirect("/admin/users?error=invalid");
+
+  try {
+    const user = await getPrismaClient().adminUser.create({
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        passwordHash: await hashAdminPassword(parsed.data.password),
+        role: parsed.data.role,
+      },
+    });
+    await getPrismaClient().adminAuditLog.create({
+      data: {
+        actorId: admin.id,
+        action: "create",
+        entityType: "AdminUser",
+        entityId: String(user.id),
+        details: { email: user.email, role: user.role },
+      },
+    });
+  } catch (error) {
+    if (duplicate(error)) redirect("/admin/users?error=duplicate");
+    redirect("/admin/users?error=save");
+  }
+
+  revalidatePath("/admin/users");
+  redirect("/admin/users?saved=1");
+}
+
+export async function updateAdminUser(formData: FormData): Promise<never> {
+  const admin = await requireAdministrator();
+  const parsed = updateSchema.safeParse({
+    id: formData.get("id"),
+    name: formData.get("name"),
+    email: String(formData.get("email") ?? "").toLowerCase(),
+    role: formData.get("role"),
+    isActive: formData.get("isActive") === "on",
+  });
+  if (!parsed.success) redirect("/admin/users?error=invalid");
+
+  const prisma = getPrismaClient();
+  const target = await prisma.adminUser.findUnique({ where: { id: parsed.data.id } });
+  if (!target) redirect("/admin/users?error=missing");
+
+  if (target.id === admin.id && (parsed.data.role !== target.role || !parsed.data.isActive)) {
+    redirect("/admin/users?error=self");
+  }
+
+  const removesAdmin =
+    target.role === AdminRole.SUPER_ADMIN &&
+    (!parsed.data.isActive || parsed.data.role !== AdminRole.SUPER_ADMIN);
+  if (
+    removesAdmin &&
+    (await prisma.adminUser.count({
+      where: { role: AdminRole.SUPER_ADMIN, isActive: true },
+    })) <= 1
+  ) {
+    redirect("/admin/users?error=last-admin");
+  }
+
+  try {
+    const user = await prisma.adminUser.update({
+      where: { id: target.id },
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        role: parsed.data.role,
+        isActive: parsed.data.isActive,
+        sessionVersion:
+          target.isActive && !parsed.data.isActive ? { increment: 1 } : undefined,
+      },
+    });
+    await prisma.adminAuditLog.create({
+      data: {
+        actorId: admin.id,
+        action: "update",
+        entityType: "AdminUser",
+        entityId: String(user.id),
+        details: { email: user.email, role: user.role, isActive: user.isActive },
+      },
+    });
+  } catch (error) {
+    if (duplicate(error)) redirect("/admin/users?error=duplicate");
+    redirect("/admin/users?error=save");
+  }
+
+  revalidatePath("/admin/users");
+  redirect("/admin/users?saved=1");
+}
+
+export async function deleteAdminUser(formData: FormData): Promise<never> {
+  const admin = await requireAdministrator();
+  const parsed = deleteSchema.safeParse({ id: formData.get("id") });
+  if (!parsed.success) redirect("/admin/users?error=invalid");
+
+  const prisma = getPrismaClient();
+  const target = await prisma.adminUser.findUnique({ where: { id: parsed.data.id } });
+  if (!target) redirect("/admin/users?error=missing");
+
+  if (target.id === admin.id) {
+    redirect("/admin/users?error=self");
+  }
+
+  const isLastActiveAdmin =
+    target.role === AdminRole.SUPER_ADMIN &&
+    target.isActive &&
+    (await prisma.adminUser.count({
+      where: { role: AdminRole.SUPER_ADMIN, isActive: true },
+    })) <= 1;
+  if (isLastActiveAdmin) {
+    redirect("/admin/users?error=last-admin");
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.adminAuditLog.create({
+        data: {
+          actorId: admin.id,
+          action: "delete",
+          entityType: "AdminUser",
+          entityId: String(target.id),
+          details: { email: target.email, role: target.role, name: target.name },
+        },
+      });
+      await tx.adminUser.delete({ where: { id: target.id } });
+    });
+  } catch (error) {
+    if (foreignKeyConstraint(error)) redirect("/admin/users?error=has-uploads");
+    redirect("/admin/users?error=delete");
+  }
+
+  revalidatePath("/admin/users");
+  redirect("/admin/users?deleted=1");
+}

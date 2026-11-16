@@ -12,7 +12,6 @@ import {
   companySchema,
   leadershipItemSchema,
   leadershipSchema,
-  programmeSchema,
 } from "@/src/lib/admin/placement-validation";
 import { cleanupUnreferencedUploads, validateImageReferences } from "@/src/lib/admin/uploads";
 import { sanitizeHtml } from "@/src/lib/content/html";
@@ -175,132 +174,19 @@ export async function saveCompany(formData: FormData): Promise<PlacementResult> 
   };
 }
 
-async function saveContent(
+export async function deletePlacementCompany(
   formData: FormData,
-  kind: "programme" | "interaction",
 ): Promise<PlacementResult> {
-  const admin = await getCurrentAdmin();
-  if (!admin) return { success: false, error: SESSION_EXPIRED };
-
-  const parsed = programmeSchema.safeParse({
-    title: formData.get("title"),
-    description: formData.get("description") || null,
-    imagePath: formData.get("imagePath") || null,
-    sortOrder: formData.get("sortOrder"),
-    isPublished: formData.get("isPublished") === "on",
-  });
-  if (!parsed.success) {
-    return {
-      success: false,
-      error: "Enter a title and check the fields, then try again.",
-    };
-  }
-
-  const id = Number(formData.get("id"));
-  const updating = Number.isSafeInteger(id) && id > 0;
-  const prisma = getPrismaClient();
-  const previous = updating
-    ? kind === "programme"
-      ? await prisma.trainingProgramme.findUnique({ where: { id } })
-      : await prisma.industryInteraction.findUnique({ where: { id } })
-    : null;
-  if (updating && !previous) {
-    return {
-      success: false,
-      error: "This record no longer exists. Refresh and try again.",
-    };
-  }
-  if (previous?.isPublished && !isAdministrator(admin)) {
-    return {
-      success: false,
-      error: "Published records can only be edited by an administrator.",
-    };
-  }
-  if (
-    !(await validateImageReferences(
-      [parsed.data.imagePath ?? ""],
-      previous?.imagePath ? [previous.imagePath] : [],
-    ))
-  ) {
-    return {
-      success: false,
-      error: "The selected image could not be verified. Upload it again.",
-    };
-  }
-
-  const isPublished = isAdministrator(admin) && parsed.data.isPublished;
-
-  try {
-    const saved = await prisma.$transaction(async (tx) => {
-      const data = {
-        ...parsed.data,
-        imagePath: parsed.data.imagePath ?? null,
-        isPublished,
-      };
-      const record =
-        kind === "programme"
-          ? updating
-            ? await tx.trainingProgramme.update({ where: { id }, data })
-            : await tx.trainingProgramme.create({ data })
-          : updating
-            ? await tx.industryInteraction.update({ where: { id }, data })
-            : await tx.industryInteraction.create({ data });
-      await tx.adminAuditLog.create({
-        data: {
-          actorId: admin.id,
-          action: updating ? "update" : "create",
-          entityType: kind === "programme" ? "TrainingProgramme" : "IndustryInteraction",
-          entityId: String(record.id),
-          details: { title: record.title, isPublished },
-        },
-      });
-      return record;
-    });
-    if (previous?.imagePath && previous.imagePath !== saved.imagePath) {
-      await cleanupUnreferencedUploads([previous.imagePath]);
-    }
-  } catch (error) {
-    console.error(`Placement ${kind} save failed:`, error);
-    return {
-      success: false,
-      error: "The record could not be saved. Please try again.",
-    };
-  }
-
-  refresh();
-  const noun = kind === "programme" ? "Programme" : "Interaction";
-  return { success: true, message: `${noun} ${updating ? "updated" : "added"}.` };
-}
-
-export async function saveProgramme(formData: FormData): Promise<PlacementResult> {
-  return saveContent(formData, "programme");
-}
-
-export async function saveInteraction(formData: FormData): Promise<PlacementResult> {
-  return saveContent(formData, "interaction");
-}
-
-export async function deletePlacement(formData: FormData): Promise<PlacementResult> {
   const admin = await requireAdministrator();
-  const kind = String(formData.get("kind"));
   const id = Number(formData.get("id"));
-  if (
-    !Number.isSafeInteger(id) ||
-    id <= 0 ||
-    !["company", "programme", "interaction"].includes(kind)
-  ) {
-    return { success: false, error: "Select a valid record to delete." };
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return { success: false, error: "Select a valid company to delete." };
   }
 
   const prisma = getPrismaClient();
-  const record =
-    kind === "company"
-      ? await prisma.placementCompany.findUnique({ where: { id } })
-      : kind === "programme"
-        ? await prisma.trainingProgramme.findUnique({ where: { id } })
-        : await prisma.industryInteraction.findUnique({ where: { id } });
+  const record = await prisma.placementCompany.findUnique({ where: { id } });
   if (!record) {
-    return { success: false, error: "This record no longer exists." };
+    return { success: false, error: "This company no longer exists." };
   }
 
   try {
@@ -309,29 +195,24 @@ export async function deletePlacement(formData: FormData): Promise<PlacementResu
         data: {
           actorId: admin.id,
           action: "delete",
-          entityType: String(kind),
+          entityType: "PlacementCompany",
           entityId: String(id),
-          details: { title: "name" in record ? record.name : record.title },
+          details: { name: record.name },
         },
       });
-      if (kind === "company") {
-        await tx.placementCompany.delete({ where: { id } });
-      } else if (kind === "programme") {
-        await tx.trainingProgramme.delete({ where: { id } });
-      } else {
-        await tx.industryInteraction.delete({ where: { id } });
-      }
+      await tx.placementCompany.delete({ where: { id } });
     });
   } catch (error) {
-    console.error("Placement delete failed:", error);
-    return { success: false, error: "The record could not be deleted. Please try again." };
+    console.error("Placement company delete failed:", error);
+    return {
+      success: false,
+      error: "The company could not be deleted. Please try again.",
+    };
   }
 
-  await cleanupUnreferencedUploads([
-    ("logoPath" in record ? record.logoPath : record.imagePath) ?? "",
-  ]);
+  await cleanupUnreferencedUploads([record.logoPath ?? ""]);
   refresh();
-  return { success: true, message: "Record removed." };
+  return { success: true, message: "Company removed." };
 }
 
 /**

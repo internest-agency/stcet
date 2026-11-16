@@ -9,15 +9,9 @@ export const metadata = { title: "Placements | STCET Admin" };
 
 export default async function PlacementsPage() {
   const admin = await requireAdmin();
-  const data = isDatabaseConfigured()
+  const [companies, leadershipRecord] = isDatabaseConfigured()
     ? await Promise.all([
         getPrismaClient().placementCompany.findMany({
-          orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-        }),
-        getPrismaClient().trainingProgramme.findMany({
-          orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
-        }),
-        getPrismaClient().industryInteraction.findMany({
           orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
         }),
         getPrismaClient().placementLeadership.findFirst({
@@ -27,7 +21,7 @@ export default async function PlacementsPage() {
           },
         }),
       ])
-    : ([[], [], [], null] as [never[], never[], never[], null]);
+    : [[], null];
 
   return (
     <div className="space-y-5">
@@ -51,8 +45,7 @@ export default async function PlacementsPage() {
             Placements Management
           </h2>
           <p className="mt-1 text-sm text-gray-600">
-            Manage placement partners, training programmes, and industry
-            interactions.
+            Manage placement partner companies and leadership content.
           </p>
         </div>
         <Link
@@ -67,15 +60,13 @@ export default async function PlacementsPage() {
 
       <PlacementsManager
         canPublish={isAdministrator(admin)}
-        companies={data[0]}
-        interactions={data[2]}
-        programmes={data[1]}
+        companies={companies}
       />
 
       <PlacementLeadershipManager
         canPublish={isAdministrator(admin)}
-        items={data[3]?.items ?? []}
-        leadership={data[3]}
+        items={leadershipRecord?.items ?? []}
+        leadership={leadershipRecord}
       />
     </div>
   );

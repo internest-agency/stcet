@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   Building2,
   ExternalLink,
-  ImageOff,
   Loader2,
   Pencil,
   Plus,
@@ -17,10 +16,8 @@ import {
 } from "lucide-react";
 import ImageUploadField from "@/src/components/admin/ImageUploadField";
 import {
-  deletePlacement,
+  deletePlacementCompany,
   saveCompany,
-  saveInteraction,
-  saveProgramme,
   type PlacementResult,
 } from "@/src/app/admin/(protected)/placements/actions";
 
@@ -31,14 +28,6 @@ type Company = {
   logoPath: string | null;
   sortOrder: number;
   isActive: boolean;
-  isPublished: boolean;
-};
-type Content = {
-  id: number;
-  title: string;
-  description: string | null;
-  imagePath: string | null;
-  sortOrder: number;
   isPublished: boolean;
 };
 
@@ -424,195 +413,32 @@ function CompanyRow({
 }
 
 /* ------------------------------------------------------------------ */
-/* Training programmes & industry interactions                         */
-/* ------------------------------------------------------------------ */
-
-function ContentForm({
-  record,
-  kind,
-  canPublish,
-  onCancel,
-  onSaved,
-}: {
-  record?: Content;
-  kind: "programme" | "interaction";
-  canPublish: boolean;
-  onCancel: () => void;
-  onSaved: (message: string) => void;
-}) {
-  const action = kind === "programme" ? saveProgramme : saveInteraction;
-  const form = usePlacementAction(action, onSaved);
-  const [imagePath, setImagePath] = useState(record?.imagePath ?? "");
-  const noun = kind === "programme" ? "programme" : "interaction";
-
-  return (
-    <form className="mt-4 grid gap-4" onSubmit={form.submit}>
-      {record ? <input name="id" type="hidden" value={record.id} /> : null}
-      <input name="imagePath" type="hidden" value={imagePath} />
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <label className={`${label} sm:col-span-2`}>
-          Title
-          <input
-            className={input}
-            defaultValue={record?.title ?? ""}
-            name="title"
-            required
-          />
-        </label>
-        <label className={label}>
-          Display order
-          <input
-            className={input}
-            defaultValue={record?.sortOrder ?? 0}
-            min="0"
-            name="sortOrder"
-            type="number"
-          />
-        </label>
-      </div>
-
-      <label className={label}>
-        Description
-        <textarea
-          className={input}
-          defaultValue={record?.description ?? ""}
-          name="description"
-          rows={3}
-        />
-      </label>
-
-      <ImageUploadField
-        category="placements"
-        compact
-        label={kind === "programme" ? "Programme image or icon" : "Interaction image"}
-        onChange={setImagePath}
-        value={imagePath}
-      />
-
-      {canPublish ? (
-        <label className="flex items-center gap-2 text-xs font-semibold text-gray-600">
-          <input
-            className="size-4 accent-primary-700"
-            defaultChecked={record?.isPublished ?? false}
-            name="isPublished"
-            type="checkbox"
-          />
-          Published
-        </label>
-      ) : (
-        <input name="isPublished" type="hidden" value="off" />
-      )}
-
-      <FormError error={form.error} />
-
-      <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
-        <button
-          className={ghostButton}
-          disabled={form.pending}
-          onClick={onCancel}
-          type="button"
-        >
-          Cancel
-        </button>
-        <SaveButton pending={form.pending}>
-          {record ? `Save ${noun}` : `Add ${noun}`}
-        </SaveButton>
-      </div>
-    </form>
-  );
-}
-
-function ContentRow({
-  record,
-  canPublish,
-  onEdit,
-  onDelete,
-}: {
-  record: Content;
-  canPublish: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <article className="flex items-center gap-3 rounded-md border border-gray-200 bg-white p-3">
-      <Thumbnail
-        alt={`${record.title} image`}
-        fallback={<ImageOff aria-hidden className="size-5 text-gray-300" />}
-        src={record.imagePath}
-      />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-semibold text-gray-800">
-            {record.title}
-          </p>
-          <StatusBadge tone={record.isPublished ? "green" : "gray"}>
-            {record.isPublished ? "Published" : "Draft"}
-          </StatusBadge>
-        </div>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
-          <span className="line-clamp-1 min-w-0 max-w-full">
-            {record.description || "No description"}
-          </span>
-          <span className="text-gray-400">Order #{record.sortOrder}</span>
-        </div>
-      </div>
-      <div className="flex shrink-0 items-center gap-1">
-        <button
-          aria-label={`Edit ${record.title}`}
-          className={rowAction}
-          onClick={onEdit}
-          title="Edit"
-          type="button"
-        >
-          <Pencil aria-hidden className="size-4" />
-        </button>
-        {canPublish ? (
-          <button
-            aria-label={`Delete ${record.title}`}
-            className="grid size-8 place-items-center rounded-md border border-gray-200 text-red-600 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
-            onClick={onDelete}
-            title="Delete"
-            type="button"
-          >
-            <Trash2 aria-hidden className="size-4" />
-          </button>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /* Delete dialog                                                       */
 /* ------------------------------------------------------------------ */
 
 function DeleteDialog({
-  kind,
   id,
   name,
   onClose,
   onDeleted,
 }: {
-  kind: "company" | "programme" | "interaction";
   id: number;
   name: string;
   onClose: () => void;
   onDeleted: (message: string) => void;
 }) {
-  const form = usePlacementAction(deletePlacement, onDeleted);
+  const form = usePlacementAction(deletePlacementCompany, onDeleted);
 
   return (
-    <Modal onClose={onClose} title="Delete record?">
+    <Modal onClose={onClose} title="Delete company?">
       <form className="mt-4" onSubmit={form.submit}>
-        <input name="kind" type="hidden" value={kind} />
         <input name="id" type="hidden" value={id} />
         <div className="flex items-center gap-3 text-red-600">
           <AlertTriangle aria-hidden className="size-6 shrink-0" />
           <p className="text-sm font-semibold text-gray-800">{name}</p>
         </div>
         <p className="mt-3 text-sm text-gray-600">
-          This permanently deletes the record and cannot be undone.
+          This permanently deletes the company and cannot be undone.
         </p>
         <div className="mt-4">
           <FormError error={form.error} />
@@ -648,24 +474,16 @@ type Editing<T> = T | "new" | null;
 
 export default function PlacementsManager({
   companies,
-  programmes,
-  interactions,
   canPublish,
 }: {
   companies: Company[];
-  programmes: Content[];
-  interactions: Content[];
   canPublish: boolean;
 }) {
   const [message, setMessage] = useState<string | null>(null);
   const [companyEdit, setCompanyEdit] = useState<Editing<Company>>(null);
-  const [programmeEdit, setProgrammeEdit] = useState<Editing<Content>>(null);
-  const [interactionEdit, setInteractionEdit] = useState<Editing<Content>>(null);
-  const [deleting, setDeleting] = useState<{
-    kind: "company" | "programme" | "interaction";
-    id: number;
-    name: string;
-  } | null>(null);
+  const [deleting, setDeleting] = useState<{ id: number; name: string } | null>(
+    null,
+  );
 
   function notify(text: string) {
     setMessage(text);
@@ -708,91 +526,9 @@ export default function PlacementsManager({
                 company={company}
                 key={company.id}
                 onDelete={() =>
-                  setDeleting({
-                    kind: "company",
-                    id: company.id,
-                    name: company.name,
-                  })
+                  setDeleting({ id: company.id, name: company.name })
                 }
                 onEdit={() => setCompanyEdit(company)}
-              />
-            ))}
-          </div>
-        )}
-      </Panel>
-
-      <Panel
-        action={
-          <button
-            className={primaryButton}
-            onClick={() => setProgrammeEdit("new")}
-            type="button"
-          >
-            <Plus aria-hidden className="size-4" />
-            Add Programme
-          </button>
-        }
-        description="Training cards keep the existing public layout and animations."
-        title="Training Programmes"
-      >
-        {programmes.length === 0 ? (
-          <EmptyState>
-            No training programmes yet. Use “Add Programme” to create one.
-          </EmptyState>
-        ) : (
-          <div className="space-y-2">
-            {programmes.map((record) => (
-              <ContentRow
-                canPublish={canPublish}
-                key={record.id}
-                onDelete={() =>
-                  setDeleting({
-                    kind: "programme",
-                    id: record.id,
-                    name: record.title,
-                  })
-                }
-                onEdit={() => setProgrammeEdit(record)}
-                record={record}
-              />
-            ))}
-          </div>
-        )}
-      </Panel>
-
-      <Panel
-        action={
-          <button
-            className={primaryButton}
-            onClick={() => setInteractionEdit("new")}
-            type="button"
-          >
-            <Plus aria-hidden className="size-4" />
-            Add Interaction
-          </button>
-        }
-        description="Verified industry activities shown on the public placements page."
-        title="Industry Interactions"
-      >
-        {interactions.length === 0 ? (
-          <EmptyState>
-            No industry interactions yet. Use “Add Interaction” to create one.
-          </EmptyState>
-        ) : (
-          <div className="space-y-2">
-            {interactions.map((record) => (
-              <ContentRow
-                canPublish={canPublish}
-                key={record.id}
-                onDelete={() =>
-                  setDeleting({
-                    kind: "interaction",
-                    id: record.id,
-                    name: record.title,
-                  })
-                }
-                onEdit={() => setInteractionEdit(record)}
-                record={record}
               />
             ))}
           </div>
@@ -816,46 +552,9 @@ export default function PlacementsManager({
         </Modal>
       ) : null}
 
-      {programmeEdit ? (
-        <Modal
-          onClose={() => setProgrammeEdit(null)}
-          title={programmeEdit === "new" ? "Add programme" : "Edit programme"}
-        >
-          <ContentForm
-            canPublish={canPublish}
-            kind="programme"
-            onCancel={() => setProgrammeEdit(null)}
-            onSaved={(text) => {
-              notify(text);
-              setProgrammeEdit(null);
-            }}
-            record={programmeEdit === "new" ? undefined : programmeEdit}
-          />
-        </Modal>
-      ) : null}
-
-      {interactionEdit ? (
-        <Modal
-          onClose={() => setInteractionEdit(null)}
-          title={interactionEdit === "new" ? "Add interaction" : "Edit interaction"}
-        >
-          <ContentForm
-            canPublish={canPublish}
-            kind="interaction"
-            onCancel={() => setInteractionEdit(null)}
-            onSaved={(text) => {
-              notify(text);
-              setInteractionEdit(null);
-            }}
-            record={interactionEdit === "new" ? undefined : interactionEdit}
-          />
-        </Modal>
-      ) : null}
-
       {deleting ? (
         <DeleteDialog
           id={deleting.id}
-          kind={deleting.kind}
           name={deleting.name}
           onClose={() => setDeleting(null)}
           onDeleted={(text) => {
