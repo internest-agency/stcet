@@ -124,7 +124,7 @@ export default function HeroSection1() {
             id="stcet-hero-title"
             as="h1"
             customSize={true}
-            className="text-[clamp(2.15rem,6.2vw,5.5rem)] leading-none! tracking-[-0.015em] text-white!"
+            className="text-[clamp(2.15rem,6.2vw,4.5rem)] leading-none! tracking-[-0.015em] text-white!"
           >
             Learning today
             <br />

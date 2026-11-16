@@ -81,7 +81,7 @@ export default function EditorialHero({
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden bg-gray-50 ${className}`}
+      className={`relative overflow-hidden bg-gray-50 pt-12 ${className}`}
     >
       {/* Background Image */}
       <div className="editorial-hero-image absolute inset-0 z-0">

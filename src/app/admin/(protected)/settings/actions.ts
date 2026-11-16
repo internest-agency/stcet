@@ -187,7 +187,7 @@ export async function saveSettings(formData: FormData): Promise<never> {
   // Check if this is a test email request
   const action = formData.get("action");
   if (action === "testEmail") {
-    return sendTestEmail();
+    return sendTestEmail(formData);
   }
 
   const raw = {
@@ -308,7 +308,7 @@ export async function saveSettings(formData: FormData): Promise<never> {
   }
 
   const zeptoEndpoint =
-    parsed.data.zeptoApiEndpoint?.trim() || "https://cpaas.zoho.com/v1.1/email";
+    parsed.data.zeptoApiEndpoint?.trim() || "https://api.zeptomail.com/v1.1/email";
 
   const values = {
     collegeName: parsed.data.collegeName,
@@ -362,11 +362,11 @@ export async function saveSettings(formData: FormData): Promise<never> {
   redirect("/admin/settings?saved=1");
 }
 
-async function sendTestEmail(): Promise<never> {
+async function sendTestEmail(formData?: FormData): Promise<never> {
   const admin = await requireAdministrator();
   const prisma = getPrismaClient();
 
-  // Get current settings
+  // Get saved settings (used as fallback and for record id)
   const settings = await prisma.siteSettings.findFirst({
     select: {
       id: true,
@@ -380,23 +380,41 @@ async function sendTestEmail(): Promise<never> {
     },
   });
 
-  if (!settings || !settings.zeptoEnabled) {
+  const enabled = formData
+    ? formData.get("zeptoEnabled") === "on"
+    : (settings?.zeptoEnabled ?? false);
+
+  const endpoint = (
+    (formData?.get("zeptoApiEndpoint") as string | null)?.trim() ||
+    settings?.zeptoApiEndpoint ||
+    "https://api.zeptomail.com/v1.1/email"
+  ).replace(/\/+$/, "");
+
+  const senderEmail = (
+    (formData?.get("zeptoSenderEmail") as string | null)?.trim() ||
+    settings?.zeptoSenderEmail ||
+    ""
+  ).trim();
+  const senderName = (
+    (formData?.get("zeptoSenderName") as string | null)?.trim() ||
+    settings?.zeptoSenderName ||
+    "STCET Website"
+  ).trim();
+  const adminEmail = (
+    (formData?.get("zeptoAdminEmail") as string | null)?.trim() ||
+    settings?.zeptoAdminEmail ||
+    ""
+  ).trim();
+
+  if (!enabled) {
     redirect(
       `/admin/settings?error=${encodeURIComponent(
-        "test_email: Email notifications are disabled. Enable and save settings first.",
+        "test_email: Email notifications are disabled. Enable notifications and try again (save settings to keep the change).",
       )}`,
     );
   }
 
-  if (!settings.zeptoTokenEncrypted || !settings.zeptoTokenSalt) {
-    redirect(
-      `/admin/settings?error=${encodeURIComponent(
-        "test_email: Send Mail Token is missing. Save a valid token first.",
-      )}`,
-    );
-  }
-
-  if (!settings.zeptoSenderEmail || !settings.zeptoAdminEmail) {
+  if (!senderEmail || !adminEmail) {
     redirect(
       `/admin/settings?error=${encodeURIComponent(
         "test_email: Sender email and admin notification email are required.",
@@ -404,28 +422,58 @@ async function sendTestEmail(): Promise<never> {
     );
   }
 
-  // Decrypt token
-  let token: string;
-  try {
-    token = await unpackAndDecrypt(settings.zeptoTokenEncrypted);
-  } catch (error) {
-    const detail =
-      error instanceof Error && error.message
-        ? error.message
-        : "Decryption failed";
+  const endpointHost = (() => {
+    try {
+      return new URL(endpoint).hostname.toLowerCase();
+    } catch {
+      return "";
+    }
+  })();
+  const endpointAllowed =
+    endpointHost === "cpaas.zoho.com" ||
+    endpointHost.endsWith(".zoho.com") ||
+    endpointHost.endsWith("zeptomail.com");
+  if (!endpointAllowed) {
     redirect(
       `/admin/settings?error=${encodeURIComponent(
-        `test_email: Could not decrypt Send Mail Token. ${detail}`,
+        "test_email: ZeptoMail API endpoint must be an HTTPS ZeptoMail/Zoho host (for example https://api.zeptomail.com/v1.1/email).",
       )}`,
     );
   }
 
-  // Normalize token: allow users to paste with or without "Zoho-enczapikey " prefix
-  const normalizedToken = token.trim().replace(/^Zoho-enczapikey\s+/i, "").trim();
-  const endpoint = (settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email").replace(/\/+$/, "");
-  const senderEmail = settings.zeptoSenderEmail.trim();
-  const senderName = (settings.zeptoSenderName || "STCET Website").trim();
-  const adminEmail = settings.zeptoAdminEmail.trim();
+  // Use token from the form if provided (so you can test without saving first),
+  // otherwise fall back to the stored token.
+  const typedToken = ((formData?.get("zeptoToken") as string | null) ?? "").trim();
+  let tokenSource = typedToken;
+  if (!tokenSource) {
+    if (!settings?.zeptoTokenEncrypted || !settings.zeptoTokenSalt) {
+      redirect(
+        `/admin/settings?error=${encodeURIComponent(
+          "test_email: Send Mail Token is missing. Paste your token and try again (save to store it).",
+        )}`,
+      );
+    }
+    try {
+      tokenSource = await unpackAndDecrypt(settings.zeptoTokenEncrypted);
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message
+          ? error.message
+          : "Decryption failed";
+      redirect(
+        `/admin/settings?error=${encodeURIComponent(
+          `test_email: Could not decrypt Send Mail Token. ${detail}`,
+        )}`,
+      );
+    }
+  }
+
+  // ZeptoMail SDK expects the Authorization header value including the prefix.
+  // Accept tokens pasted with or without the "Zoho-enczapikey " prefix.
+  const rawToken = tokenSource.trim();
+  const normalizedToken = /^Zoho-enczapikey\s+/i.test(rawToken)
+    ? `Zoho-enczapikey ${rawToken.replace(/^Zoho-enczapikey\s+/i, "").trim()}`
+    : `Zoho-enczapikey ${rawToken}`;
 
   const testSubject = "Test Email - STCET ZeptoMail Configuration";
   const testHtml = `
@@ -471,14 +519,16 @@ async function sendTestEmail(): Promise<never> {
 
     const responseText =
       typeof response === "string" ? response : JSON.stringify(response);
-    resultMessage = `Test email sent successfully. ZeptoMail response: ${responseText}`;
-    await prisma.siteSettings.update({
-      where: { id: settings.id },
-      data: {
-        zeptoLastTestAt: new Date(),
-        zeptoLastTestResult: "success",
-      },
-    });
+    resultMessage = `Test email sent successfully (endpoint: ${endpoint}). ZeptoMail response: ${responseText}`;
+    if (settings) {
+      await prisma.siteSettings.update({
+        where: { id: settings.id },
+        data: {
+          zeptoLastTestAt: new Date(),
+          zeptoLastTestResult: "success",
+        },
+      });
+    }
   } catch (error) {
     console.error("[sendTestEmail] Failed:", error);
     let detail = "Unknown error";
@@ -508,14 +558,16 @@ async function sendTestEmail(): Promise<never> {
       detail = error;
     }
 
-    resultMessage = `ZeptoMail send failed: ${detail}`;
-    await prisma.siteSettings.update({
-      where: { id: settings.id },
-      data: {
-        zeptoLastTestAt: new Date(),
-        zeptoLastTestResult: "error",
-      },
-    });
+    resultMessage = `ZeptoMail send failed (endpoint: ${endpoint}): ${detail}. Use the same Send Mail Token and API endpoint that work in Postman (e.g. https://api.zeptomail.com/v1.1/email), then click Save to store them.`;
+    if (settings) {
+      await prisma.siteSettings.update({
+        where: { id: settings.id },
+        data: {
+          zeptoLastTestAt: new Date(),
+          zeptoLastTestResult: "error",
+        },
+      });
+    }
   }
 
   invalidateSiteSettingsCache();

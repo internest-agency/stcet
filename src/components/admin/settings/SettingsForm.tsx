@@ -356,12 +356,14 @@ export default function SettingsForm({
             </div>
             <input
               className={input}
-              defaultValue={settings?.zeptoApiEndpoint ?? "https://cpaas.zoho.com/v1.1/email"}
+              defaultValue={settings?.zeptoApiEndpoint ?? "https://api.zeptomail.com/v1.1/email"}
               name="zeptoApiEndpoint"
-              placeholder="https://cpaas.zoho.com/v1.1/email"
+              placeholder="https://api.zeptomail.com/v1.1/email"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Official Zoho ZeptoMail/CPaaS send endpoint (e.g. https://cpaas.zoho.com/v1.1/email).
+              Use the same send endpoint that works for your token (e.g.{" "}
+              <code>https://api.zeptomail.com/v1.1/email</code> or your region&apos;s
+              Zoho CPaaS endpoint). Must match the token&apos;s region.
             </p>
           </label>
 
@@ -471,7 +473,8 @@ export default function SettingsForm({
                 <div>
                   <p className="text-sm font-medium text-gray-700">Send Test Email</p>
                   <p className="text-xs text-gray-500">
-                    Verify your configuration by sending a test email to the admin address.
+                    Sends using the values entered above (or the saved token if the token field
+                    is left blank). Click <strong>Save</strong> afterward to store any changes.
                   </p>
                 </div>
               </div>

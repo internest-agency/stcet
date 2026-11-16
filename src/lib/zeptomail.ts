@@ -48,11 +48,16 @@ export async function getZeptoMailConfig(): Promise<ZeptoMailConfig | null> {
     return null;
   }
 
-  const normalizedToken = token.trim().replace(/^Zoho-enczapikey\s+/i, "").trim();
+  // ZeptoMail SDK expects the Authorization header value including the prefix.
+  // Accept tokens saved with or without the "Zoho-enczapikey " prefix.
+  const rawToken = token.trim();
+  const normalizedToken = /^Zoho-enczapikey\s+/i.test(rawToken)
+    ? `Zoho-enczapikey ${rawToken.replace(/^Zoho-enczapikey\s+/i, "").trim()}`
+    : `Zoho-enczapikey ${rawToken}`;
 
   return {
     enabled: true,
-    apiEndpoint: (settings.zeptoApiEndpoint || "https://cpaas.zoho.com/v1.1/email").replace(/\/+$/, ""),
+    apiEndpoint: (settings.zeptoApiEndpoint || "https://api.zeptomail.com/v1.1/email").replace(/\/+$/, ""),
     token: normalizedToken,
     senderEmail: settings.zeptoSenderEmail.trim(),
     senderName: (settings.zeptoSenderName || "STCET Website").trim(),
