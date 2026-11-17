@@ -1,5 +1,12 @@
 # STCET Admin Setup
 
+> **Status: partly legacy.** The authoritative developer documentation is in
+> [`docs/`](./docs/README.md). This file is kept for its database, bootstrap, and
+> hosting notes. Statements below about disabled CMS modules, an eight-hour
+> session, 5 MiB uploads, and unconfigured password-reset email are outdated.
+> The current app has most CMS modules active, a **4-hour** session, a **1 MB**
+> upload cap, and password-reset email through ZeptoMail.
+
 The current admin release provides Auth.js sign-in, a database-backed dashboard, and course create/edit/publish/delete with ordered nested content. Other CMS modules are not active yet; their sidebar entries are intentionally disabled.
 
 ## Database and Environment
@@ -25,7 +32,6 @@ NEXTAUTH_SECRET="a-unique-random-secret"
 NEXTAUTH_URL="http://localhost:3000"
 DATABASE_CONNECTION_LIMIT="5"
 DATABASE_CONNECT_TIMEOUT_MS="5000"
-UPLOAD_MAX_BYTES="5242880"
 ```
 
 
@@ -122,7 +128,7 @@ Admin routes:
 
 The database check is `GET /api/health/database`. It returns only `{"status":"ok"}` or `{"status":"unavailable"}`; `ok` confirms a simple query, not that migrations are current. Sign-in and course operations require the schema to be migrated.
 
-Auth.js provides the HTTP-only session cookie. Sessions expire after eight hours; each protected request rechecks that the user is active and that the database session version matches. Signing out increments that version and clears the cookie. Five failed attempts for the same normalized email within the throttle window trigger a 15-minute cooldown. Administrator accounts map to the existing `SUPER_ADMIN` role; editors map to `CONTENT_EDITOR`. Editors can edit drafts but cannot change published courses, publish, or delete.
+Auth.js provides the HTTP-only session cookie. Sessions expire after four hours; each protected request rechecks that the user is active and that the database session version matches. Signing out increments that version and clears the cookie. Five failed attempts for the same normalized email within the throttle window trigger a 15-minute cooldown. Administrator accounts map to the existing `SUPER_ADMIN` role; editors map to `CONTENT_EDITOR`. Editors can edit drafts but cannot change published courses, publish, or delete.
 
 ## Deployment
 
@@ -166,13 +172,16 @@ your account user.
 
 Uploads are served only through the Next.js `/uploads/[...path]` route and are
 not directly exposed by the filesystem or an HTTP file server. If Nginx is the
-reverse proxy, allow enough request-body overhead for a 5 MiB image:
+reverse proxy, allow enough request-body overhead for a 1 MB image:
 
 ```nginx
-client_max_body_size 6m;
+client_max_body_size 2m;
 ```
 
 Back up `<home>/uploads` together with the MySQL database and test restoring
 both before going live.
 
-Password-reset email is not configured, so the forgot-password route directs staff to the system administrator. Course image uploads are implemented for hero, module, career-pathway, and Open Graph images. Gallery/media-library UI, uploads in placement/infrastructure/committee modules, administrator and editor management, editor assignments, and the Admissions, Scholarships, Placements, Gallery, Infrastructure, Committees, Pages, Menus, and general SEO modules remain future work.
+Password-reset email is implemented through ZeptoMail and is configured in
+**Admin -> Settings** (a token plus `ZEPTOMAIL_ENCRYPTION_KEY` is required). Most
+CMS modules are now active; see [`docs/`](./docs/README.md) for the current
+behavior and the legacy statements above that no longer apply.

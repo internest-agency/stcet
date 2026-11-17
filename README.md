@@ -1,38 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# STCET Website & Admin CMS
 
-For MySQL, Prisma, and the staged STCET admin setup, see [ADMIN_SETUP.md](./ADMIN_SETUP.md).
+The official website and content-management system for **S. Thangapazham College
+of Engineering & Technology (STCET)**. It is a Next.js 16 application with a
+MySQL/MariaDB database, Prisma, Auth.js administration, a local image-upload
+pipeline, and ZeptoMail notifications.
 
-## Getting Started
+## Features
 
-First, run the development server:
+- Public site: home, about, admissions, courses, faculty, placements,
+  scholarships, infrastructure, gallery, events, committees, institutional
+  pages, contact, and admissions enquiry.
+- Admin CMS: dashboard, enquiries, contact messages, events, about, governing
+  council, courses, faculty and groups, gallery, admissions, scholarships,
+  placements, infrastructure, committees, media, SEO, users, settings, menus,
+  and institutional pages.
+- Role-based access (`SUPER_ADMIN`, `CONTENT_EDITOR`) with publishing and
+  deletion restricted to super admins.
+- Image uploads limited to **1 MB** (JPEG, PNG, WebP), stored outside the deploy
+  tree and served only through a validated route.
+- Contact and admissions-enquiry emails to both the admin and the visitor, plus
+  admin password-reset email via ZeptoMail.
+- Events with upcoming/past/category sections, Asia/Kolkata wall-clock dates,
+  and schema.org JSON-LD.
+- Gallery images with independent **home page** and **gallery page** visibility.
+- Per-page SEO, dynamic sitemap/robots, custom head/body code, and security
+  headers.
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env      # fill in DATABASE_URL, NEXTAUTH_SECRET, ...
+npm run prisma:validate
+npx prisma migrate deploy
+npm run admin:bootstrap   # create the first super admin
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Public site: <http://localhost:3000>
+- Admin: <http://localhost:3000/admin/login>
+- Database health: <http://localhost:3000/api/health/database>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+Complete developer documentation is in **[docs/](./docs/README.md)**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Document | Contents |
+| --- | --- |
+| [Getting started](./docs/getting-started.md) | Prerequisites, environment, install, migrations, first admin |
+| [Architecture](./docs/architecture.md) | Stack, layout, route maps, data-flow conventions |
+| [Database](./docs/database.md) | Prisma setup, schema overview, migrations, seed, backups |
+| [Admin CMS](./docs/admin-cms.md) | Auth, roles, modules, publishing, users, settings, menus |
+| [Content modules](./docs/content-modules.md) | Public pages, data sources, fallbacks, events, gallery |
+| [Uploads](./docs/uploads.md) | 1 MB pipeline, storage, serving, cleanup |
+| [Email](./docs/email.md) | ZeptoMail configuration, contact/enquiry, password reset |
+| [SEO](./docs/seo.md) | Metadata, sitemap, robots, JSON-LD, custom code |
+| [Security](./docs/security.md) | AuthN/AuthZ, rate limits, sanitization, headers, secrets |
+| [Deployment](./docs/deployment.md) | Build, environment, proxy, post-deploy checks, backups |
+| [Troubleshooting](./docs/troubleshooting.md) | Known failure modes and fixes |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Additional references:
 
-## Deploy on Vercel
+- `ADMIN_SETUP.md` - database/bootstrap/deployment notes (partly legacy; see the
+  note in `docs/README.md`)
+- `THEME_GUIDE.md` - colours, typography, and helper classes
+- `STCET-Security-Audit-Report.md` - point-in-time security review
+- `AGENTS.md` - repository instructions for AI coding agents
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16.4 (App Router) · React 19 · TypeScript 5 · Tailwind CSS 4 ·
+Prisma 7 with `@prisma/adapter-mariadb` · MySQL/MariaDB · Auth.js v4 ·
+Zod 4 · ZeptoMail SDK 8 · GSAP/Lenis
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Generate Prisma client and start the dev server |
+| `npm run build` | Generate Prisma client and build with Webpack |
+| `npm run start` | Start the production server |
+| `npm run lint` | ESLint |
+| `npm run prisma:migrate -- --name <name>` | Create/apply a development migration |
+| `npm run prisma:seed` | Seed the five bundled course records |
+| `npm run admin:bootstrap` | Create the first super administrator |
+| `npm run media:cleanup` | Remove unreferenced uploads older than 24 hours |
+| `npm run db:connectivity` | Diagnose the Prisma/database connection |
+
+## License
+
+Private project. All content and branding belong to STCET.
