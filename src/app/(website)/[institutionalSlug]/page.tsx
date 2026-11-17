@@ -5,7 +5,23 @@ import EditorialHero from "@/src/components/ui/EditorialHero";
 import InstitutionalSection from "@/src/components/sections/institutional/InstitutionalSection";
 import { getPublishedInstitutionalPage } from "@/src/lib/queries/institutional-pages";
 
-export async function generateMetadata({ params }: { params: Promise<{ institutionalSlug: string }> }): Promise<Metadata> { const { institutionalSlug } = await params; const page = await getPublishedInstitutionalPage(institutionalSlug); if (!page) return {}; return { title: page.seoTitle || `${page.title} | STCET`, description: page.metaDescription || page.introduction || undefined, robots: { index: true, follow: true } }; }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ institutionalSlug: string }>;
+}): Promise<Metadata> {
+  const { institutionalSlug } = await params;
+  const page = await getPublishedInstitutionalPage(institutionalSlug);
+  if (!page) return {};
+  return {
+    title: page.seoTitle || `${page.title} | STCET`,
+    description: page.metaDescription || page.introduction || undefined,
+    alternates: {
+      canonical: `/${institutionalSlug}`,
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 export default async function InstitutionalPublicPage({ params }: { params: Promise<{ institutionalSlug: string }> }) {
   const { institutionalSlug } = await params;

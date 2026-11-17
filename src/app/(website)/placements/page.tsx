@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import PlacementHero from "@/src/components/sections/placement/PlacementHero";
 import PlacementHead from "@/src/components/sections/placement/PlacementHead";
 import IndustryConnect from "@/src/components/sections/placement/IndustryConnect";
@@ -10,6 +11,15 @@ import {
   getPublishedPlacementContent,
   getPublishedPlacementLeadership,
 } from "@/src/lib/queries/placements";
+import { getPageMetadata } from "@/src/lib/queries/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/placements", {
+    title: "Placements & Career Guidance | S. Thangapazham College of Engineering & Technology",
+    description:
+      "Explore placement records, corporate recruiters, skill training, and industry engagements at STCET.",
+  });
+}
 
 export default async function PlacementPage() {
   const [content, leadership] = await Promise.all([

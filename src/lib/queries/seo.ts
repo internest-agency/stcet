@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getPrismaClient, isDatabaseConfigured } from "@/src/lib/prisma";
 
@@ -11,6 +12,39 @@ export interface PageSeo {
   canonicalUrl: string | null;
   ogImage: string | null;
   noIndex: boolean;
+}
+
+export interface PageMetadataDefaults {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+export async function getPageMetadata(
+  pagePath: string,
+  defaults: PageMetadataDefaults
+): Promise<Metadata> {
+  const seo = await getPageSeo(pagePath);
+  const title = seo.seoTitle || defaults.title;
+  const description = seo.metaDescription || defaults.description;
+  const canonical = seo.canonicalUrl || pagePath;
+  const image = seo.ogImage || defaults.image;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical,
+    },
+    robots: seo.noIndex
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
+    openGraph: {
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
 }
 
 export async function getPageSeo(pagePath: string): Promise<PageSeo> {

@@ -10,28 +10,94 @@ import GallerySection, {
 } from "@/src/components/sections/home/gallery";
 import { getHomeGalleryItems } from "@/src/lib/queries/gallery";
 import { getPublicAdmissionsData } from "@/src/lib/queries/admissions";
-import { getPageSeo } from "@/src/lib/queries/seo";
+import { getPageMetadata } from "@/src/lib/queries/seo";
+import { getSiteSettings, parseSocialLinks } from "@/src/lib/admin/settings";
+import { getSiteUrl } from "@/src/lib/site-url";
 import HeroSection1 from "@/src/components/sections/home/hero-sectoin-1";
 
 const PAGE_PATH = "/";
 
 export const generateMetadata = async () => {
-  const seo = await getPageSeo(PAGE_PATH);
-
-  return {
-    title: seo.seoTitle || "STCET | College Website",
-    description:
-      seo.metaDescription || "A modern college website built with Next.js",
-  };
+  return getPageMetadata(PAGE_PATH, {
+    title: "STCET | College Website",
+    description: "A modern college website built with Next.js",
+  });
 };
 
 export default async function HomePage() {
-  const [homeGallery, admissionsData] = await Promise.all([
+  const [homeGallery, admissionsData, settings] = await Promise.all([
     getHomeGalleryItems(),
     getPublicAdmissionsData(),
+    getSiteSettings(),
   ]);
 
-  await getPageSeo(PAGE_PATH);
+  const siteUrl = getSiteUrl();
+  const collegeName =
+    settings.collegeName ||
+    "S. Thangapazham College of Engineering and Technology";
+  const logoUrl = settings.logoPath
+    ? `${siteUrl}${settings.logoPath}`
+    : `${siteUrl}/images/logo.png`;
+  const socialLinks = parseSocialLinks(settings.socialLinks).valid.map(
+    (item) => item.href,
+  );
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["EducationalOrganization", "CollegeOrUniversity"],
+        "@id": `${siteUrl}/#organization`,
+        name: collegeName,
+        alternateName: [
+          "STCET",
+          "S. Thangapazham College of Engineering & Technology",
+        ],
+        url: siteUrl,
+        logo: {
+          "@type": "ImageObject",
+          url: logoUrl,
+        },
+        image: `${siteUrl}/images/campus.webp`,
+        description:
+          settings.defaultMetaDescription ||
+          "S. Thangapazham College of Engineering and Technology (STCET) is a premier engineering institution in Vasudevanallur, Tenkasi, Tamil Nadu, offering AICTE-approved undergraduate programmes in engineering and technology.",
+        telephone: settings.phoneNumber || "+91 96003 12030",
+        email: settings.contactEmail || "stcet2026@gmail.com",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Vasudevanallur",
+          addressLocality: "Tenkasi District",
+          addressRegion: "Tamil Nadu",
+          postalCode: "627758",
+          addressCountry: "IN",
+        },
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            telephone: settings.phoneNumber || "+91 96003 12030",
+            contactType: "admissions",
+            email: settings.contactEmail || "stcet2026@gmail.com",
+            areaServed: "IN",
+            availableLanguage: ["English", "Tamil"],
+          },
+        ],
+        ...(socialLinks.length > 0 ? { sameAs: socialLinks } : {}),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: collegeName,
+        description:
+          settings.defaultMetaDescription ||
+          "A modern college website built with Next.js",
+        publisher: {
+          "@id": `${siteUrl}/#organization`,
+        },
+      },
+    ],
+  };
 
   const departments = [
     {
@@ -87,6 +153,12 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       {/* <HeroSection /> */}
       <HeroSection1 />
       <MarqueeSection />

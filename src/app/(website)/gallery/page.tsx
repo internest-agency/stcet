@@ -4,21 +4,16 @@ import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import { getGalleryPageData } from "@/src/lib/queries/gallery";
+import { getPageMetadata } from "@/src/lib/queries/seo";
 
-export const metadata: Metadata = {
-  title: "Campus Gallery | S. Thangapazham College of Engineering & Technology",
-  description:
-    "Explore photo highlights of the STCET engineering campus, academic departments, laboratories, hostels, and modern infrastructure.",
-  alternates: {
-    canonical: "/gallery",
-  },
-  openGraph: {
-    title: "Campus Gallery | STCET",
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/gallery", {
+    title: "Campus Gallery | S. Thangapazham College of Engineering & Technology",
     description:
       "Explore photo highlights of the STCET engineering campus, academic departments, laboratories, hostels, and modern infrastructure.",
-    images: ["/images/gallery/stcet-engineering-block-entrance.jpg"],
-  },
-};
+    image: "/images/gallery/stcet-engineering-block-entrance.jpg",
+  });
+}
 
 export default async function GalleryPage() {
   const gallery = await getGalleryPageData();

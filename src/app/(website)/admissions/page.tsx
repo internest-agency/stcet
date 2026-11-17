@@ -18,12 +18,15 @@ import { FaCircleArrowRight } from "react-icons/fa6";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import Button from "@/src/components/ui/Button";
+import { getPageMetadata } from "@/src/lib/queries/seo";
 
-export const metadata: Metadata = {
-  title: "Admissions | S. Thangapazham College of Engineering & Technology",
-  description:
-    "Explore admission routes, TNEA counselling process, management quota eligibility, and application guidelines for STCET.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/admissions", {
+    title: "Admissions | S. Thangapazham College of Engineering & Technology",
+    description:
+      "Explore admission routes, TNEA counselling process, management quota eligibility, and application guidelines for STCET.",
+  });
+}
 
 export default async function AdmissionsPage() {
   const admissionsData = await getPublicAdmissionsData();

@@ -37,19 +37,26 @@ provide a real title and description.
 `canonicalUrl`, `ogImage`, and `noIndex`. `getPageSeo(path)` returns safe empty
 values when the database is unavailable.
 
-Currently read at runtime by:
+All public pages across the site integrate with `getPageMetadata(pagePath, defaults)`
+(which delegates to `getPageSeo`) and generate canonical URLs (`alternates.canonical`),
+falling back to their route paths when no database override exists:
 
-| Page | Path used |
-| --- | --- |
-| Home | `/` |
-| Events | `/events` |
-| Faculty | `/faculty` (while the public URL is `/faculties`) |
-
-Other static pages currently define their metadata in code. Their `PageSeo`
-records are still used by the sitemap for `noIndex` and canonical handling, but
-they do not override the page's rendered `<title>` unless the page calls
-`getPageSeo`. To make a page's SEO record effective, add `getPageSeo` to its
-`generateMetadata`.
+- Home (`/`)
+- About (`/about`)
+- Admissions (`/admissions`)
+- Careers (`/careers`)
+- Contact (`/contact`)
+- Enquire Now (`/enquire-now`)
+- Events (`/events`) and Event details (`/events/[slug]`)
+- Faculty (`/faculties`)
+- Gallery (`/gallery`)
+- Infrastructure (`/infrastructure`)
+- IQAC (`/iqac`)
+- Placements (`/placements`)
+- Scholarships (`/scholarships`)
+- Statutory Committees (`/anti-ragging-committee`, `/grievance-redressal-committee`, `/internal-complaints-committee`, `/sc-st-cell`)
+- Institutional Pages (`/[institutionalSlug]`)
+- Courses (`/courses/[slug]`)
 
 ### Courses
 
@@ -110,6 +117,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api
+Content-Signal: search=yes, ai-train=no
 
 Sitemap: <origin>/sitemap.xml
 ```
@@ -175,10 +183,13 @@ Implications:
 
 ## Structured data
 
-Only event detail pages emit JSON-LD today. If you add Organization, Course,
-BreadcrumbList, or FAQ schema, keep it consistent with visible content and test
-with a structured-data validator. Do not add markup for content that is not on
-the page.
+Structured data (JSON-LD) is currently provided on:
+- **Homepage (`/`)**: Emits `EducationalOrganization` / `CollegeOrUniversity` and `WebSite` schemas describing the institution name, alternate names (STCET), contact points, postal address, logo, campus image, and official social links (`sameAs`).
+- **Event detail pages (`/events/[slug]`)**: Emits `schema.org/Event` with date, venue, organizer, and registration/ticket details.
+
+If you add Course, BreadcrumbList, or FAQ schema, keep it consistent with
+visible content and test with a structured-data validator. Do not add markup
+for content that is not on the page.
 
 ## Analytics and verification
 

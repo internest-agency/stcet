@@ -20,7 +20,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return {
     title: seo.seoTitle || DEFAULT_TITLE,
     description: seo.metaDescription || DEFAULT_DESCRIPTION,
-    alternates: { canonical: seo.canonicalUrl || PAGE_PATH },
+    alternates: { canonical: seo.canonicalUrl || "/faculties" },
     robots: seo.noIndex
       ? { index: false, follow: false }
       : { index: true, follow: true },

@@ -17,6 +17,9 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         disallow: ["/admin", "/api"],
+        other: {
+          "Content-Signal": "search=yes, ai-train=no",
+        },
       },
     ],
     sitemap: `${base}/sitemap.xml`,

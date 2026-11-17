@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import ContactMain from "@/src/components/sections/contact/ContactMain";
 import ContactMap from "@/src/components/sections/contact/ContactMap";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
@@ -6,6 +7,16 @@ import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import { FaCircleArrowRight } from "react-icons/fa6";
 import { getSiteSettings } from "@/src/lib/admin/settings";
+import { getPageMetadata } from "@/src/lib/queries/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/contact", {
+    title: "Contact Us | S. Thangapazham College of Engineering & Technology",
+    description:
+      "Get in touch with STCET for admissions, general enquiries, directions, and contact details.",
+    image: "/images/contact/contact-hero-image.webp",
+  });
+}
 
 export default async function ContactPage() {
   const settings = await getSiteSettings();

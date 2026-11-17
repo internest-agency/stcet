@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import CampusFutureSection from "@/src/components/sections/infrastructure/CampusFutureSection";
 import EngineeringLaboratories from "@/src/components/sections/infrastructure/EngineeringLaboratories";
 import LaboratoryExplorer from "@/src/components/sections/infrastructure/LaboratoryExplorer";
@@ -14,6 +15,16 @@ import SectionHeading from "@/src/components/ui/SectionHeading";
 import Button from "@/src/components/ui/Button";
 import ManagedFacilities from "@/src/components/sections/infrastructure/ManagedFacilities";
 import { getPublishedInfrastructureFacilities } from "@/src/lib/queries/infrastructure";
+import { getPageMetadata } from "@/src/lib/queries/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/infrastructure", {
+    title: "Infrastructure | S. Thangapazham College of Engineering & Technology",
+    description:
+      "Discover modern classrooms, laboratories, library, and campus facilities at STCET.",
+    image: "/images/infrastructure/stcet-laboratory-hero.webp",
+  });
+}
 
 export default async function InfrastructurePage() {
   const facilities = await getPublishedInfrastructureFacilities();

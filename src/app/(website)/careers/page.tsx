@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import CareerApplicationForm from "@/src/components/sections/careers/CareerApplicationForm";
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import Button from "@/src/components/ui/Button";
 import EditorialHero from "@/src/components/ui/EditorialHero";
 import SectionHeading from "@/src/components/ui/SectionHeading";
 import { FaCircleArrowRight } from "react-icons/fa6";
+import { getPageMetadata } from "@/src/lib/queries/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("/careers", {
+    title: "Careers | S. Thangapazham College of Engineering & Technology",
+    description:
+      "Explore career opportunities and faculty openings at S. Thangapazham College of Engineering & Technology.",
+    image: "/images/careers/career-hero.webp",
+  });
+}
 
 export default function CareerPage() {
   return (
