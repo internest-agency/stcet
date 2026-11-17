@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useState, type DragEvent } from "react";
 import { ImagePlus, LoaderCircle, Trash2, Upload } from "lucide-react";
 
-const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
+const DEFAULT_MAX_BYTES = 1 * 1024 * 1024;
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 type UploadResponse = {
@@ -46,7 +46,7 @@ export default function ImageUploadField({
     setUploadError("");
     setSuccess("");
     if (file.size > DEFAULT_MAX_BYTES) {
-      setUploadError("Choose an image no larger than 5 MB.");
+      setUploadError("Choose an image no larger than 1 MB.");
       return;
     }
     if (file.type && !ACCEPTED_TYPES.has(file.type)) {
@@ -167,7 +167,7 @@ export default function ImageUploadField({
                 : "Select or drop an image"}
           </span>
           <span className="mt-1 text-xs font-normal text-gray-500">
-            JPEG, PNG, or WebP · maximum 5 MB
+            JPEG, PNG, or WebP · maximum 1 MB
           </span>
           {uploading ? (
             <span className="mt-3 h-1.5 w-full max-w-56 overflow-hidden rounded-full bg-gray-200">

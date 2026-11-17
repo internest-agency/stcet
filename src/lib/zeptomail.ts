@@ -544,7 +544,7 @@ If you didn't request a password reset, you can safely ignore this email.
   `.trim();
 
   return sendZeptoMailEmail(config, {
-    to: [{ address: config.adminEmail, name: "STCET Admin" }],
+    to: [{ address: data.userEmail, name: data.userName }],
     subject: "Reset your STCET Admin password",
     htmlbody,
     textbody,

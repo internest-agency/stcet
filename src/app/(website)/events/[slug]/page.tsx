@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Clock, Globe, MapPin, Ticket } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Clock,
+  Globe,
+  MapPin,
+  Ticket,
+} from "lucide-react";
 
 import Breadcrumb from "@/src/components/ui/Breadcrumb";
 import Button from "@/src/components/ui/Button";
@@ -66,7 +73,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {
+export default async function EventDetailPage({
+  params,
+}: EventDetailPageProps) {
   const { slug } = await params;
   const event = await getPublishedEventBySlug(slug);
 
@@ -126,12 +135,15 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         }}
       />
 
-      <section className="relative overflow-hidden bg-primary-800 text-white">
+      <section className="relative overflow-hidden bg-primary-800 text-white pt-12">
         <Container>
           <div className="max-w-3xl py-16 sm:py-20">
             <div className="mb-6">
               <Breadcrumb
-                items={[{ label: "Events", href: "/events" }, { label: event.title }]}
+                items={[
+                  { label: "Events", href: "/events" },
+                  { label: event.title },
+                ]}
               />
             </div>
 

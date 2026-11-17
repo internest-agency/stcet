@@ -87,11 +87,10 @@ export class InvalidUploadError extends Error {}
 // filesystem cause instead of a generic "upload failed".
 export class UploadStorageError extends Error {}
 
+export const MAX_UPLOAD_BYTES = 1 * 1024 * 1024;
+
 export function getUploadLimit() {
-  const configured = Number(process.env.UPLOAD_MAX_BYTES ?? 5 * 1024 * 1024);
-  return Number.isSafeInteger(configured) && configured > 0
-    ? configured
-    : 5 * 1024 * 1024;
+  return MAX_UPLOAD_BYTES;
 }
 
 /**

@@ -45,7 +45,7 @@ export default function EventsHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-primary-800 text-white"
+      className="relative overflow-hidden bg-primary-800 text-white pt-12"
     >
       <div
         aria-hidden

@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { redirect } from "next/navigation";
 import { createHmac, randomBytes } from "node:crypto";
@@ -44,12 +44,13 @@ async function recordFailedResetAttempt(emailHash: string, now: Date) {
 }
 
 function getBaseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000"
-  );
+  const configured = process.env.NEXT_PUBLIC_BASE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl) return `https://${vercelUrl}`;
+
+  return "http://localhost:3000";
 }
 
 export async function requestPasswordReset(formData: FormData) {
@@ -63,81 +64,91 @@ export async function requestPasswordReset(formData: FormData) {
     return redirect("/admin/forgot-password?error=unavailable");
   }
 
-  const secret = process.env.NEXTAUTH_SECRET!;
-  const emailHash = createHmac("sha256", secret).update(email).digest("hex");
-  const prisma = getPrismaClient();
-  const now = new Date();
+  try {
+    const secret = process.env.NEXTAUTH_SECRET!;
+    const emailHash = createHmac("sha256", secret).update(email).digest("hex");
+    const prisma = getPrismaClient();
+    const now = new Date();
 
-  // Check rate limiting
-  const attempt = await prisma.adminLoginAttempt.findUnique({
-    where: { emailHash },
-  });
+    // Check rate limiting
+    const attempt = await prisma.adminLoginAttempt.findUnique({
+      where: { emailHash },
+    });
 
-  if (attempt?.blockedUntil && attempt.blockedUntil > now) {
-    return redirect("/admin/forgot-password?sent=1");
-  }
+    if (attempt?.blockedUntil && attempt.blockedUntil > now) {
+      console.info("[forgot-password] reset request throttled (temporary block)");
+      return redirect("/admin/forgot-password?sent=1");
+    }
 
-  // Find user (but don't reveal existence)
-  const user = await prisma.adminUser.findUnique({
-    where: { email },
-    select: { id: true, email: true, name: true, isActive: true },
-  });
+    // Find user (but don't reveal existence)
+    const user = await prisma.adminUser.findUnique({
+      where: { email },
+      select: { id: true, email: true, name: true, isActive: true },
+    });
 
-  // Always show success message to prevent account enumeration
-  const genericSuccessRedirect = "/admin/forgot-password?sent=1";
+    // Always show success message to prevent account enumeration
+    const genericSuccessRedirect = "/admin/forgot-password?sent=1";
 
-  if (!user || !user.isActive) {
-    await recordFailedResetAttempt(emailHash, now);
-    return redirect(genericSuccessRedirect);
-  }
+    if (!user || !user.isActive) {
+      await recordFailedResetAttempt(emailHash, now);
+      console.info("[forgot-password] reset requested for unknown or inactive account");
+      return redirect(genericSuccessRedirect);
+    }
 
-  // Check if user already has a recent reset request (rate limit)
-  const recentReset = await prisma.passwordResetToken.findFirst({
-    where: {
-      userId: user.id,
-      createdAt: { gte: new Date(now.getTime() - RESET_WINDOW_MS) },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+    // Check if user already has a recent reset request (rate limit)
+    const recentReset = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: user.id,
+        createdAt: { gte: new Date(now.getTime() - RESET_WINDOW_MS) },
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-  if (recentReset) {
-    await recordFailedResetAttempt(emailHash, now);
-    return redirect(genericSuccessRedirect);
-  }
+    if (recentReset) {
+      await recordFailedResetAttempt(emailHash, now);
+      console.info("[forgot-password] reset already requested recently; no new email sent");
+      return redirect(genericSuccessRedirect);
+    }
 
-  // Generate secure random token
-  const rawToken = randomBytes(32).toString("hex");
-  const tokenHash = createHmac("sha256", process.env.NEXTAUTH_SECRET!)
-    .update(rawToken)
-    .digest("hex");
+    // Generate secure random token
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = createHmac("sha256", process.env.NEXTAUTH_SECRET!)
+      .update(rawToken)
+      .digest("hex");
 
-  const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_MS);
+    const expiresAt = new Date(now.getTime() + RESET_TOKEN_EXPIRY_MS);
 
-  // Invalidate previous unused tokens for this user
-  await prisma.passwordResetToken.updateMany({
-    where: {
-      userId: user.id,
-      usedAt: null,
-      expiresAt: { gt: now },
-    },
-    data: { usedAt: now },
-  });
+    // Invalidate previous unused tokens for this user
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+        expiresAt: { gt: now },
+      },
+      data: { usedAt: now },
+    });
 
-  // Create new reset token
-  await prisma.passwordResetToken.create({
-    data: {
-      tokenHash,
-      userId: user.id,
-      expiresAt,
-    },
-  });
+    // Create new reset token
+    await prisma.passwordResetToken.create({
+      data: {
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      },
+    });
 
-  // Send reset email via ZeptoMail
-  const config = await getZeptoMailConfig();
+    // Send reset email via ZeptoMail
+    let config: Awaited<ReturnType<typeof getZeptoMailConfig>>;
+    try {
+      config = await getZeptoMailConfig();
+    } catch (error) {
+      console.error("[forgot-password] failed to load mail configuration", error);
+      return redirect("/admin/forgot-password?error=mail_unavailable");
+    }
 
-  if (config) {
-    const resetUrl = `${getBaseUrl()}/admin/reset-password?token=${rawToken}`;
-    const htmlbody = `
+    if (config) {
+      const resetUrl = `${getBaseUrl()}/admin/reset-password?token=${rawToken}`;
+      const htmlbody = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -176,8 +187,7 @@ export async function requestPasswordReset(formData: FormData) {
       </body>
       </html>
     `;
-
-    const textbody = `
+      const textbody = `
 Reset your STCET Admin password
 
 Hello ${user.name},
@@ -191,24 +201,59 @@ This link will expire in 60 minutes.
 If you didn't request a password reset, you can safely ignore this email.
     `.trim();
 
-    await sendZeptoMailEmail(config, {
-      to: [{ address: config.adminEmail, name: "STCET Admin" }],
-      subject: "Reset your STCET Admin password",
-      htmlbody,
-      textbody,
-    });
-  }
+      try {
+        const result = await sendZeptoMailEmail(config, {
+          to: [{ address: user.email, name: user.name }],
+          subject: "Reset your STCET Admin password",
+          htmlbody,
+          textbody,
+        });
+        if (!result.success) {
+          console.error("[forgot-password] reset email send failed", result.message);
+          return redirect("/admin/forgot-password?error=send_failed");
+        }
+        console.info("[forgot-password] reset email accepted for delivery");
+      } catch (error) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "digest" in error &&
+          typeof (error as { digest?: unknown }).digest === "string" &&
+          (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+        ) {
+          throw error;
+        }
+        console.error("[forgot-password] failed to send reset email", error);
+        return redirect("/admin/forgot-password?error=send_failed");
+      }
+    } else {
+      console.error("[forgot-password] ZeptoMail is not configured; cannot send reset email");
+      return redirect("/admin/forgot-password?error=mail_unavailable");
+    }
 
-  return redirect(genericSuccessRedirect);
+    return redirect(genericSuccessRedirect);
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      typeof (error as { digest?: unknown }).digest === "string" &&
+      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    console.error("[forgot-password] request failed", error);
+    return redirect("/admin/forgot-password?error=unavailable");
+  }
 }
 
 function escapeHtml(text: string): string {
   const entityMap: Record<string, string> = {
-    "&": String.fromCharCode(38) + "amp;",
-    "<": String.fromCharCode(38) + "lt;",
-    ">": String.fromCharCode(38) + "gt;",
-    '"': String.fromCharCode(38) + "quot;",
-    "'": String.fromCharCode(38) + "#039;",
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (char) => entityMap[char] ?? char);
 }

@@ -9,6 +9,20 @@ import {
   formatEventTimeRange,
 } from "@/src/lib/events/datetime";
 
+function todayInKolkata() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function isUpcoming(event: Event, today: string) {
+  const end = event.endDate || event.startDate;
+  return end >= today;
+}
+
 function EventCard({ event }: { event: Event }) {
   const time = formatEventTimeRange(event.startTime, event.endTime, event.isAllDay);
 
@@ -76,27 +90,156 @@ function EventCard({ event }: { event: Event }) {
   );
 }
 
+function EventsGrid({
+  events,
+  emptyMessage,
+}: {
+  events: Event[];
+  emptyMessage: string;
+}) {
+  if (events.length === 0) {
+    return (
+      <p className="mt-8 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center text-sm text-gray-500">
+        {emptyMessage}
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {events.map((event) => (
+        <EventCard event={event} key={event.id} />
+      ))}
+    </div>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  id,
+}: {
+  eyebrow: string;
+  title: string;
+  id?: string;
+}) {
+  return (
+    <div id={id} className="scroll-mt-24">
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
+        {eyebrow}
+      </p>
+      <h2 className="mt-3 text-2xl font-extrabold tracking-[-0.035em] text-primary-700 sm:text-3xl">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function eventStartKey(event: Event) {
+  return `${event.startDate}T${event.startTime ?? "00:00"}`;
+}
+
+function eventEndKey(event: Event) {
+  const date = event.endDate || event.startDate;
+  const time = event.endTime || event.startTime || "23:59";
+  return `${date}T${time}`;
+}
+
 export default function EventsList({ events }: { events: Event[] }) {
+  const today = todayInKolkata();
+  const upcomingEvents = events
+    .filter((event) => isUpcoming(event, today))
+    .slice()
+    .sort((a, b) => eventStartKey(a).localeCompare(eventStartKey(b)));
+  const pastEvents = events
+    .filter((event) => !isUpcoming(event, today))
+    .slice()
+    .sort((a, b) => eventEndKey(b).localeCompare(eventEndKey(a)));
+
+  const categories = new Map<string, Event[]>();
+  for (const event of events) {
+    const name = event.category?.trim() || "Other";
+    const list = categories.get(name);
+    if (list) list.push(event);
+    else categories.set(name, [event]);
+  }
+  const categoryEntries = [...categories.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(
+      ([name, items]) =>
+        [
+          name,
+          items
+            .slice()
+            .sort((a, b) => eventStartKey(b).localeCompare(eventStartKey(a))),
+        ] as [string, Event[]],
+    );
+
   return (
     <section className="bg-white">
-      <Container className="py-16 sm:py-20">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-          What&apos;s happening
-        </p>
-        <h2 className="mt-4 text-3xl font-extrabold tracking-[-0.035em] text-primary-700 sm:text-4xl">
-          Upcoming events.
-        </h2>
-
+      <Container className="space-y-16 py-16 sm:space-y-20 sm:py-20">
         {events.length === 0 ? (
-          <p className="mt-10 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center text-sm text-gray-500">
+          <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center text-sm text-gray-500">
             There are no events to show right now. Please check back soon.
           </p>
         ) : (
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <EventCard event={event} key={event.id} />
-            ))}
-          </div>
+          <>
+            <div>
+              <SectionHeader
+                eyebrow="What's happening"
+                id="upcoming-events"
+                title="Upcoming events"
+              />
+              <EventsGrid
+                emptyMessage="There are no upcoming events right now. Please check back soon."
+                events={upcomingEvents}
+              />
+            </div>
+
+            <div className="border-t border-gray-200 pt-16 sm:pt-20">
+              <SectionHeader
+                eyebrow="Archive"
+                id="past-events"
+                title="Past events"
+              />
+              <EventsGrid
+                emptyMessage="No past events to display yet."
+                events={pastEvents}
+              />
+            </div>
+
+            <div className="border-t border-gray-200 pt-16 sm:pt-20">
+              <SectionHeader
+                eyebrow="Browse"
+                id="events-by-category"
+                title="Events by category"
+              />
+              {categoryEntries.length === 0 ? (
+                <p className="mt-8 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center text-sm text-gray-500">
+                  No categorized events to display yet.
+                </p>
+              ) : (
+                <div className="mt-10 space-y-12">
+                  {categoryEntries.map(([category, items]) => (
+                    <div key={category}>
+                      <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-3">
+                        <h3 className="text-lg font-bold text-gray-900 sm:text-xl">
+                          {category}
+                        </h3>
+                        <span className="shrink-0 rounded-full bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700">
+                          {items.length} {items.length === 1 ? "event" : "events"}
+                        </span>
+                      </div>
+                      <EventsGrid
+                        emptyMessage="No events in this category."
+                        events={items}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
       </Container>
     </section>
