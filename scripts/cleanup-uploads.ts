@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { isUploadReferenced } from "../src/lib/admin/upload-references";
 import { removeManagedUpload } from "../src/lib/admin/upload-storage";
 
 const GRACE_PERIOD_MS = 24 * 60 * 60 * 1000;
@@ -30,22 +31,7 @@ async function main() {
     });
 
     for (const asset of candidates) {
-      const reference = await prisma.course.findFirst({
-        where: {
-          OR: [
-            { heroImage: asset.path },
-            { ogImage: asset.path },
-            { modules: { some: { image: asset.path } } },
-            { careerPathways: { some: { image: asset.path } } },
-          ],
-        },
-        select: { id: true },
-      });
-      const galleryReference = await prisma.galleryImage.findFirst({
-        where: { imagePath: asset.path },
-        select: { id: true },
-      });
-      if (reference || galleryReference) {
+      if (await isUploadReferenced(prisma, asset.path)) {
         retainedCount += 1;
         continue;
       }

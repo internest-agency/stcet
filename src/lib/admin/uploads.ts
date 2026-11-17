@@ -3,6 +3,7 @@ import "server-only";
 import { stat as statFile } from "node:fs/promises";
 import path from "node:path";
 import { getPrismaClient } from "@/src/lib/prisma";
+import { isUploadReferenced } from "./upload-references";
 import { isManagedUploadPath, removeManagedUpload } from "./upload-storage";
 
 export {
@@ -47,31 +48,7 @@ export async function cleanupUnreferencedUploads(references: string[]) {
 
   for (const asset of assets) {
     try {
-      const reference = await prisma.course.findFirst({
-        where: {
-          OR: [
-            { heroImage: asset.path },
-            { ogImage: asset.path },
-            { modules: { some: { image: asset.path } } },
-            { careerPathways: { some: { image: asset.path } } },
-          ],
-        },
-        select: { id: true },
-      });
-      const [galleryReference, admissionsReference, placementReference, infrastructureReference, committeeReference, pagesReference, seoReference, settingsReference, facultyReference, eventReference, councilReference] = await Promise.all([
-        prisma.galleryImage.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-        prisma.admissionRoute.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-        prisma.placementCompany.findFirst({ where: { logoPath: asset.path }, select: { id: true } }),
-        prisma.infrastructureFacility.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-        prisma.committee.findFirst({ where: { heroImage: asset.path }, select: { id: true } }),
-        prisma.generalPage.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-        prisma.pageSeo.findFirst({ where: { ogImage: asset.path }, select: { id: true } }),
-        prisma.siteSettings.findFirst({ where: { OR: [{ logoPath: asset.path }, { faviconPath: asset.path }] }, select: { id: true } }),
-        prisma.faculty.findFirst({ where: { photo: asset.path }, select: { id: true } }),
-        prisma.event.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-        prisma.governingCouncilMember.findFirst({ where: { imagePath: asset.path }, select: { id: true } }),
-      ]);
-      if (reference || galleryReference || admissionsReference || placementReference || infrastructureReference || committeeReference || pagesReference || seoReference || settingsReference || facultyReference || eventReference || councilReference) continue;
+      if (await isUploadReferenced(prisma, asset.path)) continue;
 
       if (await removeManagedUpload(asset.path)) {
         await prisma.mediaAsset.delete({ where: { id: asset.id } });
