@@ -124,6 +124,24 @@ Sitemap: <origin>/sitemap.xml
 
 `/uploads` is not disallowed because public pages need those images.
 
+## LLM guidance
+
+`public/llms.txt` is served at `/llms.txt` and summarizes the institution with
+links to key public pages. Keep its descriptions and links aligned with the
+current public routes when the site changes.
+
+The homepage also returns a Markdown representation from
+`src/lib/homepage-markdown.ts` when a request includes `Accept: text/markdown`;
+normal browser requests continue to receive the HTML page. The Markdown
+response sets `Vary: Accept` and is not cached, so update it when homepage
+content changes.
+
+The MCP Server Card is available at
+`/.well-known/mcp/server-card.json`; it points to the read-only Streamable HTTP
+server at `/mcp`. The server exposes its tools through MCP runtime discovery.
+Keep the card's server identity and protocol versions aligned with the MCP
+server configuration.
+
 ## Custom head and body code
 
 Super admins can paste raw HTML/script into **Settings -> Custom head code** and

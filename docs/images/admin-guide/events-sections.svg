@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="470" viewBox="0 0 960 470" role="img" aria-labelledby="evTitle evDesc" font-family="Segoe UI, Arial, sans-serif">
+  <title id="evTitle">How the public events page is organised</title>
+  <desc id="evDesc">The events page has three sections: upcoming events, past events, and events grouped by category. Upcoming events sort soonest first, past events most recent first, and categories alphabetically.</desc>
+
+  <rect width="960" height="470" fill="#ffffff"/>
+
+  <text x="32" y="42" font-size="20" font-weight="700" fill="#0f172a">/events — how the public page is organised</text>
+  <text x="32" y="66" font-size="12" fill="#64748b">Published events are split automatically. You only set the dates, category, and Published flag.</text>
+
+  <!-- page mock -->
+  <rect x="32" y="84" width="560" height="352" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <!-- hero -->
+  <path d="M32 94 A10 10 0 0 1 42 84 L582 84 A10 10 0 0 1 592 94 L592 148 L32 148 Z" fill="#002370"/>
+  <text x="52" y="108" font-size="9" font-weight="700" letter-spacing="1.2" fill="#c7d7fe">STCET</text>
+  <text x="52" y="132" font-size="18" font-weight="700" fill="#ffffff">Events</text>
+
+  <!-- section nav -->
+  <rect x="52" y="160" width="112" height="20" rx="10" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="108" y="174" font-size="8.5" font-weight="700" text-anchor="middle" fill="#002370">Upcoming events</text>
+  <rect x="172" y="160" width="88" height="20" rx="10" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="216" y="174" font-size="8.5" font-weight="700" text-anchor="middle" fill="#002370">Past events</text>
+  <rect x="268" y="160" width="92" height="20" rx="10" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="314" y="174" font-size="8.5" font-weight="700" text-anchor="middle" fill="#002370">By category</text>
+
+  <!-- upcoming -->
+  <text x="52" y="206" font-size="13" font-weight="700" fill="#0f172a">Upcoming events</text>
+  <rect x="176" y="194" width="110" height="16" rx="8" fill="#f1f5f9"/>
+  <text x="231" y="205" font-size="8" text-anchor="middle" fill="#64748b">#upcoming-events</text>
+
+  <rect x="52" y="218" width="250" height="46" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="62" y="228" width="28" height="26" rx="4" fill="#002370"/>
+  <text x="76" y="245" font-size="8" font-weight="700" text-anchor="middle" fill="#ffffff">12</text>
+  <rect x="100" y="230" width="130" height="7" rx="3" fill="#e2e8f0"/>
+  <rect x="100" y="244" width="90" height="5" rx="2.5" fill="#f1f5f9"/>
+
+  <rect x="314" y="218" width="250" height="46" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="324" y="228" width="28" height="26" rx="4" fill="#002370"/>
+  <text x="338" y="245" font-size="8" font-weight="700" text-anchor="middle" fill="#ffffff">20</text>
+  <rect x="362" y="230" width="160" height="7" rx="3" fill="#e2e8f0"/>
+  <rect x="362" y="244" width="110" height="5" rx="2.5" fill="#f1f5f9"/>
+
+  <!-- past -->
+  <text x="52" y="292" font-size="13" font-weight="700" fill="#0f172a">Past events</text>
+  <rect x="146" y="280" width="92" height="16" rx="8" fill="#f1f5f9"/>
+  <text x="192" y="291" font-size="8" text-anchor="middle" fill="#64748b">#past-events</text>
+
+  <rect x="52" y="304" width="512" height="44" rx="6" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="62" y="313" width="28" height="26" rx="4" fill="#94a3b8"/>
+  <text x="76" y="330" font-size="8" font-weight="700" text-anchor="middle" fill="#ffffff">03</text>
+  <rect x="100" y="315" width="180" height="7" rx="3" fill="#e2e8f0"/>
+  <rect x="100" y="329" width="120" height="5" rx="2.5" fill="#f1f5f9"/>
+  <rect x="486" y="318" width="60" height="14" rx="7" fill="#f1f5f9"/>
+
+  <!-- categories -->
+  <text x="52" y="378" font-size="13" font-weight="700" fill="#0f172a">Events by category</text>
+  <rect x="198" y="366" width="130" height="16" rx="8" fill="#f1f5f9"/>
+  <text x="263" y="377" font-size="8" text-anchor="middle" fill="#64748b">#events-by-category</text>
+
+  <g>
+    <rect x="52" y="390" width="74" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="89" y="404" font-size="8.5" text-anchor="middle" fill="#334155">Workshop (6)</text>
+    <rect x="134" y="390" width="58" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="163" y="404" font-size="8.5" text-anchor="middle" fill="#334155">Sports (3)</text>
+    <rect x="200" y="390" width="64" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="232" y="404" font-size="8.5" text-anchor="middle" fill="#334155">Cultural (2)</text>
+    <rect x="272" y="390" width="52" height="20" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="298" y="404" font-size="8.5" text-anchor="middle" fill="#334155">Other (1)</text>
+  </g>
+
+  <!-- rules panel -->
+  <rect x="616" y="84" width="312" height="352" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="636" y="112" font-size="13" font-weight="700" fill="#0f172a">How events are sorted</text>
+
+  <g font-size="10.5" fill="#334155">
+    <circle cx="640" cy="136" r="2.5" fill="#002370"/>
+    <text x="652" y="140"><tspan font-weight="700">Today</tspan> is the Asia/Kolkata date.</text>
+
+    <circle cx="640" cy="174" r="2.5" fill="#002370"/>
+    <text x="652" y="170"><tspan font-weight="700">Upcoming:</tspan> end date is today</text>
+    <text x="652" y="186">or later. Soonest first.</text>
+
+    <circle cx="640" cy="212" r="2.5" fill="#002370"/>
+    <text x="652" y="208"><tspan font-weight="700">Past:</tspan> ended before today.</text>
+    <text x="652" y="224">Most recent first.</text>
+
+    <circle cx="640" cy="250" r="2.5" fill="#002370"/>
+    <text x="652" y="246"><tspan font-weight="700">Categories:</tspan> A–Z, newest event</text>
+    <text x="652" y="262">first inside each group.</text>
+
+    <circle cx="640" cy="294" r="2.5" fill="#002370"/>
+    <text x="652" y="290">A blank category becomes</text>
+    <text x="652" y="306"><tspan font-weight="700">“Other”</tspan>. A multi-day event stays</text>
+    <text x="652" y="322">upcoming through its end date.</text>
+  </g>
+
+  <line x1="636" y1="344" x2="908" y2="344" stroke="#e2e8f0"/>
+  <text x="636" y="366" font-size="10" fill="#475569">Each card links to <tspan font-family="Consolas, monospace">/events/&lt;slug&gt;</tspan>.</text>
+  <text x="636" y="386" font-size="10" fill="#475569">Section links can be shared, e.g.</text>
+  <text x="636" y="402" font-family="Consolas, monospace" font-size="9.5" fill="#002370">/events#upcoming-events</text>
+  <text x="636" y="418" font-family="Consolas, monospace" font-size="9.5" fill="#002370">/events#past-events</text>
+</svg>

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430" role="img" aria-labelledby="upTitle upDesc" font-family="Segoe UI, Arial, sans-serif">
+  <title id="upTitle">Uploading an image safely</title>
+  <desc id="upDesc">Accepted image formats are JPEG, PNG and WebP up to 1 MB. The browser checks the file, the upload API re-checks it, the server detects the real type, and the file is stored outside the website folder and registered in the media library.</desc>
+
+  <defs>
+    <marker id="upArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="430" fill="#ffffff"/>
+
+  <text x="32" y="42" font-size="20" font-weight="700" fill="#0f172a">Uploading an image safely</text>
+  <text x="32" y="66" font-size="12" fill="#64748b">The same 1 MB limit is enforced in the browser and again on the server.</text>
+
+  <!-- format chips -->
+  <rect x="600" y="52" width="56" height="24" rx="12" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="628" y="68" font-size="10" font-weight="700" text-anchor="middle" fill="#002370">JPEG</text>
+  <rect x="664" y="52" width="56" height="24" rx="12" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="692" y="68" font-size="10" font-weight="700" text-anchor="middle" fill="#002370">PNG</text>
+  <rect x="728" y="52" width="62" height="24" rx="12" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="759" y="68" font-size="10" font-weight="700" text-anchor="middle" fill="#002370">WEBP</text>
+  <rect x="808" y="46" width="120" height="34" rx="8" fill="#002370"/>
+  <text x="868" y="68" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">MAX 1 MB</text>
+
+  <!-- row 1 -->
+  <g>
+    <rect x="32" y="104" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="48" y="128" font-size="12" font-weight="700" fill="#0f172a">1. Choose a file</text>
+    <text x="48" y="148" font-size="10.5" fill="#475569">Pick or drag an image into the upload field.</text>
+    <text x="48" y="164" font-size="10.5" fill="#475569">The form checks size and type at once.</text>
+
+    <rect x="345" y="104" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="361" y="128" font-size="12" font-weight="700" fill="#0f172a">2. Upload request</text>
+    <text x="361" y="148" font-size="10.5" fill="#475569">Sent to the media upload endpoint with</text>
+    <text x="361" y="164" font-size="10.5" fill="#475569">your signed-in administrator session.</text>
+
+    <rect x="658" y="104" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="674" y="128" font-size="12" font-weight="700" fill="#0f172a">3. Server re-checks</text>
+    <text x="674" y="148" font-size="10.5" fill="#475569">1 MB hard limit, then the real type is</text>
+    <text x="674" y="164" font-size="10.5" fill="#475569">detected from the file's first bytes.</text>
+  </g>
+
+  <!-- row 1 arrows -->
+  <g stroke="#94a3b8" stroke-width="2">
+    <line x1="304" y1="142" x2="336" y2="142"/>
+    <line x1="617" y1="142" x2="649" y2="142"/>
+  </g>
+  <polygon points="342,142 333,137 333,147" fill="#94a3b8"/>
+  <polygon points="655,142 646,137 646,147" fill="#94a3b8"/>
+
+  <!-- connector 3 -> 4 -->
+  <path d="M793 182 L793 198 L167 198 L167 212" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#upArrow)"/>
+
+  <!-- row 2 -->
+  <g>
+    <rect x="32" y="216" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="48" y="240" font-size="12" font-weight="700" fill="#0f172a">4. Stored outside the site</text>
+    <text x="48" y="260" font-size="10.5" fill="#475569">Saved in the account's uploads folder,</text>
+    <text x="48" y="276" font-size="10.5" fill="#475569">not in public/ and not in the deploy tree.</text>
+
+    <rect x="345" y="216" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="361" y="240" font-size="12" font-weight="700" fill="#0f172a">5. Registered in Media</text>
+    <text x="361" y="260" font-size="10.5" fill="#475569">The database records the path, type,</text>
+    <text x="361" y="276" font-size="10.5" fill="#475569">size, and who uploaded it.</text>
+
+    <rect x="658" y="216" width="270" height="76" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="674" y="240" font-size="12" font-weight="700" fill="#0f172a">6. Path saved in the form</text>
+    <text x="674" y="260" font-size="10.5" fill="#475569">A preview appears. Save the record to</text>
+    <text x="674" y="276" font-size="10.5" fill="#475569">attach the image to that content.</text>
+  </g>
+
+  <!-- row 2 arrows -->
+  <g stroke="#94a3b8" stroke-width="2">
+    <line x1="304" y1="254" x2="336" y2="254"/>
+    <line x1="617" y1="254" x2="649" y2="254"/>
+  </g>
+  <polygon points="342,254 333,249 333,259" fill="#94a3b8"/>
+  <polygon points="655,254 646,249 646,259" fill="#94a3b8"/>
+
+  <!-- notes -->
+  <rect x="32" y="318" width="440" height="72" rx="9" fill="#e9f7ef" stroke="#a7f3d0"/>
+  <text x="50" y="342" font-size="12" font-weight="700" fill="#106b39">Accepted</text>
+  <text x="50" y="362" font-size="10.5" fill="#14532d">JPEG, PNG or WebP.</text>
+  <text x="50" y="378" font-size="10.5" fill="#14532d">1 MB (1,048,576 bytes) maximum.</text>
+
+  <rect x="488" y="318" width="440" height="72" rx="9" fill="#fef2f2" stroke="#fecaca"/>
+  <text x="506" y="342" font-size="12" font-weight="700" fill="#b91c1c">Rejected</text>
+  <text x="506" y="362" font-size="10.5" fill="#7f1d1d">Larger than 1 MB, GIF or SVG, or a non-image</text>
+  <text x="506" y="378" font-size="10.5" fill="#7f1d1d">file renamed with an image extension.</text>
+</svg>

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="370" viewBox="0 0 960 370" role="img" aria-labelledby="pubTitle pubDesc" font-family="Segoe UI, Arial, sans-serif">
+  <title id="pubTitle">How a change reaches the live website</title>
+  <desc id="pubDesc">Five steps: save a draft, review it, an administrator ticks Published and saves, the public page is revalidated, and the change appears on the live site.</desc>
+
+  <rect width="960" height="370" fill="#ffffff"/>
+
+  <text x="32" y="44" font-size="20" font-weight="700" fill="#0f172a">How a change reaches the live website</text>
+  <text x="32" y="68" font-size="12" fill="#64748b">A draft is private. An administrator publishes it, and the public page updates immediately.</text>
+
+  <!-- role chips -->
+  <rect x="32" y="84" width="106" height="18" rx="9" fill="#eef4ff" stroke="#bfdbfe"/>
+  <text x="85" y="97" font-size="8" font-weight="700" text-anchor="middle" fill="#002370">EDITOR OR ADMIN</text>
+
+  <rect x="400" y="84" width="86" height="18" rx="9" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="443" y="97" font-size="8" font-weight="700" text-anchor="middle" fill="#b45309">ADMIN ONLY</text>
+
+  <!-- boxes -->
+  <g>
+    <rect x="32" y="108" width="164" height="112" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="48" y="132" font-size="8" font-weight="700" letter-spacing="1" fill="#94a3b8">STEP 1 · EDIT</text>
+    <text x="48" y="154" font-size="14" font-weight="700" fill="#0f172a">Save a draft</text>
+    <text x="48" y="176" font-size="10.5" fill="#475569">Create or edit the</text>
+    <text x="48" y="192" font-size="10.5" fill="#475569">record. Leave</text>
+    <text x="48" y="208" font-size="10.5" fill="#475569">Published unticked.</text>
+
+    <rect x="216" y="108" width="164" height="112" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="232" y="132" font-size="8" font-weight="700" letter-spacing="1" fill="#94a3b8">STEP 2 · REVIEW</text>
+    <text x="232" y="154" font-size="14" font-weight="700" fill="#0f172a">Check the result</text>
+    <text x="232" y="176" font-size="10.5" fill="#475569">Read the text and</text>
+    <text x="232" y="192" font-size="10.5" fill="#475569">check images and</text>
+    <text x="232" y="208" font-size="10.5" fill="#475569">links. Courses can</text>
+    <text x="232" y="222" font-size="10.5" fill="#475569">be previewed.</text>
+
+    <rect x="400" y="108" width="164" height="112" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="416" y="132" font-size="8" font-weight="700" letter-spacing="1" fill="#94a3b8">STEP 3 · PUBLISH</text>
+    <text x="416" y="154" font-size="14" font-weight="700" fill="#0f172a">Tick Published</text>
+    <text x="416" y="176" font-size="10.5" fill="#475569">Save again. Editor</text>
+    <text x="416" y="192" font-size="10.5" fill="#475569">accounts cannot</text>
+    <text x="416" y="208" font-size="10.5" fill="#475569">change this flag.</text>
+
+    <rect x="584" y="108" width="164" height="112" rx="9" fill="#ffffff" stroke="#cbd5e1"/>
+    <text x="600" y="132" font-size="8" font-weight="700" letter-spacing="1" fill="#94a3b8">STEP 4 · REFRESH</text>
+    <text x="600" y="154" font-size="14" font-weight="700" fill="#0f172a">Page revalidates</text>
+    <text x="600" y="176" font-size="10.5" fill="#475569">The save refreshes</text>
+    <text x="600" y="192" font-size="10.5" fill="#475569">the affected public</text>
+    <text x="600" y="208" font-size="10.5" fill="#475569">and admin pages.</text>
+
+    <rect x="768" y="108" width="160" height="112" rx="9" fill="#eef4ff" stroke="#bfdbfe"/>
+    <text x="784" y="132" font-size="8" font-weight="700" letter-spacing="1" fill="#002370">STEP 5 · LIVE</text>
+    <text x="784" y="154" font-size="14" font-weight="700" fill="#002370">Visible on the site</text>
+    <text x="784" y="176" font-size="10.5" fill="#334155">Open the public</text>
+    <text x="784" y="192" font-size="10.5" fill="#334155">page and confirm</text>
+    <text x="784" y="208" font-size="10.5" fill="#334155">the change.</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#94a3b8" stroke-width="2">
+    <line x1="198" y1="164" x2="208" y2="164"/>
+    <line x1="382" y1="164" x2="392" y2="164"/>
+    <line x1="566" y1="164" x2="576" y2="164"/>
+    <line x1="750" y1="164" x2="760" y2="164"/>
+  </g>
+  <g fill="#94a3b8">
+    <polygon points="214,164 205,159 205,169"/>
+    <polygon points="398,164 389,159 389,169"/>
+    <polygon points="582,164 573,159 573,169"/>
+    <polygon points="766,164 757,159 757,169"/>
+  </g>
+
+  <!-- notes -->
+  <rect x="32" y="248" width="896" height="86" rx="10" fill="#f8fafc" stroke="#e2e8f0"/>
+  <circle cx="54" cy="274" r="3" fill="#002370"/>
+  <text x="68" y="278" font-size="11.5" fill="#334155">A draft is invisible to visitors. Untick <tspan font-weight="700">Published</tspan> and save to take a page down again.</text>
+  <circle cx="54" cy="302" r="3" fill="#002370"/>
+  <text x="68" y="306" font-size="11.5" fill="#334155"><tspan font-weight="700">Editors</tspan> can create and edit drafts. Publishing, deleting, and the Users, Settings, SEO, and Media pages need an <tspan font-weight="700">Administrator</tspan>.</text>
+  <circle cx="54" cy="326" r="3" fill="#b45309"/>
+  <text x="68" y="330" font-size="11.5" fill="#334155">Deleting is permanent. A deleted record's uploaded image is removed only when nothing else on the site uses it.</text>
+</svg>

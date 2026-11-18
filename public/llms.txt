@@ -1,0 +1,36 @@
+# S. Thangapazham College of Engineering and Technology (STCET)
+
+> Official website of S. Thangapazham College of Engineering and Technology, an engineering college in Vasudevanallur, Tenkasi District, Tamil Nadu, India.
+
+Use the following pages as the primary sources for information about the college, its programmes, admissions, campus, and student services.
+
+## Main pages
+
+- [Home](https://stcet.in/): College overview and campus highlights.
+- [About](https://stcet.in/about): About the institution.
+- [Admissions](https://stcet.in/admissions): Admission information and eligibility.
+- [Courses](https://stcet.in/courses): Engineering programmes.
+- [Faculties](https://stcet.in/faculties): Faculty information.
+- [Infrastructure](https://stcet.in/infrastructure): Campus facilities.
+- [Placements](https://stcet.in/placements): Placement information.
+- [Scholarships](https://stcet.in/scholarships): Scholarship information.
+- [Events](https://stcet.in/events): College events.
+- [Gallery](https://stcet.in/gallery): Campus and college photos.
+- [Contact](https://stcet.in/contact): Contact information.
+- [Enquire now](https://stcet.in/enquire-now): Admissions enquiry.
+
+## Engineering programmes
+
+- [Computer Science and Engineering](https://stcet.in/courses/computer-science-engineering)
+- [Computer Science and Engineering (AI/ML)](https://stcet.in/courses/computer-science-ai-ml)
+- [Information Technology](https://stcet.in/courses/information-technology)
+- [Electronics and Communication Engineering](https://stcet.in/courses/electronics-communication-engineering)
+- [Electrical and Electronics Engineering](https://stcet.in/courses/electrical-electronics-engineering)
+
+## Institutional information
+
+- [IQAC](https://stcet.in/iqac)
+- [Anti-Ragging Committee](https://stcet.in/anti-ragging-committee)
+- [Grievance Redressal Committee](https://stcet.in/grievance-redressal-committee)
+- [Internal Complaints Committee](https://stcet.in/internal-complaints-committee)
+- [SC/ST Cell](https://stcet.in/sc-st-cell)
